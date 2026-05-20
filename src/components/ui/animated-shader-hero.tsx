@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, CheckCircle2, Bot, Globe, TrendingUp, Sparkles } from 'lucide-react'
+import { ArrowRight, Bot, Globe, Sparkles, Volume2, VolumeX } from 'lucide-react'
 
 // ── WebGL shader source ──────────────────────────────────────────────────────
 
@@ -220,9 +220,9 @@ function ShaderCanvas() {
 // ── Feature pills ─────────────────────────────────────────────────────────────
 
 const FEATURES = [
-  { icon: Globe, label: 'Webs Premium' },
-  { icon: TrendingUp, label: 'SEO Avanzado' },
-  { icon: Bot, label: 'Agentes IA' },
+  { icon: Globe, label: 'Videomapping & DanceMapping' },
+  { icon: Sparkles, label: 'Webs Premium' },
+  { icon: Bot, label: 'Avatares Interactivos' },
 ]
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -236,16 +236,25 @@ interface AnimatedShaderHeroProps {
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export function AnimatedShaderHero({
-  headline1 = 'Transforma Tu Negocio',
-  headline2 = 'Con IA y Automatización',
-  subtitle  = 'IMMERSO Studio — Webs premium, SEO y agentes de IA para empresas que quieren destacar.',
+  headline1 = 'NEXUS',
+  headline2 = '360',
+  subtitle  = 'Experiencias inmersivas. Soluciones 360° que transforman eventos, espacios y marcas.',
 }: AnimatedShaderHeroProps) {
   const [visible, setVisible] = useState(false)
+  const [muted, setMuted] = useState(true)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 120)
     return () => clearTimeout(t)
   }, [])
+
+  function toggleMute() {
+    setMuted(m => {
+      if (videoRef.current) videoRef.current.muted = !m
+      return !m
+    })
+  }
 
   const fadeUp = (delay: number): React.CSSProperties => ({
     opacity:   visible ? 1 : 0,
@@ -284,16 +293,19 @@ export function AnimatedShaderHero({
 
           {/* Headline */}
           <div style={fadeUp(160)}>
-            <h1 className="text-5xl sm:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.06]">
-              <span className="text-white drop-shadow-lg">{headline1}</span>
-              <br />
+            <h1 className="font-black leading-none tracking-tighter">
               <span
-                className="bg-clip-text text-transparent"
+                className="block bg-clip-text text-transparent"
                 style={{
-                  backgroundImage:
-                    'linear-gradient(135deg, #a78bfa 0%, #818cf8 40%, #38bdf8 100%)',
-                  filter: 'drop-shadow(0 0 32px rgba(139,92,246,0.5))',
+                  backgroundImage: 'linear-gradient(135deg, #22d3ee 0%, #a78bfa 50%, #ec4899 100%)',
+                  fontSize: 'clamp(5rem, 14vw, 10rem)',
                 }}
+              >
+                {headline1}
+              </span>
+              <span
+                className="block text-white"
+                style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', marginTop: '-0.1em' }}
               >
                 {headline2}
               </span>
@@ -340,108 +352,45 @@ export function AnimatedShaderHero({
           </div>
 
           {/* Trust line */}
-          <div style={fadeUp(800)} className="flex items-center gap-2 text-sm text-white/40">
-            <CheckCircle2 className="size-4 text-violet-400 shrink-0" />
-            Sin permanencias · Resultados medibles · Soporte dedicado
+          <div style={fadeUp(800)} className="text-sm text-white/35 font-mono tracking-wider uppercase">
+            Girasomnis · IMMERSO · Madrid
           </div>
         </div>
 
-        {/* Right — glowing stat cards */}
+        {/* Right — hero video */}
         <div
           style={{
             opacity:   visible ? 1 : 0,
             transform: visible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.96)',
             transition: 'opacity 1s ease 500ms, transform 1s ease 500ms',
           }}
-          className="relative hidden lg:flex flex-col gap-4"
+          className="relative hidden lg:block"
         >
-          {/* Main card */}
           <div
-            className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
-            style={{ boxShadow: '0 0 64px rgba(124,58,237,0.15), inset 0 0 0 1px rgba(255,255,255,0.08)' }}
+            className="relative rounded-2xl overflow-hidden border border-white/10"
+            style={{ boxShadow: '0 0 64px rgba(0,212,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.07)' }}
           >
-            <div
-              className="h-[320px] w-full"
-              style={{
-                background: 'linear-gradient(135deg, rgba(124,58,237,0.25) 0%, rgba(79,70,229,0.15) 50%, rgba(56,189,248,0.1) 100%)',
-                backdropFilter: 'blur(8px)',
-              }}
+            <video
+              ref={videoRef}
+              src="/Hero.mp4"
+              autoPlay
+              loop
+              muted={muted}
+              playsInline
+              preload="none"
+              className="w-full h-auto block"
+              style={{ maxHeight: '520px', objectFit: 'cover' }}
             />
-
-            {/* Mock UI lines */}
-            <div className="absolute inset-0 p-6 flex flex-col justify-between">
-              <div className="flex items-center gap-3">
-                <div className="size-8 rounded-full bg-violet-500/30 flex items-center justify-center">
-                  <Bot className="size-4 text-violet-300" />
-                </div>
-                <div className="space-y-1">
-                  <div className="h-2.5 w-28 rounded-full bg-white/20" />
-                  <div className="h-2 w-16 rounded-full bg-white/10" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="h-2 w-full rounded-full bg-white/10" />
-                <div className="h-2 w-4/5 rounded-full bg-white/10" />
-                <div className="h-2 w-3/5 rounded-full bg-white/10" />
-              </div>
-            </div>
-
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#07040f]/80 to-transparent" />
-
-            {/* Stat bar */}
-            <div
-              className="absolute bottom-5 left-5 right-5 rounded-xl p-4 flex items-center justify-between gap-4 border border-white/10"
-              style={{ background: 'rgba(7,4,15,0.75)', backdropFilter: 'blur(12px)' }}
+            {/* Subtle gradient overlay bottom */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#010305]/60 via-transparent to-transparent pointer-events-none" />
+            {/* Mute / unmute toggle */}
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? 'Activar sonido' : 'Silenciar'}
+              className="absolute bottom-3 right-3 flex items-center justify-center size-9 rounded-full bg-black/50 border border-white/15 text-white backdrop-blur-sm hover:bg-black/70 transition-colors z-10"
             >
-              {[
-                { label: 'Proyectos completados', value: '+120' },
-                { label: 'Satisfacción cliente', value: '98%' },
-                { label: 'Años de experiencia', value: '5+' },
-              ].map((s, i) => (
-                <div key={s.label} className="flex-1 text-center">
-                  {i > 0 && <div className="absolute w-px h-8 bg-white/10" style={{ left: `${i * 33.3}%` }} />}
-                  <p className="text-[10px] text-white/40 leading-tight">{s.label}</p>
-                  <p className="text-xl font-bold text-white mt-0.5">{s.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Secondary cards row */}
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { icon: Globe, title: 'Rendimiento Web', sub: 'Core Web Vitals · 100/100', color: '#38bdf8' },
-              { icon: TrendingUp, title: 'SEO Posicionamiento', sub: 'Top 3 en 90 días', color: '#a78bfa' },
-            ].map(({ icon: Icon, title, sub, color }) => (
-              <div
-                key={title}
-                className="rounded-xl border border-white/10 p-4 space-y-3"
-                style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  backdropFilter: 'blur(8px)',
-                }}
-              >
-                <div className="size-9 rounded-lg flex items-center justify-center" style={{ background: `${color}22` }}>
-                  <Icon className="size-4" style={{ color }} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">{title}</p>
-                  <p className="text-xs text-white/40 mt-0.5">{sub}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* IA badge */}
-          <div
-            className="absolute -top-3 -right-3 px-3 py-1.5 rounded-full text-xs font-bold text-white"
-            style={{
-              background: 'linear-gradient(135deg, #7c3aed, #4f46e5)',
-              boxShadow: '0 0 16px rgba(124,58,237,0.6)',
-            }}
-          >
-            IA Powered
+              {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
+            </button>
           </div>
         </div>
       </div>
