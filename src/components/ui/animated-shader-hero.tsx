@@ -358,9 +358,9 @@ export function AnimatedShaderHero({
             transform: visible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.96)',
             transition: 'opacity 1s ease 500ms, transform 1s ease 500ms',
           }}
-          className="relative hidden lg:flex items-center justify-center"
+          className="relative flex items-center justify-center"
         >
-          <div className="w-full" style={{ height: '520px' }}>
+          <div className="w-full" style={{ height: 'clamp(280px, 50vw, 520px)' }}>
             <Suspense fallback={
               <div className="flex items-center justify-center w-full h-full">
                 <div className="size-8 rounded-full border-2 border-transparent animate-spin"
