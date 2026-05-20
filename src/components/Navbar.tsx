@@ -32,7 +32,7 @@ export function Navbar() {
         {/* Logo */}
         <a href="#" className="flex items-center gap-2 font-bold text-foreground text-lg">
           <Sparkles className="size-5 text-primary" />
-          IMMERSO
+          NEXUS 360
         </a>
 
         {/* Desktop nav */}

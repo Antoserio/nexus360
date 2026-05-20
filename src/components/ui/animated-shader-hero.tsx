@@ -281,7 +281,7 @@ export function AnimatedShaderHero({
           <div style={fadeUp(0)}>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 text-white/70 text-sm font-medium backdrop-blur-sm">
               <Sparkles className="size-3.5 text-violet-400" />
-              Agencia Digital con IA
+              Soluciones digitales 360
             </span>
           </div>
 
@@ -347,7 +347,7 @@ export function AnimatedShaderHero({
 
           {/* Trust line */}
           <div style={fadeUp(800)} className="text-sm text-white/35 font-mono tracking-wider uppercase">
-            Girasomnis · IMMERSO · Madrid
+            Girasomnis · IMMERSO · Madrid · Valencia
           </div>
         </div>
 
