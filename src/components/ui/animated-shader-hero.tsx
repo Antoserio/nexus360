@@ -357,14 +357,14 @@ export function AnimatedShaderHero({
           </div>
         </div>
 
-        {/* Right — hero video */}
+        {/* Right — hero video (visible on all sizes, below text on mobile) */}
         <div
           style={{
             opacity:   visible ? 1 : 0,
             transform: visible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.96)',
             transition: 'opacity 1s ease 500ms, transform 1s ease 500ms',
           }}
-          className="relative hidden lg:block"
+          className="relative"
         >
           <div
             className="relative rounded-2xl overflow-hidden border border-white/10"
@@ -379,7 +379,7 @@ export function AnimatedShaderHero({
               playsInline
               preload="none"
               className="w-full h-auto block"
-              style={{ maxHeight: '520px', objectFit: 'cover' }}
+              style={{ maxHeight: '60vw', objectFit: 'cover' }}
             />
             {/* Subtle gradient overlay bottom */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#010305]/60 via-transparent to-transparent pointer-events-none" />
