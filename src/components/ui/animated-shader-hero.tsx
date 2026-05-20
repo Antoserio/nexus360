@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, Bot, Globe, Sparkles, Volume2, VolumeX } from 'lucide-react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { ArrowRight, Bot, Globe, Sparkles } from 'lucide-react'
+
+const Spline = lazy(() => import('@splinetool/react-spline'))
+const SPLINE_SCENE = 'https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode'
 
 // ── WebGL shader source ──────────────────────────────────────────────────────
 
@@ -241,20 +244,11 @@ export function AnimatedShaderHero({
   subtitle  = 'Experiencias inmersivas. Soluciones 360° que transforman eventos, espacios y marcas.',
 }: AnimatedShaderHeroProps) {
   const [visible, setVisible] = useState(false)
-  const [muted, setMuted] = useState(true)
-  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 120)
     return () => clearTimeout(t)
   }, [])
-
-  function toggleMute() {
-    setMuted(m => {
-      if (videoRef.current) videoRef.current.muted = !m
-      return !m
-    })
-  }
 
   const fadeUp = (delay: number): React.CSSProperties => ({
     opacity:   visible ? 1 : 0,
@@ -357,40 +351,24 @@ export function AnimatedShaderHero({
           </div>
         </div>
 
-        {/* Right — hero video (visible on all sizes, below text on mobile) */}
+        {/* Right — Spline robot */}
         <div
           style={{
             opacity:   visible ? 1 : 0,
             transform: visible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.96)',
             transition: 'opacity 1s ease 500ms, transform 1s ease 500ms',
           }}
-          className="relative"
+          className="relative hidden lg:flex items-center justify-center"
         >
-          <div
-            className="relative rounded-2xl overflow-hidden border border-white/10"
-            style={{ boxShadow: '0 0 64px rgba(0,212,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.07)' }}
-          >
-            <video
-              ref={videoRef}
-              src="/Hero.mp4"
-              autoPlay
-              loop
-              muted={muted}
-              playsInline
-              preload="none"
-              className="w-full h-auto block"
-              style={{ maxHeight: '60vw', objectFit: 'cover' }}
-            />
-            {/* Subtle gradient overlay bottom */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#010305]/60 via-transparent to-transparent pointer-events-none" />
-            {/* Mute / unmute toggle */}
-            <button
-              onClick={toggleMute}
-              aria-label={muted ? 'Activar sonido' : 'Silenciar'}
-              className="absolute bottom-3 right-3 flex items-center justify-center size-9 rounded-full bg-black/50 border border-white/15 text-white backdrop-blur-sm hover:bg-black/70 transition-colors z-10"
-            >
-              {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
-            </button>
+          <div className="w-full" style={{ height: '520px' }}>
+            <Suspense fallback={
+              <div className="flex items-center justify-center w-full h-full">
+                <div className="size-8 rounded-full border-2 border-transparent animate-spin"
+                  style={{ borderTopColor: '#00d4ff', borderRightColor: 'rgba(0,212,255,0.2)' }} />
+              </div>
+            }>
+              <Spline scene={SPLINE_SCENE} style={{ width: '100%', height: '100%' }} />
+            </Suspense>
           </div>
         </div>
       </div>

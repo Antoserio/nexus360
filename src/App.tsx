@@ -1,6 +1,6 @@
 import { Navbar } from '@/components/Navbar'
 import { AnimatedShaderHero } from '@/components/ui/animated-shader-hero'
-import { SplineScene } from '@/components/ui/spline-scene'
+import { VideoSection } from '@/components/VideoSection'
 import { NexusSection } from '@/components/NexusSection'
 import { Footer } from '@/components/Footer'
 
@@ -10,7 +10,7 @@ function App() {
       <Navbar />
       <main>
         <AnimatedShaderHero />
-        <SplineScene />
+        <VideoSection />
         <NexusSection />
       </main>
       <Footer />
