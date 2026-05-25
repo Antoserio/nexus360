@@ -400,7 +400,12 @@ export default function AiaSomnisPage() {
         <div className="absolute inset-0 backdrop-blur-md"
           style={{ background: 'rgba(5,7,13,0.85)', borderBottom: `1px solid ${C.border}` }} />
         <div className="relative z-10 flex items-center justify-between w-full">
-          <span className="font-black text-lg tracking-widest" style={{ color: C.blue }}>AIA-SOMNIS</span>
+          <span className="font-black text-base tracking-widest" style={{ color: C.blue }}>AIA-SOMNIS</span>
+          {/* Mobile: just contact link */}
+          <a href="#contacto" className="md:hidden px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+            style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white }}>
+            Contacto
+          </a>
           <div className="hidden md:flex items-center gap-6">
             {SERVICES.map((s, i) => (
               <button key={s.id} onClick={() => scrollTo(i)}
@@ -439,17 +444,19 @@ export default function AiaSomnisPage() {
           }}
           transition={{ duration: 0.5 }} />
 
-        {/* ── 4 CORNER CARDS ── */}
-        {([0, 1, 2, 3] as const).map(corner => (
-          <HudCard
-            key={corner}
-            s={SERVICES[CORNER_SERVICE[corner]]}
-            delay={300 + corner * 100}
-            corner={corner}
-            active={heroQuadrant === corner}
-            visible={heroVisible}
-          />
-        ))}
+        {/* ── 4 CORNER CARDS — desktop only ── */}
+        <div className="hidden lg:contents">
+          {([0, 1, 2, 3] as const).map(corner => (
+            <HudCard
+              key={corner}
+              s={SERVICES[CORNER_SERVICE[corner]]}
+              delay={300 + corner * 100}
+              corner={corner}
+              active={heroQuadrant === corner}
+              visible={heroVisible}
+            />
+          ))}
+        </div>
 
         {/* ── CENTER: Robot + title + CTA ── */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none">
@@ -468,8 +475,8 @@ export default function AiaSomnisPage() {
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.95)',
             transition: 'opacity 1.1s ease 300ms, transform 1.1s ease 300ms',
-            width: 'clamp(280px, 38vw, 520px)',
-            height: 'clamp(280px, 38vw, 520px)',
+            width: 'clamp(220px, 55vw, 520px)',
+            height: 'clamp(220px, 55vw, 520px)',
             position: 'relative',
             pointerEvents: 'auto',
           }}>
@@ -508,15 +515,27 @@ export default function AiaSomnisPage() {
           </div>
 
           {/* CTAs */}
-          <div style={fadeUp(600)} className="flex flex-wrap gap-4 justify-center mt-7 pointer-events-auto">
-            <button onClick={() => scrollTo(0)} className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
+          <div style={fadeUp(600)} className="flex flex-wrap gap-3 justify-center mt-6 pointer-events-auto px-6">
+            <button onClick={() => scrollTo(0)} className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
               style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white, boxShadow: `0 0 30px rgba(0,184,255,0.35)` }}>
-              Ver servicios <ArrowRight size={16} />
+              Ver servicios <ArrowRight size={15} />
             </button>
-            <a href="#contacto" className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
+            <a href="#contacto" className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
               style={{ border: `1px solid ${C.border}`, color: C.gray, background: 'rgba(255,255,255,0.03)' }}>
               Contactar
             </a>
+          </div>
+
+          {/* Mobile-only service grid (corner cards hidden on mobile) */}
+          <div className="lg:hidden grid grid-cols-2 gap-2 mt-5 px-6 pointer-events-auto w-full max-w-sm" style={fadeUp(750)}>
+            {SERVICES.map((s, i) => (
+              <button key={s.id} onClick={() => scrollTo(i)}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-left"
+                style={{ background: 'rgba(5,10,20,0.75)', border: `1px solid ${C.border}` }}>
+                <span className="font-black text-xs flex-shrink-0" style={{ color: s.accent }}>{s.num}</span>
+                <span className="text-xs leading-tight truncate" style={{ color: C.gray }}>{s.title}</span>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -584,8 +603,8 @@ export default function AiaSomnisPage() {
                   }} />
 
                 {/* ── TOP: compact service info ── */}
-                <div className="relative z-10 flex items-start gap-5"
-                  style={{ padding: 'clamp(1.8rem, 3vw, 3rem) clamp(1.8rem, 3vw, 3rem) 1.2rem' }}>
+                <div className="relative z-10 flex items-start gap-3 md:gap-5"
+                  style={{ padding: 'clamp(1.2rem, 3vw, 3rem) clamp(1rem, 3vw, 3rem) 1rem' }}>
                   {/* Big number watermark */}
                   <span className="font-black leading-none select-none flex-shrink-0"
                     style={{
@@ -613,8 +632,8 @@ export default function AiaSomnisPage() {
 
                 {/* ── CENTER: full-width dark reel area ── */}
                 {/* NO overflow-hidden — position:fixed trail images must escape to viewport */}
-                <div className="flex-1 relative mx-5 mb-5"
-                  style={{ minHeight: 340, borderRadius: 16, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}` }}>
+                <div className="flex-1 relative mx-3 mb-3 md:mx-5 md:mb-5"
+                  style={{ minHeight: 'clamp(240px, 40vh, 400px)', borderRadius: 14, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}` }}>
                   {/* Accent corner glow when active */}
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 pointer-events-none"
                     style={{
@@ -865,15 +884,19 @@ export default function AiaSomnisPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.15 }}>
-              <Magazine3D
-                cover={MAG_COVER}
-                pages={MAG_PAGES}
-                width={250}
-                height={340}
-                accent={C.blue}
-                title="AIA-SOMNIS"
-                subtitle="Portfolio 2024"
-              />
+              {/* Scale down on mobile so it always fits the screen */}
+              <div style={{ transform: 'scale(var(--mag-scale, 1))', transformOrigin: 'center top' }}
+                className="[--mag-scale:0.82] sm:[--mag-scale:0.92] md:[--mag-scale:1]">
+                <Magazine3D
+                  cover={MAG_COVER}
+                  pages={MAG_PAGES}
+                  width={250}
+                  height={340}
+                  accent={C.blue}
+                  title="AIA-SOMNIS"
+                  subtitle="Portfolio 2024"
+                />
+              </div>
             </motion.div>
 
           </div>
