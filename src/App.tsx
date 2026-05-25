@@ -1,21 +1,7 @@
-import { Navbar } from '@/components/Navbar'
-import { AnimatedShaderHero } from '@/components/ui/animated-shader-hero'
-import { VideoSection } from '@/components/VideoSection'
-import { NexusSection } from '@/components/NexusSection'
-import { Footer } from '@/components/Footer'
+import AiaSomnisPage from './AiaSomnisPage'
 
 function App() {
-  return (
-    <>
-      <Navbar />
-      <main>
-        <AnimatedShaderHero />
-        <VideoSection />
-        <NexusSection />
-      </main>
-      <Footer />
-    </>
-  )
+  return <AiaSomnisPage />
 }
 
 export default App
