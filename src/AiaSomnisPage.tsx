@@ -64,13 +64,13 @@ const px = (id: number, w = 600, h = 400) =>
 // Trail images per service (6 Pexels photos each — swap for real project images)
 const TRAIL_IMAGES: string[][] = [
   // 01 Avatares IA — robots, AI, holograms, tech
-  [8386440, 8386434, 8386422, 3861969, 8294404, 3862021].map(id => px(id)),
+  [8386440, 8386434, 8386422, 3861969, 8294404, 3862021].map(id => px(id, 400, 400)),
   // 02 Instalaciones interactivas — events, screens, exhibitions
-  [1190297, 2608517, 1449940, 3861974, 1105666, 3075993].map(id => px(id)),
+  [1190297, 2608517, 1449940, 3861974, 1105666, 3075993].map(id => px(id, 400, 400)),
   // 03 Visuales generativos — neon, abstract art, colorful
-  [2387418, 3756165, 1762851, 3612885, 2685229, 1279813].map(id => px(id)),
+  [2387418, 3756165, 1762851, 3612885, 2685229, 1279813].map(id => px(id, 400, 400)),
   // 04 Digital / dev — code, laptops, web
-  [574069, 1181271, 546819, 3183150, 270360, 1181244].map(id => px(id)),
+  [574069, 1181271, 546819, 3183150, 270360, 1181244].map(id => px(id, 400, 400)),
 ]
 
 // Projects for FxSlider — real Pexels backgrounds
@@ -202,6 +202,41 @@ function RobotEye({ active }: { active: number }) {
   )
 }
 
+// ── HUD service card (hero corners) ───────────────────────────────────────────
+function HudCard({ s, delay, side }: { s: typeof SERVICES[0]; delay: number; side: 'left' | 'right' }) {
+  const [vis, setVis] = useState(false)
+  useEffect(() => { const t = setTimeout(() => setVis(true), delay); return () => clearTimeout(t) }, [delay])
+  return (
+    <div style={{
+      opacity: vis ? 1 : 0,
+      transform: vis ? 'translateY(0)' : `translateY(${side === 'left' ? '-' : ''}16px)`,
+      transition: 'opacity 0.7s ease, transform 0.7s ease',
+    }}>
+      <div className="relative p-4 rounded-xl"
+        style={{ background: 'rgba(5,10,20,0.7)', border: `1px solid ${C.border}`, backdropFilter: 'blur(12px)', minWidth: 180 }}>
+        {/* HUD corner brackets */}
+        <div className="absolute top-0 left-0 w-3 h-3" style={{ borderTop: `1.5px solid ${s.accent}`, borderLeft: `1.5px solid ${s.accent}` }} />
+        <div className="absolute top-0 right-0 w-3 h-3" style={{ borderTop: `1.5px solid ${s.accent}`, borderRight: `1.5px solid ${s.accent}` }} />
+        <div className="absolute bottom-0 left-0 w-3 h-3" style={{ borderBottom: `1.5px solid ${s.accent}`, borderLeft: `1.5px solid ${s.accent}` }} />
+        <div className="absolute bottom-0 right-0 w-3 h-3" style={{ borderBottom: `1.5px solid ${s.accent}`, borderRight: `1.5px solid ${s.accent}` }} />
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5"
+            style={{ background: `${s.accent}18`, border: `1px solid ${s.accent}35` }}>
+            <span className="font-black text-xs" style={{ color: s.accent }}>{s.num}</span>
+          </div>
+          <div>
+            <h3 className="font-bold text-sm leading-tight mb-1" style={{ color: C.white }}>{s.title}</h3>
+            <p className="text-xs leading-snug" style={{ color: C.gray }}>{s.subtitle}</p>
+          </div>
+        </div>
+        {/* Connector line stub */}
+        <div className={`absolute top-1/2 -translate-y-1/2 h-px w-6 ${side === 'left' ? '-right-6' : '-left-6'}`}
+          style={{ background: `linear-gradient(${side === 'left' ? 'to right' : 'to left'}, transparent, ${s.accent}60)` }} />
+      </div>
+    </div>
+  )
+}
+
 // ── Social icons ──────────────────────────────────────────────────────────────
 const IconLinkedin = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -297,85 +332,105 @@ export default function AiaSomnisPage() {
         </div>
       </motion.nav>
 
-      {/* ══════════ HERO ══════════ */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden"
-        style={{ background: `radial-gradient(ellipse at 60% 40%, #102B4A 0%, ${C.bg2} 45%, ${C.bg} 100%)` }}>
+      {/* ══════════ HERO — Centered HUD layout ══════════ */}
+      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
+        style={{ background: `radial-gradient(ellipse at 50% 40%, #102B4A 0%, ${C.bg2} 45%, ${C.bg} 100%)` }}>
+
+        {/* Grid overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
           style={{ backgroundImage: `linear-gradient(${C.blue} 1px, transparent 1px), linear-gradient(90deg, ${C.blue} 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
-          style={{ background: `radial-gradient(circle, rgba(0,184,255,0.08) 0%, transparent 70%)` }} />
+        {/* Central glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
+          style={{ background: `radial-gradient(circle, rgba(0,184,255,0.09) 0%, transparent 65%)` }} />
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-10 py-24 grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <div style={fadeUp(0)}>
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
-                style={{ background: 'rgba(0,184,255,0.08)', border: `1px solid rgba(0,184,255,0.25)`, color: C.blue }}>
-                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.blue }} />
-                Artificial Intelligence Agency
-              </span>
+        {/* Badge */}
+        <div className="relative z-10 mb-6" style={fadeUp(0)}>
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
+            style={{ background: 'rgba(0,184,255,0.08)', border: `1px solid rgba(0,184,255,0.25)`, color: C.blue }}>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.blue }} />
+            Artificial Intelligence Agency
+          </span>
+        </div>
+
+        {/* ── 3-column HUD: [left cards] [robot] [right cards] ── */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 flex items-center justify-center gap-0">
+
+          {/* LEFT cards: 01 top, 02 bottom */}
+          <div className="hidden lg:flex flex-col gap-5 items-end" style={{ width: 220, flexShrink: 0 }}>
+            <HudCard s={SERVICES[0]} delay={400} side="left" />
+            <HudCard s={SERVICES[1]} delay={550} side="left" />
+          </div>
+
+          {/* CENTER: Spline robot + title */}
+          <div className="flex-1 flex flex-col items-center" style={{ minWidth: 0, maxWidth: 560 }}>
+            {/* Robot */}
+            <div style={{
+              opacity: heroVisible ? 1 : 0,
+              transform: heroVisible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.95)',
+              transition: 'opacity 1.1s ease 300ms, transform 1.1s ease 300ms',
+              width: '100%',
+              height: 'clamp(300px, 45vw, 520px)',
+              position: 'relative',
+            }}>
+              {splineInView ? (
+                <Suspense fallback={
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
+                      style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
+                  </div>
+                }>
+                  <Spline scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" style={{ width: '100%', height: '100%' }} />
+                </Suspense>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
+                    style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
+                </div>
+              )}
+              {/* Gold ground glow */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-56 h-8 blur-2xl pointer-events-none"
+                style={{ background: `radial-gradient(ellipse, ${C.gold}50, transparent)` }} />
             </div>
-            <div style={fadeUp(150)}>
-              <h1 className="font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3.5rem,9vw,7.5rem)' }}>
+
+            {/* Title below robot */}
+            <div className="text-center mt-2 px-4" style={fadeUp(200)}>
+              <h1 className="font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3rem,8vw,6.5rem)' }}>
                 <span className="block" style={{ color: C.white }}>AIA</span>
                 <span className="block" style={{
                   backgroundImage: `linear-gradient(90deg, ${C.blue} 0%, ${C.deep} 55%, ${C.gold} 100%)`,
                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
                 }}>SOMNIS</span>
               </h1>
-            </div>
-            <div style={fadeUp(300)}>
-              <p className="text-lg leading-relaxed max-w-md" style={{ color: C.gray }}>
-                Para eventos, marcas y cultura.{' '}
-                <span style={{ color: C.white }}>Avatares IA, instalaciones interactivas, visuales generativos y soluciones digitales.</span>
+              <p className="text-sm md:text-base mt-3 max-w-sm mx-auto" style={{ color: C.gray }}>
+                Para <span style={{ color: C.white }}>eventos, marcas y cultura.</span>
               </p>
             </div>
-            <div style={fadeUp(450)} className="flex flex-wrap gap-4">
-              <button onClick={() => scrollTo(0)} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm tracking-wide"
+
+            {/* CTA buttons */}
+            <div style={fadeUp(600)} className="flex flex-wrap gap-4 justify-center mt-8">
+              <button onClick={() => scrollTo(0)} className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
                 style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white, boxShadow: `0 0 30px rgba(0,184,255,0.35)` }}>
                 Ver servicios <ArrowRight size={16} />
               </button>
-              <a href="#contacto" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm tracking-wide"
+              <a href="#contacto" className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
                 style={{ border: `1px solid ${C.border}`, color: C.gray, background: 'rgba(255,255,255,0.03)' }}>
                 Contactar
               </a>
             </div>
-            <div style={fadeUp(600)} className="flex gap-4 pt-2">
-              {SERVICES.map((s, i) => (
-                <button key={s.id} onClick={() => scrollTo(i)} className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest"
-                  style={{ color: C.gray }}>
-                  <span className="w-1 h-1 rounded-full" style={{ background: s.accent }} />{s.num}
-                </button>
-              ))}
-            </div>
           </div>
 
-          {/* Spline robot */}
-          <div style={{
-            opacity: heroVisible ? 1 : 0,
-            transform: heroVisible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.95)',
-            transition: 'opacity 1.1s ease 500ms, transform 1.1s ease 500ms',
-          }} className="h-[360px] sm:h-[460px] md:h-[600px] order-first md:order-last relative">
-            {splineInView ? (
-              <Suspense fallback={
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
-                    style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
-                </div>
-              }>
-                <Spline scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" style={{ width: '100%', height: '100%' }} />
-              </Suspense>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
-                  style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
-              </div>
-            )}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-6 blur-2xl pointer-events-none"
-              style={{ background: `radial-gradient(ellipse, ${C.gold}40, transparent)` }} />
+          {/* RIGHT cards: 03 top, 04 bottom */}
+          <div className="hidden lg:flex flex-col gap-5 items-start" style={{ width: 220, flexShrink: 0 }}>
+            <HudCard s={SERVICES[2]} delay={400} side="right" />
+            <HudCard s={SERVICES[3]} delay={550} side="right" />
           </div>
         </div>
 
-        <div style={fadeUp(900)} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+        {/* Horizontal scan line decoration */}
+        <div className="absolute left-0 right-0 pointer-events-none" style={{ top: '50%', height: 1, background: `linear-gradient(90deg, transparent, ${C.blue}20, ${C.blue}40, ${C.blue}20, transparent)` }} />
+
+        {/* Scroll indicator */}
+        <div style={fadeUp(900)} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
           <span className="text-xs uppercase tracking-widest" style={{ color: C.gray }}>Scroll</span>
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
             <ChevronDown size={20} style={{ color: C.blue }} />
@@ -388,9 +443,9 @@ export default function AiaSomnisPage() {
       {/* ══════════ SERVICIOS ══════════ */}
       <section id="servicios">
         <div className="flex" style={{ background: C.bg }}>
-          {/* LEFT: sticky robot */}
+          {/* LEFT: sticky robot eye */}
           <div className="hidden lg:flex flex-col items-center justify-center gap-8 sticky top-0 h-screen"
-            style={{ width: '38%', flexShrink: 0, borderRight: `1px solid ${C.border}` }}>
+            style={{ width: '34%', flexShrink: 0, borderRight: `1px solid ${C.border}` }}>
             <RobotEye active={activeService} />
             <div className="flex flex-col gap-4 w-40">
               {SERVICES.map((s, i) => (
@@ -413,47 +468,78 @@ export default function AiaSomnisPage() {
           <div className="flex-1 min-w-0">
             {SERVICES.map((s, i) => (
               <div key={s.id} ref={el => { sectionRefs.current[i] = el }}
-                className="min-h-screen flex flex-col justify-center relative overflow-hidden"
-                style={{ padding: 'clamp(2rem, 5vw, 5rem)' }}>
+                className="min-h-screen flex flex-col md:flex-row relative overflow-hidden"
+                style={{ padding: 0 }}>
+
+                {/* Active glow overlay */}
                 <motion.div className="absolute inset-0 pointer-events-none"
                   animate={{ opacity: i === activeService ? 1 : 0 }} transition={{ duration: 0.8 }}>
-                  <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 30% 50%, ${s.glow} 0%, transparent 70%)` }} />
+                  <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 30% 50%, ${s.glow} 0%, transparent 65%)` }} />
                 </motion.div>
+
+                {/* Left active bar */}
                 <motion.div className="absolute left-0 top-1/4 bottom-1/4 w-0.5 rounded-full"
                   animate={{ opacity: i === activeService ? 1 : 0, scaleY: i === activeService ? 1 : 0 }}
                   transition={{ duration: 0.5 }}
                   style={{ background: `linear-gradient(to bottom, transparent, ${s.accent}, transparent)`, transformOrigin: 'center' }} />
 
-                <div className="relative z-10 max-w-xl">
+                {/* Text content — left/top half */}
+                <div className="flex-1 flex flex-col justify-center relative z-10"
+                  style={{ padding: 'clamp(2rem, 4vw, 4.5rem)', minWidth: 0 }}>
                   <motion.div className="text-7xl md:text-8xl font-black leading-none mb-4 select-none"
                     animate={{ opacity: i === activeService ? 0.12 : 0.05 }}
                     style={{ color: s.accent, letterSpacing: '-0.05em' }}>{s.num}</motion.div>
-                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-black leading-tight mb-2" style={{ color: C.white }}>{s.title}</h2>
-                  <p className="text-base md:text-lg mb-6" style={{ color: s.accent }}>{s.subtitle}</p>
-                  <p className="text-base leading-relaxed mb-8" style={{ color: C.gray }}>{s.desc}</p>
-                  <div className="flex flex-wrap gap-2 mb-10">
+                  <h2 className="text-3xl md:text-4xl font-black leading-tight mb-2" style={{ color: C.white }}>{s.title}</h2>
+                  <p className="text-base mb-5" style={{ color: s.accent }}>{s.subtitle}</p>
+                  <p className="text-sm leading-relaxed mb-7" style={{ color: C.gray }}>{s.desc}</p>
+                  <div className="flex flex-wrap gap-2">
                     {s.tags.map(tag => (
                       <span key={tag} className="px-3 py-1 rounded-full text-xs font-semibold tracking-wide"
                         style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray }}>{tag}</span>
                     ))}
                   </div>
+                </div>
 
-                  {/* Media area with image trail */}
-                  <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={80} maxImages={7} imageWidth={220} imageHeight={148}>
-                    <div className="w-full aspect-video rounded-2xl flex items-center justify-center relative overflow-hidden cursor-none"
-                      style={{ border: `1px solid ${C.border}`, background: 'rgba(7,17,32,0.6)' }}>
-                      <motion.div className="absolute inset-0 rounded-2xl"
-                        animate={{ boxShadow: i === activeService ? `inset 0 0 40px ${s.glow}` : 'none' }}
-                        transition={{ duration: 0.6 }} />
-                      <div className="relative z-10 text-center select-none">
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3"
-                          style={{ background: `${s.accent}20`, border: `1px solid ${s.accent}40` }}>
-                          <div className="w-0 h-0" style={{ borderTop: '10px solid transparent', borderBottom: '10px solid transparent', borderLeft: `18px solid ${s.accent}`, marginLeft: 4 }} />
-                        </div>
-                        <span className="text-xs uppercase tracking-widest" style={{ color: C.border }}>
-                          Mueve el ratón · Reel {s.num}
-                        </span>
+                {/* Media area — dark panel, right/bottom half — image trail here */}
+                <div className="md:w-[42%] flex-shrink-0 relative flex items-center justify-center"
+                  style={{ minHeight: '50vw', maxHeight: '100vh' }}>
+                  {/* Very dark background for strong image trail contrast */}
+                  <div className="absolute inset-0"
+                    style={{ background: `linear-gradient(135deg, rgba(2,5,12,0.97) 0%, rgba(3,8,18,0.99) 100%)`, borderLeft: `1px solid ${C.border}` }} />
+                  {/* Subtle accent corner glow */}
+                  <motion.div className="absolute inset-0 pointer-events-none"
+                    animate={{ opacity: i === activeService ? 1 : 0 }} transition={{ duration: 0.8 }}>
+                    <div className="absolute bottom-0 right-0 w-48 h-48"
+                      style={{ background: `radial-gradient(circle at bottom right, ${s.glow} 0%, transparent 70%)` }} />
+                  </motion.div>
+
+                  <ImageTrail
+                    images={TRAIL_IMAGES[i]}
+                    triggerDistance={40}
+                    maxImages={10}
+                    imageWidth={160}
+                    imageHeight={160}
+                    maxRotation={8}
+                  >
+                    <div className="absolute inset-0 flex flex-col items-center justify-center cursor-none select-none">
+                      {/* Play icon */}
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3"
+                        style={{ background: `${s.accent}18`, border: `1px solid ${s.accent}35` }}>
+                        <div className="w-0 h-0" style={{ borderTop: '9px solid transparent', borderBottom: '9px solid transparent', borderLeft: `16px solid ${s.accent}`, marginLeft: 3 }} />
                       </div>
+                      <span className="text-xs uppercase tracking-[0.25em]" style={{ color: `${s.accent}60` }}>
+                        Reel {s.num}
+                      </span>
+                      {/* Corner brackets */}
+                      {['top-4 left-4', 'top-4 right-4', 'bottom-4 left-4', 'bottom-4 right-4'].map((pos, ci) => (
+                        <div key={ci} className={`absolute ${pos} w-5 h-5 pointer-events-none`}
+                          style={{
+                            borderTop: ci < 2 ? `1px solid ${s.accent}40` : 'none',
+                            borderBottom: ci >= 2 ? `1px solid ${s.accent}40` : 'none',
+                            borderLeft: ci % 2 === 0 ? `1px solid ${s.accent}40` : 'none',
+                            borderRight: ci % 2 !== 0 ? `1px solid ${s.accent}40` : 'none',
+                          }} />
+                      ))}
                     </div>
                   </ImageTrail>
                 </div>
@@ -461,6 +547,11 @@ export default function AiaSomnisPage() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* ══════════ PROYECTOS — FxSlider (immediately after services) ══════════ */}
+      <section id="proyectos">
+        <FxSlider items={PROJECTS} headerText="Proyectos seleccionados" duration={0.64} parallaxAmount={5} />
       </section>
 
       {/* ══════════ LÍNEAS DE LUZ ══════════ */}
@@ -481,11 +572,6 @@ export default function AiaSomnisPage() {
         <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none" style={{ background: `linear-gradient(to top, ${C.bg}, transparent)` }} />
       </section>
 
-      {/* ══════════ PROYECTOS — FxSlider ══════════ */}
-      <section id="proyectos">
-        <FxSlider items={PROJECTS} headerText="Proyectos seleccionados" duration={0.64} parallaxAmount={5} />
-      </section>
-
       {/* ══════════ ESCENA 3D — Gaussian Splat ══════════ */}
       <section className="relative flex flex-col items-center justify-center py-16 px-6" style={{ background: C.bg2 }}>
         <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
@@ -499,20 +585,14 @@ export default function AiaSomnisPage() {
           </p>
         </motion.div>
 
-        {/* Gaussian Splat viewer */}
         <div className="relative w-full max-w-6xl mx-auto rounded-3xl overflow-hidden"
           style={{ height: '80vh', border: `1px solid ${C.border}` }}>
-          <GaussianSplatViewer
-            src={SPZ_FILE}
-            className="w-full h-full"
-          />
-          {/* Corner accents */}
+          <GaussianSplatViewer src={SPZ_FILE} className="w-full h-full" />
           {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
             <div key={i} className={`absolute ${pos} w-8 h-8 pointer-events-none z-10`}
               style={{ borderTop: i < 2 ? `2px solid ${C.gold}` : 'none', borderBottom: i >= 2 ? `2px solid ${C.gold}` : 'none', borderLeft: i % 2 === 0 ? `2px solid ${C.gold}` : 'none', borderRight: i % 2 !== 0 ? `2px solid ${C.gold}` : 'none' }} />
           ))}
         </div>
-
         <p className="mt-6 text-xs text-center" style={{ color: C.border }}>
           Arrastra para orbitar · Scroll para zoom · Click derecho para desplazar
         </p>

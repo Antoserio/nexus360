@@ -16,6 +16,7 @@ interface ImageTrailProps {
   maxImages?: number
   imageWidth?: number
   imageHeight?: number
+  maxRotation?: number   // degrees, default 22 — set lower for ordered look
 }
 
 export function ImageTrail({
@@ -25,6 +26,7 @@ export function ImageTrail({
   maxImages = 7,
   imageWidth = 210,
   imageHeight = 145,
+  maxRotation = 22,
 }: ImageTrailProps) {
   const [items, setItems] = useState<TrailItem[]>([])
   const lastPos = useRef({ x: -9999, y: -9999 })
@@ -42,7 +44,7 @@ export function ImageTrail({
 
     setItems(prev => [
       ...prev.slice(-(maxImages - 1)),
-      { id, x: e.clientX, y: e.clientY, src, rotate: (Math.random() - 0.5) * 22 },
+      { id, x: e.clientX, y: e.clientY, src, rotate: (Math.random() - 0.5) * maxRotation * 2 },
     ])
     setTimeout(() => setItems(prev => prev.filter(t => t.id !== id)), 950)
   }, [images, triggerDistance, maxImages])
