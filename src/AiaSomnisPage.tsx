@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useRef, useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
 import { Mail, MapPin, ChevronDown, ArrowRight } from 'lucide-react'
