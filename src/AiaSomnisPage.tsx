@@ -2,6 +2,7 @@ import { Suspense, lazy, memo, useEffect, useRef, useState, useCallback } from '
 import { motion } from 'framer-motion'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
+import { Magazine3D } from '@/components/ui/magazine-3d'
 import { Mail, MapPin, ChevronDown, ArrowRight } from 'lucide-react'
 
 // Heavy components loaded only when needed
@@ -107,6 +108,16 @@ const PROJECTS: SliderItem[] = [
 
 // .spz file name — put your file in /public and set this
 const SPZ_FILE = '/scene.spz'
+
+// Magazine images: cover + interior pages (portrait crop)
+const MAG_COVER = px(8386440, 480, 640)
+const MAG_PAGES = [
+  px(1105666, 480, 640),
+  px(3861974, 480, 640),
+  px(8386434, 480, 640),
+  px(3075993, 480, 640),
+  px(2387418, 480, 640),
+]
 
 // ── WebGL shader (blue / gold) ────────────────────────────────────────────────
 const VERT = `attribute vec2 a_position; void main(){gl_Position=vec4(a_position,0,1);}`
@@ -801,33 +812,71 @@ export default function AiaSomnisPage() {
       </section>
 
       {/* ══════════ CONTACTO ══════════ */}
-      <section id="contacto" className="relative py-32 px-6 overflow-hidden" style={{ background: C.bg }}>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full pointer-events-none"
+      <section id="contacto" className="relative py-24 px-6 overflow-hidden" style={{ background: C.bg }}>
+        {/* Background glow */}
+        <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full pointer-events-none"
           style={{ background: `radial-gradient(circle, rgba(0,184,255,0.06) 0%, transparent 70%)` }} />
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.gold }}>Hablemos</span>
-            <h2 className="font-black leading-none mb-6" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)', color: C.white }}>
-              ¿Tienes un{' '}
-              <span style={{ backgroundImage: `linear-gradient(90deg, ${C.blue}, ${C.gold})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>proyecto?</span>
-            </h2>
-            <p className="text-lg mb-12 max-w-xl mx-auto" style={{ color: C.gray }}>
-              Cuéntanos tu idea. Transformamos creatividad, tecnología e inteligencia artificial en experiencias que impactan.
-            </p>
-            <a href="mailto:info@girasomnis.com"
-              className="inline-flex items-center gap-3 px-10 py-4 rounded-full font-bold text-base transition-all duration-300"
-              style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white, boxShadow: `0 0 40px rgba(0,184,255,0.3)` }}>
-              <Mail size={18} /> info@girasomnis.com
-            </a>
-            <div className="flex justify-center gap-8 mt-12">
-              {['Madrid', 'Valencia', 'Barcelona'].map(city => (
-                <div key={city} className="flex items-center gap-2">
-                  <MapPin size={14} style={{ color: C.blue }} />
-                  <span className="text-sm font-semibold" style={{ color: C.gray }}>{city}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+        <div className="absolute top-1/2 right-1/4 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full pointer-events-none"
+          style={{ background: `radial-gradient(circle, rgba(255,212,42,0.04) 0%, transparent 70%)` }} />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+
+            {/* LEFT: contact text */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}>
+              <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.gold }}>Hablemos</span>
+              <h2 className="font-black leading-none mb-6" style={{ fontSize: 'clamp(2.5rem,5vw,4.5rem)', color: C.white }}>
+                ¿Tienes un{' '}
+                <span style={{
+                  backgroundImage: `linear-gradient(90deg, ${C.blue}, ${C.gold})`,
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                }}>proyecto?</span>
+              </h2>
+              <p className="text-base md:text-lg mb-10 max-w-md" style={{ color: C.gray, lineHeight: 1.7 }}>
+                Cuéntanos tu idea. Transformamos creatividad, tecnología e inteligencia artificial en experiencias que impactan.
+              </p>
+              <a href="mailto:info@girasomnis.com"
+                className="inline-flex items-center gap-3 px-9 py-4 rounded-full font-bold text-base transition-all duration-300 mb-10"
+                style={{
+                  background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`,
+                  color: C.white,
+                  boxShadow: `0 0 40px rgba(0,184,255,0.3)`,
+                }}>
+                <Mail size={18} /> info@girasomnis.com
+              </a>
+              <div className="flex gap-6 mt-2">
+                {['Madrid', 'Valencia', 'Barcelona'].map(city => (
+                  <div key={city} className="flex items-center gap-2">
+                    <MapPin size={13} style={{ color: C.blue }} />
+                    <span className="text-sm font-semibold" style={{ color: C.gray }}>{city}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* RIGHT: 3D magazine */}
+            <motion.div
+              className="flex justify-center items-center"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.15 }}>
+              <Magazine3D
+                cover={MAG_COVER}
+                pages={MAG_PAGES}
+                width={250}
+                height={340}
+                accent={C.blue}
+                title="AIA-SOMNIS"
+                subtitle="Portfolio 2024"
+              />
+            </motion.div>
+
+          </div>
         </div>
       </section>
 
