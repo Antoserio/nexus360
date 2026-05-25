@@ -551,7 +551,7 @@ export default function AiaSomnisPage() {
           <div className="flex-1 min-w-0">
             {SERVICES.map((s, i) => (
               <div key={s.id} ref={el => { sectionRefs.current[i] = el }}
-                className="min-h-screen flex flex-col relative overflow-hidden"
+                className="min-h-screen flex flex-col relative"
                 style={{ padding: 0 }}>
 
                 {/* Glow bg */}
@@ -601,8 +601,9 @@ export default function AiaSomnisPage() {
                 </div>
 
                 {/* ── CENTER: full-width dark reel area ── */}
-                <div className="flex-1 relative mx-5 mb-5 rounded-2xl overflow-hidden"
-                  style={{ minHeight: 340, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}` }}>
+                {/* NO overflow-hidden — position:fixed trail images must escape to viewport */}
+                <div className="flex-1 relative mx-5 mb-5"
+                  style={{ minHeight: 340, borderRadius: 16, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}` }}>
                   {/* Accent corner glow when active */}
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 pointer-events-none"
                     style={{

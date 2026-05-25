@@ -71,7 +71,9 @@ export function ImageTrail({
   }, [])
 
   return (
-    <div onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} className="relative w-full h-full">
+    // absolute inset-0 → always fills the nearest positioned ancestor,
+    // no dependency on height:100% chain through flex items
+    <div onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} className="absolute inset-0">
       {children}
       <AnimatePresence>
         {items.map(item => (
