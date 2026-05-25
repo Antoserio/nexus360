@@ -1,11 +1,14 @@
-import { Suspense, lazy, useEffect, useRef, useState, useCallback } from 'react'
+import { Suspense, lazy, memo, useEffect, useRef, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
-import { GaussianSplatViewer } from '@/components/ui/gaussian-splat-viewer'
 import { Mail, MapPin, ChevronDown, ArrowRight } from 'lucide-react'
 
+// Heavy components loaded only when needed
 const Spline = lazy(() => import('@splinetool/react-spline'))
+const GaussianSplatViewer = lazy(() =>
+  import('@/components/ui/gaussian-splat-viewer').then(m => ({ default: m.GaussianSplatViewer }))
+)
 
 // ── Brand palette ─────────────────────────────────────────────────────────────
 const C = {
@@ -107,13 +110,14 @@ const SPZ_FILE = '/scene.spz'
 
 // ── WebGL shader (blue / gold) ────────────────────────────────────────────────
 const VERT = `attribute vec2 a_position; void main(){gl_Position=vec4(a_position,0,1);}`
+// Shader runs at half resolution — same visual, ~4× less GPU load
 const FRAG = `
-  precision highp float;
+  precision mediump float;
   uniform float u_time; uniform vec2 u_resolution;
   vec2 hash2(vec2 p){p=vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));return -1.0+2.0*fract(sin(p)*43758.5453123);}
   float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.0-2.0*f);return mix(mix(dot(hash2(i),f),dot(hash2(i+vec2(1,0)),f-vec2(1,0)),u.x),mix(dot(hash2(i+vec2(0,1)),f-vec2(0,1)),dot(hash2(i+vec2(1,1)),f-vec2(1,1)),u.x),u.y);}
-  float fbm(vec2 p){float v=0.0,a=0.5;mat2 rot=mat2(cos(0.5),sin(0.5),-sin(0.5),cos(0.5));for(int i=0;i<5;i++){v+=a*noise(p);p=rot*p*2.0+vec2(100.0);a*=0.5;}return v;}
-  float clouds(vec2 p){float f=0.0,a=0.5;for(int i=0;i<4;i++){f+=a*noise(p);p*=2.1;a*=0.5;}return f*0.5+0.5;}
+  float fbm(vec2 p){float v=0.0,a=0.5;for(int i=0;i<4;i++){v+=a*noise(p);p=p*2.0+vec2(100.0);a*=0.5;}return v;}
+  float clouds(vec2 p){float f=0.0,a=0.5;for(int i=0;i<3;i++){f+=a*noise(p);p*=2.1;a*=0.5;}return f*0.5+0.5;}
   void main(){
     vec2 FC=gl_FragCoord.xy,R=u_resolution;float T=u_time;
     vec2 uv=(FC-0.5*R)/min(R.x,R.y),st=uv*vec2(2,1);
@@ -126,13 +130,12 @@ const FRAG = `
     col=mix(col,cC,clamp(length(q),0.0,1.0));col=mix(col,cD,clamp(r.x+r.y,0.0,1.0));
     col=mix(col,vec3(0.0,bg*0.04,bg*0.12),0.35);
     vec2 puv=uv*(1.0-0.3*(sin(T*0.2)*0.5+0.5));
-    for(float i=1.0;i<13.0;i++){
+    for(float i=1.0;i<9.0;i++){
       puv+=0.1*cos(i*vec2(0.1+0.01*i,0.8)+i*i+T*0.5+0.1*puv.x);
       vec2 pp=puv;float d=length(pp);float tt=fract(sin(i*127.1)*43758.5);
       vec3 pCol=mix(vec3(0.0,0.72,1.0),vec3(1.0,0.83,0.16),tt)*2.5;
       col+=0.0025/d*pCol;float b=noise(i+pp+bg*1.731);
       col+=0.004*b/length(max(pp,vec2(b*pp.x*0.02,pp.y)))*pCol;
-      col=mix(col,vec3(0.0,bg*0.03,bg*0.08),d*0.55);
     }
     vec2 vig=(FC/R)*(1.0-FC/R);col*=pow(vig.x*vig.y*16.0,0.3);col=col/(col+0.6);
     gl_FragColor=vec4(col,1.0);
@@ -141,11 +144,13 @@ const FRAG = `
 function compileShader(gl: WebGLRenderingContext, type: number, src: string) {
   const s = gl.createShader(type)!; gl.shaderSource(s, src); gl.compileShader(s); return s
 }
-function ShaderCanvas() {
+// Memoized — never re-renders, runs its own RAF loop
+const ShaderCanvas = memo(function ShaderCanvas() {
   const ref = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return
-    const gl = canvas.getContext('webgl'); if (!gl) return
+    const gl = canvas.getContext('webgl', { antialias: false, powerPreference: 'high-performance' })
+    if (!gl) return
     const prog = gl.createProgram()!
     gl.attachShader(prog, compileShader(gl, gl.VERTEX_SHADER, VERT))
     gl.attachShader(prog, compileShader(gl, gl.FRAGMENT_SHADER, FRAG))
@@ -157,16 +162,28 @@ function ShaderCanvas() {
     gl.enableVertexAttribArray(pos); gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0)
     const uT = gl.getUniformLocation(prog, 'u_time'), uR = gl.getUniformLocation(prog, 'u_resolution')
     let raf: number, t0 = performance.now()
-    const resize = () => { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; gl.viewport(0,0,canvas.width,canvas.height) }
-    const draw = () => { gl.uniform1f(uT,(performance.now()-t0)/1000); gl.uniform2f(uR,canvas.width,canvas.height); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); raf=requestAnimationFrame(draw) }
-    const ro = new ResizeObserver(resize); ro.observe(canvas); resize(); draw()
+    // Render at 55% resolution — canvas CSS fills container via object-fit stretch
+    const resize = () => {
+      const scale = 0.55
+      canvas.width  = Math.floor(canvas.clientWidth  * scale)
+      canvas.height = Math.floor(canvas.clientHeight * scale)
+      gl.viewport(0, 0, canvas.width, canvas.height)
+    }
+    const draw = () => {
+      gl.uniform1f(uT, (performance.now() - t0) / 1000)
+      gl.uniform2f(uR, canvas.width, canvas.height)
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+      raf = requestAnimationFrame(draw)
+    }
+    const ro = new ResizeObserver(resize)
+    ro.observe(canvas); resize(); draw()
     return () => { cancelAnimationFrame(raf); ro.disconnect() }
   }, [])
-  return <canvas ref={ref} className="absolute inset-0 w-full h-full" aria-hidden />
-}
+  return <canvas ref={ref} className="absolute inset-0 w-full h-full" style={{ imageRendering: 'auto' }} aria-hidden />
+})
 
 // ── Robot Eye ─────────────────────────────────────────────────────────────────
-function RobotEye({ active }: { active: number }) {
+const RobotEye = memo(function RobotEye({ active }: { active: number }) {
   const s = SERVICES[active]
   const dotPos = [{ top: '4%', left: '50%' }, { top: '50%', left: '96%' }, { top: '96%', left: '50%' }, { top: '50%', left: '4%' }]
   const lines = [{ x2: '100', y2: '8' }, { x2: '192', y2: '100' }, { x2: '100', y2: '192' }, { x2: '8', y2: '100' }]
@@ -200,7 +217,7 @@ function RobotEye({ active }: { active: number }) {
       ))}
     </div>
   )
-}
+})
 
 // ── HUD service card (hero corners) ───────────────────────────────────────────
 // corner: 0=top-left  1=top-right  2=bottom-left  3=bottom-right
@@ -340,6 +357,7 @@ export default function AiaSomnisPage() {
     return () => observers.forEach(o => o.disconnect())
   }, [])
 
+  const lastQuadrant = useRef<number | null>(null)
   const onHeroMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const cx = rect.left + rect.width / 2
@@ -347,7 +365,7 @@ export default function AiaSomnisPage() {
     const isRight = e.clientX >= cx
     const isBottom = e.clientY >= cy
     const q = (!isRight && !isBottom) ? 0 : (isRight && !isBottom) ? 1 : (!isRight && isBottom) ? 2 : 3
-    setHeroQuadrant(q as 0|1|2|3)
+    if (q !== lastQuadrant.current) { lastQuadrant.current = q; setHeroQuadrant(q as 0|1|2|3) }
   }, [])
 
   const fadeUp = (delay: number): React.CSSProperties => ({
@@ -529,80 +547,103 @@ export default function AiaSomnisPage() {
             <span className="text-xs tracking-widest uppercase" style={{ color: C.border }}>Girasomnis × Immerso</span>
           </div>
 
-          {/* RIGHT: 4 service panels */}
+          {/* RIGHT: 4 service panels — stacked: text top · reel centered */}
           <div className="flex-1 min-w-0">
             {SERVICES.map((s, i) => (
               <div key={s.id} ref={el => { sectionRefs.current[i] = el }}
-                className="min-h-screen flex flex-col md:flex-row relative overflow-hidden"
+                className="min-h-screen flex flex-col relative overflow-hidden"
                 style={{ padding: 0 }}>
 
-                {/* Active glow overlay */}
-                <motion.div className="absolute inset-0 pointer-events-none"
-                  animate={{ opacity: i === activeService ? 1 : 0 }} transition={{ duration: 0.8 }}>
-                  <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 30% 50%, ${s.glow} 0%, transparent 65%)` }} />
-                </motion.div>
+                {/* Glow bg */}
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: `radial-gradient(ellipse at 50% 60%, ${s.glow} 0%, transparent 65%)`,
+                    opacity: i === activeService ? 1 : 0,
+                    transition: 'opacity 0.6s ease',
+                  }} />
 
-                {/* Left active bar */}
-                <motion.div className="absolute left-0 top-1/4 bottom-1/4 w-0.5 rounded-full"
-                  animate={{ opacity: i === activeService ? 1 : 0, scaleY: i === activeService ? 1 : 0 }}
-                  transition={{ duration: 0.5 }}
-                  style={{ background: `linear-gradient(to bottom, transparent, ${s.accent}, transparent)`, transformOrigin: 'center' }} />
+                {/* Left accent bar */}
+                <div className="absolute left-0 top-1/4 bottom-1/4 w-0.5 rounded-full pointer-events-none"
+                  style={{
+                    background: `linear-gradient(to bottom, transparent, ${s.accent}, transparent)`,
+                    opacity: i === activeService ? 1 : 0,
+                    transform: `scaleY(${i === activeService ? 1 : 0})`,
+                    transformOrigin: 'center',
+                    transition: 'opacity 0.5s ease, transform 0.5s ease',
+                  }} />
 
-                {/* Text content — left/top half */}
-                <div className="flex-1 flex flex-col justify-center relative z-10"
-                  style={{ padding: 'clamp(2rem, 4vw, 4.5rem)', minWidth: 0 }}>
-                  <motion.div className="text-7xl md:text-8xl font-black leading-none mb-4 select-none"
-                    animate={{ opacity: i === activeService ? 0.12 : 0.05 }}
-                    style={{ color: s.accent, letterSpacing: '-0.05em' }}>{s.num}</motion.div>
-                  <h2 className="text-3xl md:text-4xl font-black leading-tight mb-2" style={{ color: C.white }}>{s.title}</h2>
-                  <p className="text-base mb-5" style={{ color: s.accent }}>{s.subtitle}</p>
-                  <p className="text-sm leading-relaxed mb-7" style={{ color: C.gray }}>{s.desc}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {s.tags.map(tag => (
-                      <span key={tag} className="px-3 py-1 rounded-full text-xs font-semibold tracking-wide"
-                        style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray }}>{tag}</span>
-                    ))}
+                {/* ── TOP: compact service info ── */}
+                <div className="relative z-10 flex items-start gap-5"
+                  style={{ padding: 'clamp(1.8rem, 3vw, 3rem) clamp(1.8rem, 3vw, 3rem) 1.2rem' }}>
+                  {/* Big number watermark */}
+                  <span className="font-black leading-none select-none flex-shrink-0"
+                    style={{
+                      fontSize: 'clamp(3rem,5vw,5rem)',
+                      color: s.accent,
+                      opacity: i === activeService ? 0.15 : 0.05,
+                      letterSpacing: '-0.05em',
+                      transition: 'opacity 0.5s ease',
+                    }}>{s.num}</span>
+                  <div className="flex-1 min-w-0">
+                    <h2 className="font-black leading-tight mb-1"
+                      style={{ fontSize: 'clamp(1.4rem,2.5vw,2.2rem)', color: C.white }}>{s.title}</h2>
+                    <p className="text-sm mb-3" style={{ color: s.accent }}>{s.subtitle}</p>
+                    <p className="text-sm leading-relaxed mb-4" style={{ color: C.gray, maxWidth: 480 }}>{s.desc}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {s.tags.map(tag => (
+                        <span key={tag} className="px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray }}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Media area — dark panel, right/bottom half — image trail here */}
-                <div className="md:w-[42%] flex-shrink-0 relative flex items-center justify-center"
-                  style={{ minHeight: '50vw', maxHeight: '100vh' }}>
-                  {/* Very dark background for strong image trail contrast */}
-                  <div className="absolute inset-0"
-                    style={{ background: `linear-gradient(135deg, rgba(2,5,12,0.97) 0%, rgba(3,8,18,0.99) 100%)`, borderLeft: `1px solid ${C.border}` }} />
-                  {/* Subtle accent corner glow */}
-                  <motion.div className="absolute inset-0 pointer-events-none"
-                    animate={{ opacity: i === activeService ? 1 : 0 }} transition={{ duration: 0.8 }}>
-                    <div className="absolute bottom-0 right-0 w-48 h-48"
-                      style={{ background: `radial-gradient(circle at bottom right, ${s.glow} 0%, transparent 70%)` }} />
-                  </motion.div>
+                {/* ── CENTER: full-width dark reel area ── */}
+                <div className="flex-1 relative mx-5 mb-5 rounded-2xl overflow-hidden"
+                  style={{ minHeight: 340, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}` }}>
+                  {/* Accent corner glow when active */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(ellipse at bottom, ${s.glow} 0%, transparent 70%)`,
+                      opacity: i === activeService ? 1 : 0,
+                      transition: 'opacity 0.6s ease',
+                    }} />
 
                   <ImageTrail
                     images={TRAIL_IMAGES[i]}
-                    triggerDistance={40}
-                    maxImages={10}
+                    triggerDistance={38}
+                    maxImages={8}
                     imageWidth={160}
                     imageHeight={160}
                     maxRotation={8}
                   >
                     <div className="absolute inset-0 flex flex-col items-center justify-center cursor-none select-none">
                       {/* Play icon */}
-                      <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3"
-                        style={{ background: `${s.accent}18`, border: `1px solid ${s.accent}35` }}>
-                        <div className="w-0 h-0" style={{ borderTop: '9px solid transparent', borderBottom: '9px solid transparent', borderLeft: `16px solid ${s.accent}`, marginLeft: 3 }} />
+                      <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+                        style={{ background: `${s.accent}16`, border: `1px solid ${s.accent}30` }}>
+                        <div className="w-0 h-0" style={{
+                          borderTop: '8px solid transparent', borderBottom: '8px solid transparent',
+                          borderLeft: `14px solid ${s.accent}`, marginLeft: 3,
+                        }} />
                       </div>
-                      <span className="text-xs uppercase tracking-[0.25em]" style={{ color: `${s.accent}60` }}>
+                      <span className="text-xs uppercase tracking-[0.3em]" style={{ color: `${s.accent}55` }}>
                         Reel {s.num}
                       </span>
-                      {/* Corner brackets */}
-                      {['top-4 left-4', 'top-4 right-4', 'bottom-4 left-4', 'bottom-4 right-4'].map((pos, ci) => (
+                      {/* Corner HUD brackets */}
+                      {[
+                        'top-4 left-4',
+                        'top-4 right-4',
+                        'bottom-4 left-4',
+                        'bottom-4 right-4',
+                      ].map((pos, ci) => (
                         <div key={ci} className={`absolute ${pos} w-5 h-5 pointer-events-none`}
                           style={{
-                            borderTop: ci < 2 ? `1px solid ${s.accent}40` : 'none',
-                            borderBottom: ci >= 2 ? `1px solid ${s.accent}40` : 'none',
-                            borderLeft: ci % 2 === 0 ? `1px solid ${s.accent}40` : 'none',
-                            borderRight: ci % 2 !== 0 ? `1px solid ${s.accent}40` : 'none',
+                            borderTop:    ci < 2     ? `1px solid ${s.accent}35` : 'none',
+                            borderBottom: ci >= 2    ? `1px solid ${s.accent}35` : 'none',
+                            borderLeft:   ci % 2 === 0 ? `1px solid ${s.accent}35` : 'none',
+                            borderRight:  ci % 2 !== 0 ? `1px solid ${s.accent}35` : 'none',
                           }} />
                       ))}
                     </div>
@@ -652,7 +693,14 @@ export default function AiaSomnisPage() {
 
         <div className="relative w-full max-w-6xl mx-auto rounded-3xl overflow-hidden"
           style={{ height: '80vh', border: `1px solid ${C.border}` }}>
-          <GaussianSplatViewer src={SPZ_FILE} className="w-full h-full" />
+          <Suspense fallback={
+            <div className="w-full h-full flex items-center justify-center" style={{ background: '#05070D' }}>
+              <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
+                style={{ borderTopColor: '#00B8FF', borderRightColor: 'rgba(0,184,255,0.2)' }} />
+            </div>
+          }>
+            <GaussianSplatViewer src={SPZ_FILE} className="w-full h-full" />
+          </Suspense>
           {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
             <div key={i} className={`absolute ${pos} w-8 h-8 pointer-events-none z-10`}
               style={{ borderTop: i < 2 ? `2px solid ${C.gold}` : 'none', borderBottom: i >= 2 ? `2px solid ${C.gold}` : 'none', borderLeft: i % 2 === 0 ? `2px solid ${C.gold}` : 'none', borderRight: i % 2 !== 0 ? `2px solid ${C.gold}` : 'none' }} />

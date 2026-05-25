@@ -272,42 +272,57 @@ export function FxSlider({
         </AnimatePresence>
       </div>
 
-      {/* ── BOTTOM COUNTER: prev ——— next ── */}
+      {/* ── BOTTOM COUNTER: ← prev ——● next → ── */}
       <div className="absolute bottom-0 inset-x-0 flex items-center justify-center z-10 pb-10">
-        <div className="flex items-center gap-4">
-          {/* Prev number */}
-          <button onClick={prev} style={{ background: 'none', border: 'none', cursor: current > 0 ? 'pointer' : 'default' }}>
-            <motion.span
-              animate={{ color: current > 0 ? C.gray : C.border }}
-              className="text-sm font-bold tabular-nums tracking-widest">
-              {String(Math.max(1, current)).padStart(2, '0')}
-            </motion.span>
+        <div className="flex items-center gap-5">
+
+          {/* ← Prev arrow — always visible */}
+          <button
+            onClick={prev}
+            className="flex items-center gap-2 transition-all duration-250"
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              opacity: current > 0 ? 1 : 0.28,
+            }}>
+            <span style={{ color: C.white, fontSize: 16, lineHeight: 1 }}>←</span>
+            <span
+              className="text-sm font-bold tabular-nums tracking-widest"
+              style={{ color: current > 0 ? C.gray : C.border }}>
+              {String(current).padStart(2, '0')}
+            </span>
           </button>
 
           {/* Progress track */}
-          <div className="relative flex items-center" style={{ width: 96, height: 2 }}>
+          <div className="relative flex items-center" style={{ width: 88, height: 2 }}>
             <div className="absolute inset-0 rounded-full" style={{ background: C.border }} />
             <motion.div
               className="absolute left-0 top-0 h-full rounded-full"
-              animate={{ width: `${((current) / Math.max(items.length - 1, 1)) * 100}%` }}
+              animate={{ width: `${(current / Math.max(items.length - 1, 1)) * 100}%` }}
               transition={t}
               style={{ background: active.accent }} />
-            {/* Sliding dot */}
             <motion.div
               className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
-              animate={{ left: `${((current) / Math.max(items.length - 1, 1)) * 100}%` }}
+              animate={{ left: `${(current / Math.max(items.length - 1, 1)) * 100}%` }}
               transition={t}
               style={{ background: active.accent, boxShadow: `0 0 6px ${active.accent}`, marginLeft: -4 }} />
           </div>
 
-          {/* Next number */}
-          <button onClick={next} style={{ background: 'none', border: 'none', cursor: current < items.length - 1 ? 'pointer' : 'default' }}>
-            <motion.span
-              animate={{ color: current < items.length - 1 ? C.gray : C.border }}
-              className="text-sm font-bold tabular-nums tracking-widest">
-              {String(Math.min(items.length, current + 2)).padStart(2, '0')}
-            </motion.span>
+          {/* Next → arrow — always visible */}
+          <button
+            onClick={next}
+            className="flex items-center gap-2 transition-all duration-250"
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              opacity: current < items.length - 1 ? 1 : 0.28,
+            }}>
+            <span
+              className="text-sm font-bold tabular-nums tracking-widest"
+              style={{ color: current < items.length - 1 ? C.gray : C.border }}>
+              {String(current + 2).padStart(2, '0')}
+            </span>
+            <span style={{ color: C.white, fontSize: 16, lineHeight: 1 }}>→</span>
           </button>
+
         </div>
       </div>
 
