@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
+import { GaussianSplatViewer } from '@/components/ui/gaussian-splat-viewer'
 import { Mail, MapPin, ChevronDown, ArrowRight } from 'lucide-react'
 
 const Spline = lazy(() => import('@splinetool/react-spline'))
@@ -56,33 +57,53 @@ const TEAM = [
   { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ' },
 ]
 
-// ── Placeholder image builder — swap src for real URLs ────────────────────────
-function ph(color: string, label: string): string {
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="420" height="290">
-      <rect width="420" height="290" fill="${color}" fill-opacity="0.12"/>
-      <rect x="0" y="0" width="420" height="290" fill="none" stroke="${color}" stroke-opacity="0.25" stroke-width="1"/>
-      <text x="210" y="155" fill="${color}" fill-opacity="0.45" font-family="system-ui,sans-serif" font-size="13" font-weight="700" text-anchor="middle" dominant-baseline="middle">${label}</text>
-    </svg>`
-  )}`
-}
+// ── Pexels CDN helper ─────────────────────────────────────────────────────────
+const px = (id: number, w = 600, h = 400) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${w}&h=${h}&fit=crop`
 
-// Trail images per service — replace with real image URLs
+// Trail images per service (6 Pexels photos each — swap for real project images)
 const TRAIL_IMAGES: string[][] = [
-  Array.from({ length: 6 }, (_, i) => ph('#00B8FF', `Avatar ${i + 1} · imagen real`)),
-  Array.from({ length: 6 }, (_, i) => ph('#22D3FF', `Instalación ${i + 1} · imagen real`)),
-  Array.from({ length: 6 }, (_, i) => ph('#FFD42A', `Visual ${i + 1} · imagen real`)),
-  Array.from({ length: 6 }, (_, i) => ph('#F6B93B', `Digital ${i + 1} · imagen real`)),
+  // 01 Avatares IA — robots, AI, holograms, tech
+  [8386440, 8386434, 8386422, 3861969, 8294404, 3862021].map(id => px(id)),
+  // 02 Instalaciones interactivas — events, screens, exhibitions
+  [1190297, 2608517, 1449940, 3861974, 1105666, 3075993].map(id => px(id)),
+  // 03 Visuales generativos — neon, abstract art, colorful
+  [2387418, 3756165, 1762851, 3612885, 2685229, 1279813].map(id => px(id)),
+  // 04 Digital / dev — code, laptops, web
+  [574069, 1181271, 546819, 3183150, 270360, 1181244].map(id => px(id)),
 ]
 
-// Projects — replace bg with real image: "url('/img/project.jpg') center/cover no-repeat"
+// Projects for FxSlider — real Pexels backgrounds
 const PROJECTS: SliderItem[] = [
-  { num: '01', year: '2024', accent: '#00B8FF', title: 'Avatar Viky · Girasomnis', category: 'Avatares IA',              bg: 'linear-gradient(135deg, rgba(0,184,255,0.25) 0%, #05070D 100%)' },
-  { num: '02', year: '2024', accent: '#22D3FF', title: 'Canet Rock IA',            category: 'Visuales Generativos',     bg: 'linear-gradient(135deg, rgba(34,211,255,0.22) 0%, #05070D 100%)' },
-  { num: '03', year: '2024', accent: '#FFD42A', title: 'Quiniela Planeta',         category: 'Instalación Interactiva',  bg: 'linear-gradient(135deg, rgba(255,212,42,0.2) 0%, #05070D 100%)' },
-  { num: '04', year: '2024', accent: '#F6B93B', title: 'FLUGE — Avatar Demo',      category: 'Avatar Interactivo',       bg: 'linear-gradient(135deg, rgba(246,185,59,0.2) 0%, #05070D 100%)' },
-  { num: '05', year: '2023', accent: '#1B3DFF', title: 'Interactivos Táctiles',    category: 'Instalación Interactiva',  bg: 'linear-gradient(135deg, rgba(27,61,255,0.25) 0%, #05070D 100%)' },
+  {
+    num: '01', year: '2024', accent: '#00B8FF',
+    title: 'Avatar Viky · Girasomnis', category: 'Avatares IA',
+    bg: `url('${px(8386440, 1200, 800)}') center/cover no-repeat`,
+  },
+  {
+    num: '02', year: '2024', accent: '#22D3FF',
+    title: 'Canet Rock IA', category: 'Visuales Generativos',
+    bg: `url('${px(1105666, 1200, 800)}') center/cover no-repeat`,
+  },
+  {
+    num: '03', year: '2024', accent: '#FFD42A',
+    title: 'Quiniela Planeta', category: 'Instalación Interactiva',
+    bg: `url('${px(3861974, 1200, 800)}') center/cover no-repeat`,
+  },
+  {
+    num: '04', year: '2024', accent: '#F6B93B',
+    title: 'FLUGE — Avatar Demo', category: 'Avatar Interactivo',
+    bg: `url('${px(8386434, 1200, 800)}') center/cover no-repeat`,
+  },
+  {
+    num: '05', year: '2023', accent: '#1B3DFF',
+    title: 'Interactivos Táctiles', category: 'Instalación Interactiva',
+    bg: `url('${px(3075993, 1200, 800)}') center/cover no-repeat`,
+  },
 ]
+
+// .spz file name — put your file in /public and set this
+const SPZ_FILE = '/scene.spz'
 
 // ── WebGL shader (blue / gold) ────────────────────────────────────────────────
 const VERT = `attribute vec2 a_position; void main(){gl_Position=vec4(a_position,0,1);}`
@@ -465,29 +486,36 @@ export default function AiaSomnisPage() {
         <FxSlider items={PROJECTS} headerText="Proyectos seleccionados" duration={0.64} parallaxAmount={5} />
       </section>
 
-      {/* ══════════ ESCENA 3D ══════════ */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center py-24 px-6" style={{ background: C.bg2 }}>
+      {/* ══════════ ESCENA 3D — Gaussian Splat ══════════ */}
+      <section className="relative flex flex-col items-center justify-center py-16 px-6" style={{ background: C.bg2 }}>
         <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
           style={{ backgroundImage: `linear-gradient(${C.border} 1px, transparent 1px), linear-gradient(90deg, ${C.border} 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
-          className="text-center mb-12 relative z-10">
+          className="text-center mb-10 relative z-10">
           <span className="text-xs uppercase tracking-[0.3em] mb-4 block" style={{ color: C.gold }}>Experiencia Interactiva</span>
-          <h2 className="font-black mb-4" style={{ fontSize: 'clamp(2rem,5vw,4rem)', color: C.white }}>Escena 3D</h2>
-          <p style={{ color: C.gray }}>Tu escena Spline se cargará aquí</p>
+          <h2 className="font-black mb-2" style={{ fontSize: 'clamp(2rem,5vw,4rem)', color: C.white }}>Escena 3D</h2>
+          <p className="text-sm" style={{ color: C.gray }}>
+            Pon tu archivo <code style={{ color: C.blue }}>.spz</code> en <code style={{ color: C.blue }}>/public/scene.spz</code> para verlo aquí
+          </p>
         </motion.div>
-        {/* Mount point — replace inner content with <Spline scene="TU_URL" ... /> */}
-        <div className="relative w-full max-w-5xl mx-auto rounded-3xl overflow-hidden"
-          style={{ aspectRatio: '16/9', border: `1px solid ${C.border}`, background: 'rgba(7,17,32,0.8)' }}>
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4"
-            style={{ background: `radial-gradient(ellipse at center, rgba(0,184,255,0.06) 0%, transparent 70%)` }}>
-            <span className="text-sm font-semibold tracking-widest uppercase" style={{ color: C.blue }}>Spline Scene — Coming Soon</span>
-            <span className="text-xs" style={{ color: C.border }}>Sustituye este bloque con tu componente Spline</span>
-          </div>
+
+        {/* Gaussian Splat viewer */}
+        <div className="relative w-full max-w-6xl mx-auto rounded-3xl overflow-hidden"
+          style={{ height: '80vh', border: `1px solid ${C.border}` }}>
+          <GaussianSplatViewer
+            src={SPZ_FILE}
+            className="w-full h-full"
+          />
+          {/* Corner accents */}
           {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
-            <div key={i} className={`absolute ${pos} w-8 h-8 pointer-events-none`}
+            <div key={i} className={`absolute ${pos} w-8 h-8 pointer-events-none z-10`}
               style={{ borderTop: i < 2 ? `2px solid ${C.gold}` : 'none', borderBottom: i >= 2 ? `2px solid ${C.gold}` : 'none', borderLeft: i % 2 === 0 ? `2px solid ${C.gold}` : 'none', borderRight: i % 2 !== 0 ? `2px solid ${C.gold}` : 'none' }} />
           ))}
         </div>
+
+        <p className="mt-6 text-xs text-center" style={{ color: C.border }}>
+          Arrastra para orbitar · Scroll para zoom · Click derecho para desplazar
+        </p>
       </section>
 
       {/* ══════════ ABOUT US ══════════ */}
