@@ -203,37 +203,79 @@ function RobotEye({ active }: { active: number }) {
 }
 
 // ── HUD service card (hero corners) ───────────────────────────────────────────
-function HudCard({ s, delay, side }: { s: typeof SERVICES[0]; delay: number; side: 'left' | 'right' }) {
-  const [vis, setVis] = useState(false)
-  useEffect(() => { const t = setTimeout(() => setVis(true), delay); return () => clearTimeout(t) }, [delay])
+// corner: 0=top-left  1=top-right  2=bottom-left  3=bottom-right
+const CORNER_STYLES: React.CSSProperties[] = [
+  { top: '10%',    left: '3%'  },
+  { top: '10%',    right: '3%' },
+  { bottom: '18%', left: '3%'  },
+  { bottom: '18%', right: '3%' },
+]
+
+function HudCard({
+  s, delay, corner, active, visible,
+}: {
+  s: typeof SERVICES[0]
+  delay: number
+  corner: 0 | 1 | 2 | 3
+  active: boolean
+  visible: boolean
+}) {
+  const isRight = corner === 1 || corner === 3
+
   return (
-    <div style={{
-      opacity: vis ? 1 : 0,
-      transform: vis ? 'translateY(0)' : `translateY(${side === 'left' ? '-' : ''}16px)`,
-      transition: 'opacity 0.7s ease, transform 0.7s ease',
-    }}>
-      <div className="relative p-4 rounded-xl"
-        style={{ background: 'rgba(5,10,20,0.7)', border: `1px solid ${C.border}`, backdropFilter: 'blur(12px)', minWidth: 180 }}>
+    <motion.div
+      className="absolute z-20"
+      style={{ ...CORNER_STYLES[corner], pointerEvents: 'auto' }}
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={{ opacity: visible ? 1 : 0, scale: visible ? 1 : 0.92 }}
+      transition={{ duration: 0.6, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}>
+      <motion.div
+        animate={{
+          boxShadow: active ? `0 0 40px ${s.glow}, 0 0 80px ${s.glow}` : '0 0 0px transparent',
+          borderColor: active ? s.accent : C.border,
+        }}
+        transition={{ duration: 0.4 }}
+        className="relative p-4 rounded-xl"
+        style={{
+          background: active ? `rgba(5,10,20,0.85)` : 'rgba(5,10,20,0.65)',
+          backdropFilter: 'blur(16px)',
+          width: 190,
+          border: `1px solid ${C.border}`,
+        }}>
         {/* HUD corner brackets */}
-        <div className="absolute top-0 left-0 w-3 h-3" style={{ borderTop: `1.5px solid ${s.accent}`, borderLeft: `1.5px solid ${s.accent}` }} />
-        <div className="absolute top-0 right-0 w-3 h-3" style={{ borderTop: `1.5px solid ${s.accent}`, borderRight: `1.5px solid ${s.accent}` }} />
-        <div className="absolute bottom-0 left-0 w-3 h-3" style={{ borderBottom: `1.5px solid ${s.accent}`, borderLeft: `1.5px solid ${s.accent}` }} />
-        <div className="absolute bottom-0 right-0 w-3 h-3" style={{ borderBottom: `1.5px solid ${s.accent}`, borderRight: `1.5px solid ${s.accent}` }} />
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5"
-            style={{ background: `${s.accent}18`, border: `1px solid ${s.accent}35` }}>
-            <span className="font-black text-xs" style={{ color: s.accent }}>{s.num}</span>
-          </div>
-          <div>
-            <h3 className="font-bold text-sm leading-tight mb-1" style={{ color: C.white }}>{s.title}</h3>
-            <p className="text-xs leading-snug" style={{ color: C.gray }}>{s.subtitle}</p>
+        <motion.div animate={{ borderColor: active ? s.accent : `${s.accent}50` }} transition={{ duration: 0.4 }}
+          className="absolute top-0 left-0 w-3 h-3" style={{ borderTop: `1.5px solid ${s.accent}50`, borderLeft: `1.5px solid ${s.accent}50` }} />
+        <motion.div animate={{ borderColor: active ? s.accent : `${s.accent}50` }} transition={{ duration: 0.4 }}
+          className="absolute top-0 right-0 w-3 h-3" style={{ borderTop: `1.5px solid ${s.accent}50`, borderRight: `1.5px solid ${s.accent}50` }} />
+        <motion.div animate={{ borderColor: active ? s.accent : `${s.accent}50` }} transition={{ duration: 0.4 }}
+          className="absolute bottom-0 left-0 w-3 h-3" style={{ borderBottom: `1.5px solid ${s.accent}50`, borderLeft: `1.5px solid ${s.accent}50` }} />
+        <motion.div animate={{ borderColor: active ? s.accent : `${s.accent}50` }} transition={{ duration: 0.4 }}
+          className="absolute bottom-0 right-0 w-3 h-3" style={{ borderBottom: `1.5px solid ${s.accent}50`, borderRight: `1.5px solid ${s.accent}50` }} />
+
+        <div className={`flex items-start gap-3 ${isRight ? 'flex-row-reverse' : ''}`}>
+          <motion.div animate={{ background: active ? `${s.accent}28` : `${s.accent}10`, borderColor: active ? `${s.accent}70` : `${s.accent}30` }}
+            transition={{ duration: 0.4 }}
+            className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5"
+            style={{ border: `1px solid ${s.accent}30` }}>
+            <motion.span animate={{ color: active ? s.accent : `${s.accent}80` }} transition={{ duration: 0.4 }}
+              className="font-black text-xs">{s.num}</motion.span>
+          </motion.div>
+          <div className={isRight ? 'text-right' : ''}>
+            <motion.h3 animate={{ color: active ? C.white : C.gray }} transition={{ duration: 0.4 }}
+              className="font-bold text-sm leading-tight mb-1">{s.title}</motion.h3>
+            <motion.p animate={{ color: active ? C.gray : `${C.gray}60` }} transition={{ duration: 0.4 }}
+              className="text-xs leading-snug">{s.subtitle}</motion.p>
           </div>
         </div>
-        {/* Connector line stub */}
-        <div className={`absolute top-1/2 -translate-y-1/2 h-px w-6 ${side === 'left' ? '-right-6' : '-left-6'}`}
-          style={{ background: `linear-gradient(${side === 'left' ? 'to right' : 'to left'}, transparent, ${s.accent}60)` }} />
-      </div>
-    </div>
+
+        {/* Active scan line */}
+        <motion.div
+          animate={{ scaleX: active ? 1 : 0, opacity: active ? 1 : 0 }}
+          transition={{ duration: 0.4 }}
+          className="absolute bottom-0 inset-x-0 h-px rounded-full"
+          style={{ background: `linear-gradient(90deg, transparent, ${s.accent}, transparent)`, transformOrigin: 'center' }} />
+      </motion.div>
+    </motion.div>
   )
 }
 
@@ -259,11 +301,15 @@ const IconInstagram = ({ size = 16 }: { size?: number }) => (
 )
 
 // ── Main page ─────────────────────────────────────────────────────────────────
+// corner→service index mapping: top-left=0, top-right=1, bottom-left=2, bottom-right=3
+const CORNER_SERVICE = [0, 1, 2, 3] as const
+
 export default function AiaSomnisPage() {
   const [heroVisible, setHeroVisible] = useState(false)
   const [activeService, setActiveService] = useState(0)
   const [scrolledPastHero, setScrolledPastHero] = useState(false)
   const [splineInView, setSplineInView] = useState(false)
+  const [heroQuadrant, setHeroQuadrant] = useState<0|1|2|3|null>(null)
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
   const heroRef = useRef<HTMLElement>(null)
 
@@ -292,6 +338,16 @@ export default function AiaSomnisPage() {
       obs.observe(el); observers.push(obs)
     })
     return () => observers.forEach(o => o.disconnect())
+  }, [])
+
+  const onHeroMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+    const isRight = e.clientX >= cx
+    const isBottom = e.clientY >= cy
+    const q = (!isRight && !isBottom) ? 0 : (isRight && !isBottom) ? 1 : (!isRight && isBottom) ? 2 : 3
+    setHeroQuadrant(q as 0|1|2|3)
   }, [])
 
   const fadeUp = (delay: number): React.CSSProperties => ({
@@ -332,105 +388,114 @@ export default function AiaSomnisPage() {
         </div>
       </motion.nav>
 
-      {/* ══════════ HERO — Centered HUD layout ══════════ */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
-        style={{ background: `radial-gradient(ellipse at 50% 40%, #102B4A 0%, ${C.bg2} 45%, ${C.bg} 100%)` }}>
+      {/* ══════════ HERO — 4-corner HUD layout ══════════ */}
+      <section
+        ref={heroRef}
+        className="relative min-h-screen overflow-hidden"
+        style={{ background: `radial-gradient(ellipse at 50% 40%, #102B4A 0%, ${C.bg2} 45%, ${C.bg} 100%)` }}
+        onMouseMove={onHeroMouseMove}
+        onMouseLeave={() => setHeroQuadrant(null)}>
 
         {/* Grid overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
           style={{ backgroundImage: `linear-gradient(${C.blue} 1px, transparent 1px), linear-gradient(90deg, ${C.blue} 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
-        {/* Central glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
-          style={{ background: `radial-gradient(circle, rgba(0,184,255,0.09) 0%, transparent 65%)` }} />
 
-        {/* Badge */}
-        <div className="relative z-10 mb-6" style={fadeUp(0)}>
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
-            style={{ background: 'rgba(0,184,255,0.08)', border: `1px solid rgba(0,184,255,0.25)`, color: C.blue }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.blue }} />
-            Artificial Intelligence Agency
-          </span>
-        </div>
+        {/* Dynamic center glow that follows active quadrant card color */}
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
+          animate={{
+            background: heroQuadrant !== null
+              ? `radial-gradient(circle, ${SERVICES[CORNER_SERVICE[heroQuadrant]].glow} 0%, transparent 65%)`
+              : `radial-gradient(circle, rgba(0,184,255,0.07) 0%, transparent 65%)`
+          }}
+          transition={{ duration: 0.5 }} />
 
-        {/* ── 3-column HUD: [left cards] [robot] [right cards] ── */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 flex items-center justify-center gap-0">
+        {/* ── 4 CORNER CARDS ── */}
+        {([0, 1, 2, 3] as const).map(corner => (
+          <HudCard
+            key={corner}
+            s={SERVICES[CORNER_SERVICE[corner]]}
+            delay={300 + corner * 100}
+            corner={corner}
+            active={heroQuadrant === corner}
+            visible={heroVisible}
+          />
+        ))}
 
-          {/* LEFT cards: 01 top, 02 bottom */}
-          <div className="hidden lg:flex flex-col gap-5 items-end" style={{ width: 220, flexShrink: 0 }}>
-            <HudCard s={SERVICES[0]} delay={400} side="left" />
-            <HudCard s={SERVICES[1]} delay={550} side="left" />
+        {/* ── CENTER: Robot + title + CTA ── */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none">
+
+          {/* Badge */}
+          <div className="mb-6 pointer-events-none" style={fadeUp(0)}>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
+              style={{ background: 'rgba(0,184,255,0.08)', border: `1px solid rgba(0,184,255,0.25)`, color: C.blue }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.blue }} />
+              Artificial Intelligence Agency
+            </span>
           </div>
 
-          {/* CENTER: Spline robot + title */}
-          <div className="flex-1 flex flex-col items-center" style={{ minWidth: 0, maxWidth: 560 }}>
-            {/* Robot */}
-            <div style={{
-              opacity: heroVisible ? 1 : 0,
-              transform: heroVisible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.95)',
-              transition: 'opacity 1.1s ease 300ms, transform 1.1s ease 300ms',
-              width: '100%',
-              height: 'clamp(300px, 45vw, 520px)',
-              position: 'relative',
-            }}>
-              {splineInView ? (
-                <Suspense fallback={
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
-                      style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
-                  </div>
-                }>
-                  <Spline scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" style={{ width: '100%', height: '100%' }} />
-                </Suspense>
-              ) : (
+          {/* Spline robot */}
+          <div style={{
+            opacity: heroVisible ? 1 : 0,
+            transform: heroVisible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.95)',
+            transition: 'opacity 1.1s ease 300ms, transform 1.1s ease 300ms',
+            width: 'clamp(280px, 38vw, 520px)',
+            height: 'clamp(280px, 38vw, 520px)',
+            position: 'relative',
+            pointerEvents: 'auto',
+          }}>
+            {splineInView ? (
+              <Suspense fallback={
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
                     style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
                 </div>
-              )}
-              {/* Gold ground glow */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-56 h-8 blur-2xl pointer-events-none"
-                style={{ background: `radial-gradient(ellipse, ${C.gold}50, transparent)` }} />
-            </div>
-
-            {/* Title below robot */}
-            <div className="text-center mt-2 px-4" style={fadeUp(200)}>
-              <h1 className="font-black leading-none tracking-tight" style={{ fontSize: 'clamp(3rem,8vw,6.5rem)' }}>
-                <span className="block" style={{ color: C.white }}>AIA</span>
-                <span className="block" style={{
-                  backgroundImage: `linear-gradient(90deg, ${C.blue} 0%, ${C.deep} 55%, ${C.gold} 100%)`,
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                }}>SOMNIS</span>
-              </h1>
-              <p className="text-sm md:text-base mt-3 max-w-sm mx-auto" style={{ color: C.gray }}>
-                Para <span style={{ color: C.white }}>eventos, marcas y cultura.</span>
-              </p>
-            </div>
-
-            {/* CTA buttons */}
-            <div style={fadeUp(600)} className="flex flex-wrap gap-4 justify-center mt-8">
-              <button onClick={() => scrollTo(0)} className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
-                style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white, boxShadow: `0 0 30px rgba(0,184,255,0.35)` }}>
-                Ver servicios <ArrowRight size={16} />
-              </button>
-              <a href="#contacto" className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
-                style={{ border: `1px solid ${C.border}`, color: C.gray, background: 'rgba(255,255,255,0.03)' }}>
-                Contactar
-              </a>
-            </div>
+              }>
+                <Spline scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" style={{ width: '100%', height: '100%' }} />
+              </Suspense>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
+                  style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
+              </div>
+            )}
+            {/* Gold ground glow */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-56 h-8 blur-2xl pointer-events-none"
+              style={{ background: `radial-gradient(ellipse, ${C.gold}50, transparent)` }} />
           </div>
 
-          {/* RIGHT cards: 03 top, 04 bottom */}
-          <div className="hidden lg:flex flex-col gap-5 items-start" style={{ width: 220, flexShrink: 0 }}>
-            <HudCard s={SERVICES[2]} delay={400} side="right" />
-            <HudCard s={SERVICES[3]} delay={550} side="right" />
+          {/* Title */}
+          <div className="text-center px-4 -mt-6" style={fadeUp(200)}>
+            <h1 className="font-black leading-none tracking-tight" style={{ fontSize: 'clamp(2.6rem,7vw,6rem)' }}>
+              <span className="block" style={{ color: C.white }}>AIA</span>
+              <span className="block" style={{
+                backgroundImage: `linear-gradient(90deg, ${C.blue} 0%, ${C.deep} 55%, ${C.gold} 100%)`,
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              }}>SOMNIS</span>
+            </h1>
+            <p className="text-sm mt-3 max-w-xs mx-auto" style={{ color: C.gray }}>
+              Para <span style={{ color: C.white }}>eventos, marcas y cultura.</span>
+            </p>
+          </div>
+
+          {/* CTAs */}
+          <div style={fadeUp(600)} className="flex flex-wrap gap-4 justify-center mt-7 pointer-events-auto">
+            <button onClick={() => scrollTo(0)} className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
+              style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white, boxShadow: `0 0 30px rgba(0,184,255,0.35)` }}>
+              Ver servicios <ArrowRight size={16} />
+            </button>
+            <a href="#contacto" className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm tracking-wide"
+              style={{ border: `1px solid ${C.border}`, color: C.gray, background: 'rgba(255,255,255,0.03)' }}>
+              Contactar
+            </a>
           </div>
         </div>
 
-        {/* Horizontal scan line decoration */}
+        {/* Horizontal scan line */}
         <div className="absolute left-0 right-0 pointer-events-none" style={{ top: '50%', height: 1, background: `linear-gradient(90deg, transparent, ${C.blue}20, ${C.blue}40, ${C.blue}20, transparent)` }} />
 
         {/* Scroll indicator */}
-        <div style={fadeUp(900)} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
+        <div style={fadeUp(900)} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20">
           <span className="text-xs uppercase tracking-widest" style={{ color: C.gray }}>Scroll</span>
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
             <ChevronDown size={20} style={{ color: C.blue }} />
