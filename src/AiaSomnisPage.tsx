@@ -63,10 +63,10 @@ const SERVICES: {
 ]
 
 const TEAM = [
-  { name: 'Paco Gramaje',      role: 'Creative Director', initials: 'PG', photo: '/team/paco.jpg',   imgStyle: { objectPosition: 'center 15%', transform: 'scale(1.05)' } },
-  { name: 'Leonardo Bautista', role: 'Director Creativo', initials: 'LB', photo: '/team/LEO.png',    imgStyle: { objectPosition: 'center 10%', transform: 'scale(1.0)'  } },
-  { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL', photo: '/team/Anto.png',   imgStyle: { objectPosition: 'center 8%',  transform: 'scale(0.68)' } },
-  { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ', photo: '/team/MARTIN.png', imgStyle: { objectPosition: 'center 10%', transform: 'scale(1.0)'  } },
+  { name: 'Paco Gramaje',      role: 'Creative Director', initials: 'PG', photo: '/team/paco.jpg',   imgStyle: { objectPosition: 'center 12%' } },
+  { name: 'Leonardo Bautista', role: 'Director Creativo', initials: 'LB', photo: '/team/LEO.png',    imgStyle: { objectPosition: 'center 10%' } },
+  { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL', photo: '/team/Anto.png',   imgStyle: { objectPosition: 'center 25%' } },
+  { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ', photo: '/team/MARTIN.png', imgStyle: { objectPosition: 'center 10%' } },
 ]
 
 // ── Pexels CDN helper ─────────────────────────────────────────────────────────
@@ -874,7 +874,7 @@ export default function AiaSomnisPage() {
                         src={member.photo}
                         alt={member.name}
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                        style={{ transformOrigin: 'center top', ...member.imgStyle }}
+                        style={member.imgStyle}
                       />
                       {/* Dark gradient overlay at bottom */}
                       <div className="absolute inset-0"
