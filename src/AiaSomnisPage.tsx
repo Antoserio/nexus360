@@ -23,6 +23,7 @@ const C = {
 const SERVICES: {
   num: string; id: string; title: string; cardDesc: string; subtitle: string;
   desc: string; tags: string[]; accent: string; glow: string; Icon: LucideIcon
+  reel: string | null   // drop any .mp4 in /public and put its path here e.g. '/reel-01.mp4'
 }[] = [
   {
     num: '01', id: 'avatares', Icon: Bot,
@@ -32,6 +33,7 @@ const SERVICES: {
     desc: 'Creamos avatares conversacionales personalizados que pueden atender al público, presentar contenidos, responder preguntas, hablar en varios idiomas y captar leads en tiempo real.',
     tags: ['Ferias y exposiciones', 'Centros comerciales', 'Eventos corporativos', 'Presentador virtual', 'Multilingüe', 'Conectado a marca'],
     accent: '#00B8FF', glow: 'rgba(0,184,255,0.3)',
+    reel: null,
   },
   {
     num: '02', id: 'instalaciones', Icon: Layers,
@@ -41,6 +43,7 @@ const SERVICES: {
     desc: 'Diseñamos experiencias donde el público interactúa con cámaras, pantallas, sensores y sistemas generativos, creando contenido visual en tiempo real.',
     tags: ['Cámara + IA', 'Visuales reactivos', 'Photocalls inteligentes', 'Tótems interactivos', 'Holográfico', '360° inmersivo'],
     accent: '#22D3FF', glow: 'rgba(34,211,255,0.28)',
+    reel: null,
   },
   {
     num: '03', id: 'visuales', Icon: Film,
@@ -50,6 +53,7 @@ const SERVICES: {
     desc: 'Creamos imágenes, animaciones y mundos visuales con IA, combinando dirección artística, 3D, motion graphics y producción audiovisual profesional.',
     tags: ['Campañas publicitarias', 'Pantallas LED', 'Videomapping IA', 'Animaciones generativas', 'Conciertos y espectáculos'],
     accent: '#FFD42A', glow: 'rgba(255,212,42,0.22)',
+    reel: '/reel-test.mp4',   // ← cambia esta ruta cuando tengas el video real
   },
   {
     num: '04', id: 'digital', Icon: Globe,
@@ -59,6 +63,7 @@ const SERVICES: {
     desc: 'Creamos soluciones digitales con IA para automatizar procesos, captar leads, mejorar la atención al cliente y crear experiencias web más inteligentes.',
     tags: ['Webs con IA', 'Asistentes virtuales', 'Automatización de procesos', 'CRM integration', 'Experiencias 3D web'],
     accent: '#F6B93B', glow: 'rgba(246,185,59,0.22)',
+    reel: null,
   },
 ]
 
@@ -614,12 +619,10 @@ export default function AiaSomnisPage() {
             <span className="text-xs tracking-widest uppercase" style={{ color: C.border }}>Girasomnis × Immerso</span>
           </div>
 
-          {/* RIGHT: 4 service panels — alternating 2-col layout */}
+          {/* RIGHT: 4 service panels — info alternates L/R, reel full-width below */}
           <div className="flex-1 min-w-0">
             {SERVICES.map((s, i) => {
-              // i=0,2 → tags LEFT · reel RIGHT  |  i=1,3 → reel LEFT · tags RIGHT
-              const flip = i % 2 !== 0
-              const hasVideo = i === 2
+              const infoRight = i % 2 !== 0   // services 02 & 04 → info block floats right
 
               return (
                 <div key={s.id} ref={el => { sectionRefs.current[i] = el }}
@@ -633,86 +636,97 @@ export default function AiaSomnisPage() {
                     transition: 'opacity 0.6s ease',
                   }} />
 
-                  {/* ── HEADER: num · title · subtitle ── */}
-                  <div className="relative z-10" style={{ padding: 'clamp(1.5rem,3vw,3rem) clamp(1rem,3vw,2.5rem) 1rem' }}>
-                    <div className="flex items-baseline gap-3 flex-wrap">
-                      <span className="font-black tracking-[0.25em] text-xs uppercase flex-shrink-0"
-                        style={{ color: s.accent }}>{s.num}</span>
-                      <h2 className="font-black leading-tight"
-                        style={{ fontSize: 'clamp(1.3rem,2.4vw,2.1rem)', color: C.white }}>{s.title}</h2>
-                    </div>
-                    <p className="text-sm mt-1 ml-[calc(1.5ch+0.75rem)]" style={{ color: `${s.accent}BB` }}>{s.subtitle}</p>
-                  </div>
+                  {/* ── INFO BLOCK — floats left or right, full-width on mobile ── */}
+                  <div className={`relative z-10 flex ${infoRight ? 'justify-end' : 'justify-start'}`}
+                    style={{ padding: 'clamp(1.5rem,3vw,3rem) clamp(1rem,3vw,2.5rem) 1.25rem' }}>
+                    <div style={{ width: '100%', maxWidth: 'clamp(280px, 52%, 540px)' }}>
 
-                  {/* ── BODY: two columns ── */}
-                  <div className={`flex-1 flex flex-col md:flex-row gap-3 md:gap-4 relative z-10
-                    mx-3 mb-3 md:mx-5 md:mb-5 ${flip ? 'md:flex-row-reverse' : ''}`}>
+                      {/* num + title */}
+                      <div className="flex items-baseline gap-3 mb-1 flex-wrap">
+                        <span className="font-black tracking-[0.25em] text-xs uppercase flex-shrink-0"
+                          style={{ color: s.accent }}>{s.num}</span>
+                        <h2 className="font-black leading-tight"
+                          style={{ fontSize: 'clamp(1.6rem,3vw,2.6rem)', color: C.white }}>{s.title}</h2>
+                      </div>
 
-                    {/* ── TAGS / TEXT COLUMN ── */}
-                    <div className="md:w-[36%] flex flex-col justify-center gap-5 py-3 md:py-0"
-                      style={{ paddingLeft: 'clamp(0.25rem,1vw,1rem)', paddingRight: 'clamp(0.25rem,1vw,1rem)' }}>
-                      <p className="text-sm leading-relaxed" style={{ color: C.gray }}>{s.desc}</p>
+                      {/* subtitle */}
+                      <p className="mb-4" style={{ color: `${s.accent}CC`, fontSize: 'clamp(0.85rem,1.1vw,1rem)' }}>
+                        {s.subtitle}
+                      </p>
+
+                      {/* description */}
+                      <p className="leading-relaxed mb-5"
+                        style={{ color: C.gray, fontSize: 'clamp(0.9rem,1.1vw,1.05rem)', maxWidth: 460 }}>
+                        {s.desc}
+                      </p>
+
+                      {/* tags */}
                       <div className="flex flex-wrap gap-1.5">
                         {s.tags.map(tag => (
-                          <span key={tag} className="px-2.5 py-0.5 rounded-full text-xs font-medium"
-                            style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray }}>
+                          <span key={tag} className="px-2 py-0.5 rounded-full"
+                            style={{
+                              background: 'rgba(255,255,255,0.04)',
+                              border: `1px solid ${C.border}`,
+                              color: C.gray,
+                              fontSize: 11,
+                            }}>
                             {tag}
                           </span>
                         ))}
                       </div>
                     </div>
-
-                    {/* ── REEL COLUMN (NO overflow-hidden — fixed trail images escape to viewport) ── */}
-                    <div className="flex-1 relative"
-                      style={{ borderRadius: 14, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}`, minHeight: 'clamp(260px,38vh,520px)' }}>
-
-                      {/* Active glow */}
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 pointer-events-none" style={{
-                        background: `radial-gradient(ellipse at bottom, ${s.glow} 0%, transparent 70%)`,
-                        opacity: i === activeService ? 1 : 0,
-                        transition: 'opacity 0.6s ease',
-                      }} />
-
-                      <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={38} maxImages={8} imageWidth={160} imageHeight={160} maxRotation={8}>
-                        <div className="absolute inset-0 flex flex-col items-center justify-center cursor-none select-none">
-
-                          {/* Video (service 03 only) — no label when video shows */}
-                          {hasVideo && (
-                            <video src="/reel-test.mp4" autoPlay muted loop playsInline
-                              className="absolute inset-0 w-full h-full object-cover rounded-[13px] pointer-events-none"
-                              style={{ opacity: 0.6 }} />
-                          )}
-
-                          {/* Placeholder (services without video yet) */}
-                          {!hasVideo && (
-                            <>
-                              <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center mb-3"
-                                style={{ background: `${s.accent}22`, border: `1px solid ${s.accent}45` }}>
-                                <div className="w-0 h-0" style={{
-                                  borderTop: '8px solid transparent', borderBottom: '8px solid transparent',
-                                  borderLeft: `14px solid ${s.accent}`, marginLeft: 3,
-                                }} />
-                              </div>
-                              <span className="relative z-10 text-xs uppercase tracking-[0.3em]" style={{ color: `${s.accent}70` }}>
-                                Reel {s.num}
-                              </span>
-                            </>
-                          )}
-
-                          {/* Corner brackets */}
-                          {['top-4 left-4','top-4 right-4','bottom-4 left-4','bottom-4 right-4'].map((pos, ci) => (
-                            <div key={ci} className={`absolute ${pos} z-10 w-5 h-5 pointer-events-none`} style={{
-                              borderTop:    ci < 2      ? `1px solid ${s.accent}30` : 'none',
-                              borderBottom: ci >= 2     ? `1px solid ${s.accent}30` : 'none',
-                              borderLeft:   ci % 2 === 0 ? `1px solid ${s.accent}30` : 'none',
-                              borderRight:  ci % 2 !== 0 ? `1px solid ${s.accent}30` : 'none',
-                            }} />
-                          ))}
-                        </div>
-                      </ImageTrail>
-                    </div>
-
                   </div>
+
+                  {/* ── REEL — same full width as before (NO overflow-hidden) ── */}
+                  <div className="flex-1 relative mx-3 mb-3 md:mx-5 md:mb-5"
+                    style={{ minHeight: 'clamp(240px,40vh,420px)', borderRadius: 14, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}` }}>
+
+                    {/* Active glow */}
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 pointer-events-none" style={{
+                      background: `radial-gradient(ellipse at bottom, ${s.glow} 0%, transparent 70%)`,
+                      opacity: i === activeService ? 1 : 0,
+                      transition: 'opacity 0.6s ease',
+                    }} />
+
+                    <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={38} maxImages={8} imageWidth={160} imageHeight={160} maxRotation={8}>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center cursor-none select-none">
+
+                        {/* Video from s.reel path — drop file in /public, set path in SERVICES.reel */}
+                        {s.reel && (
+                          <video src={s.reel} autoPlay muted loop playsInline
+                            className="absolute inset-0 w-full h-full object-cover rounded-[13px] pointer-events-none"
+                            style={{ opacity: 0.62 }} />
+                        )}
+
+                        {/* Placeholder (no video yet) */}
+                        {!s.reel && (
+                          <>
+                            <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center mb-3"
+                              style={{ background: `${s.accent}22`, border: `1px solid ${s.accent}45` }}>
+                              <div className="w-0 h-0" style={{
+                                borderTop: '8px solid transparent', borderBottom: '8px solid transparent',
+                                borderLeft: `14px solid ${s.accent}`, marginLeft: 3,
+                              }} />
+                            </div>
+                            <span className="relative z-10 text-xs uppercase tracking-[0.3em]" style={{ color: `${s.accent}70` }}>
+                              Reel {s.num}
+                            </span>
+                          </>
+                        )}
+
+                        {/* Corner brackets */}
+                        {['top-4 left-4','top-4 right-4','bottom-4 left-4','bottom-4 right-4'].map((pos, ci) => (
+                          <div key={ci} className={`absolute ${pos} z-10 w-5 h-5 pointer-events-none`} style={{
+                            borderTop:    ci < 2       ? `1px solid ${s.accent}30` : 'none',
+                            borderBottom: ci >= 2      ? `1px solid ${s.accent}30` : 'none',
+                            borderLeft:   ci % 2 === 0 ? `1px solid ${s.accent}30` : 'none',
+                            borderRight:  ci % 2 !== 0 ? `1px solid ${s.accent}30` : 'none',
+                          }} />
+                        ))}
+                      </div>
+                    </ImageTrail>
+                  </div>
+
                 </div>
               )
             })}
