@@ -3,7 +3,8 @@ import { motion } from 'framer-motion'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
 import { Magazine3D } from '@/components/ui/magazine-3d'
-import { Mail, MapPin, ChevronDown, ArrowRight } from 'lucide-react'
+import { Mail, MapPin, ChevronDown, ArrowRight, Bot, Layers, Film, Globe } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 // Heavy components loaded only when needed
 const Spline = lazy(() => import('@splinetool/react-spline'))
@@ -19,34 +20,41 @@ const C = {
 }
 
 // ── 4 Services ────────────────────────────────────────────────────────────────
-const SERVICES = [
+const SERVICES: {
+  num: string; id: string; title: string; cardDesc: string; subtitle: string;
+  desc: string; tags: string[]; accent: string; glow: string; Icon: LucideIcon
+}[] = [
   {
-    num: '01', id: 'avatares',
+    num: '01', id: 'avatares', Icon: Bot,
     title: 'Avatares IA',
+    cardDesc: 'Avatares conversacionales para eventos, ferias y espacios físicos.',
     subtitle: 'para eventos, ferias y espacios físicos',
     desc: 'Creamos avatares conversacionales personalizados que pueden atender al público, presentar contenidos, responder preguntas, hablar en varios idiomas y captar leads en tiempo real.',
     tags: ['Ferias y exposiciones', 'Centros comerciales', 'Eventos corporativos', 'Presentador virtual', 'Multilingüe', 'Conectado a marca'],
     accent: '#00B8FF', glow: 'rgba(0,184,255,0.3)',
   },
   {
-    num: '02', id: 'instalaciones',
+    num: '02', id: 'instalaciones', Icon: Layers,
     title: 'Instalaciones interactivas',
+    cardDesc: 'Experiencias con IA, cámaras y pantallas en tiempo real.',
     subtitle: 'con Inteligencia Artificial',
     desc: 'Diseñamos experiencias donde el público interactúa con cámaras, pantallas, sensores y sistemas generativos, creando contenido visual en tiempo real.',
     tags: ['Cámara + IA', 'Visuales reactivos', 'Photocalls inteligentes', 'Tótems interactivos', 'Holográfico', '360° inmersivo'],
     accent: '#22D3FF', glow: 'rgba(34,211,255,0.28)',
   },
   {
-    num: '03', id: 'visuales',
-    title: 'Visuales generativos',
+    num: '03', id: 'visuales', Icon: Film,
+    title: 'Producción audiovisual con IA',
+    cardDesc: 'Contenido publicitario, visuales generativos y videomapping.',
     subtitle: 'y producción audiovisual con IA',
     desc: 'Creamos imágenes, animaciones y mundos visuales con IA, combinando dirección artística, 3D, motion graphics y producción audiovisual profesional.',
     tags: ['Campañas publicitarias', 'Pantallas LED', 'Videomapping IA', 'Animaciones generativas', 'Conciertos y espectáculos'],
     accent: '#FFD42A', glow: 'rgba(255,212,42,0.22)',
   },
   {
-    num: '04', id: 'digital',
-    title: 'Desarrollo digital, IA',
+    num: '04', id: 'digital', Icon: Globe,
+    title: 'Soluciones digitales con IA',
+    cardDesc: 'Webs, automatizaciones y agentes inteligentes para empresas.',
     subtitle: 'y automatizaciones',
     desc: 'Creamos soluciones digitales con IA para automatizar procesos, captar leads, mejorar la atención al cliente y crear experiencias web más inteligentes.',
     tags: ['Webs con IA', 'Asistentes virtuales', 'Automatización de procesos', 'CRM integration', 'Experiencias 3D web'],
@@ -55,10 +63,10 @@ const SERVICES = [
 ]
 
 const TEAM = [
-  { name: 'Paco Gramaje',      role: 'Creative Director', initials: 'PG' },
-  { name: 'Leonardo Bautista', role: 'Director Creativo', initials: 'LB' },
-  { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL' },
-  { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ' },
+  { name: 'Paco Gramaje',      role: 'Creative Director', initials: 'PG', photo: '/team/paco.jpg'   },
+  { name: 'Leonardo Bautista', role: 'Director Creativo', initials: 'LB', photo: '/team/leo.jpg'    },
+  { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL', photo: null               },
+  { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ', photo: '/team/martin.jpg' },
 ]
 
 // ── Pexels CDN helper ─────────────────────────────────────────────────────────
@@ -233,10 +241,10 @@ const RobotEye = memo(function RobotEye({ active }: { active: number }) {
 // ── HUD service card (hero corners) ───────────────────────────────────────────
 // corner: 0=top-left  1=top-right  2=bottom-left  3=bottom-right
 const CORNER_STYLES: React.CSSProperties[] = [
-  { top: '9%',     left: '2%'  },
-  { top: '9%',     right: '2%' },
-  { bottom: '14%', left: '2%'  },
-  { bottom: '14%', right: '2%' },
+  { top: '9%',     left: '1.5%' },
+  { top: '9%',     right: '1.5%' },
+  { bottom: '12%', left: '1.5%' },
+  { bottom: '12%', right: '1.5%' },
 ]
 
 function HudCard({
@@ -249,60 +257,88 @@ function HudCard({
   visible: boolean
 }) {
   const isRight = corner === 1 || corner === 3
+  const { Icon } = s
 
   return (
     <motion.div
       className="absolute z-20"
-      style={{ ...CORNER_STYLES[corner], pointerEvents: 'auto' }}
-      initial={{ opacity: 0, scale: 0.92 }}
-      animate={{ opacity: visible ? 1 : 0, scale: visible ? 1 : 0.92 }}
-      transition={{ duration: 0.6, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}>
+      style={{ ...CORNER_STYLES[corner], pointerEvents: 'none' }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 12 }}
+      transition={{ duration: 0.7, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}>
+
       <motion.div
         animate={{
-          boxShadow: active ? `0 0 40px ${s.glow}, 0 0 80px ${s.glow}` : '0 0 0px transparent',
-          borderColor: active ? s.accent : C.border,
+          boxShadow: active
+            ? `0 8px 32px ${s.glow}, 0 0 0 1px ${s.accent}80`
+            : `0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px ${C.border}`,
         }}
-        transition={{ duration: 0.4 }}
-        className="relative rounded-xl"
+        transition={{ duration: 0.45 }}
+        className="relative rounded-2xl overflow-hidden"
         style={{
-          background: active ? `rgba(5,10,20,0.88)` : 'rgba(5,10,20,0.72)',
-          backdropFilter: 'blur(16px)',
-          width: 'clamp(132px, 36vw, 190px)',
-          padding: 'clamp(8px, 2vw, 16px)',
-          border: `1px solid ${C.border}`,
+          background: active ? 'rgba(4,9,20,0.92)' : 'rgba(4,9,20,0.78)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          width: 'clamp(148px, 19vw, 210px)',
+          padding: 'clamp(10px, 1.4vw, 18px)',
         }}>
-        {/* HUD corner brackets */}
-        <motion.div animate={{ borderColor: active ? s.accent : `${s.accent}50` }} transition={{ duration: 0.4 }}
-          className="absolute top-0 left-0 w-3 h-3" style={{ borderTop: `1.5px solid ${s.accent}50`, borderLeft: `1.5px solid ${s.accent}50` }} />
-        <motion.div animate={{ borderColor: active ? s.accent : `${s.accent}50` }} transition={{ duration: 0.4 }}
-          className="absolute top-0 right-0 w-3 h-3" style={{ borderTop: `1.5px solid ${s.accent}50`, borderRight: `1.5px solid ${s.accent}50` }} />
-        <motion.div animate={{ borderColor: active ? s.accent : `${s.accent}50` }} transition={{ duration: 0.4 }}
-          className="absolute bottom-0 left-0 w-3 h-3" style={{ borderBottom: `1.5px solid ${s.accent}50`, borderLeft: `1.5px solid ${s.accent}50` }} />
-        <motion.div animate={{ borderColor: active ? s.accent : `${s.accent}50` }} transition={{ duration: 0.4 }}
-          className="absolute bottom-0 right-0 w-3 h-3" style={{ borderBottom: `1.5px solid ${s.accent}50`, borderRight: `1.5px solid ${s.accent}50` }} />
 
-        <div className={`flex items-start gap-3 ${isRight ? 'flex-row-reverse' : ''}`}>
-          <motion.div animate={{ background: active ? `${s.accent}28` : `${s.accent}10`, borderColor: active ? `${s.accent}70` : `${s.accent}30` }}
+        {/* Subtle inner border gradient when active */}
+        <motion.div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          animate={{ opacity: active ? 1 : 0 }}
+          transition={{ duration: 0.4 }}
+          style={{
+            background: `linear-gradient(135deg, ${s.accent}14 0%, transparent 60%)`,
+          }} />
+
+        {/* Icon row */}
+        <div className={`flex items-center gap-2.5 mb-2.5 ${isRight ? 'flex-row-reverse' : ''}`}>
+          <motion.div
+            animate={{
+              background: active ? `${s.accent}22` : `${s.accent}0D`,
+              borderColor: active ? `${s.accent}55` : `${s.accent}28`,
+            }}
             transition={{ duration: 0.4 }}
-            className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5"
-            style={{ border: `1px solid ${s.accent}30` }}>
-            <motion.span animate={{ color: active ? s.accent : `${s.accent}80` }} transition={{ duration: 0.4 }}
-              className="font-black text-xs">{s.num}</motion.span>
+            className="flex-shrink-0 rounded-xl flex items-center justify-center"
+            style={{
+              width: 'clamp(28px, 2.4vw, 34px)',
+              height: 'clamp(28px, 2.4vw, 34px)',
+              border: `1px solid ${s.accent}28`,
+            }}>
+            <motion.div animate={{ color: active ? s.accent : `${s.accent}70` }} transition={{ duration: 0.4 }}>
+              <Icon size={14} />
+            </motion.div>
           </motion.div>
-          <div className={isRight ? 'text-right' : ''}>
-            <motion.h3 animate={{ color: active ? C.white : C.gray }} transition={{ duration: 0.4 }}
-              className="font-bold text-sm leading-tight mb-1">{s.title}</motion.h3>
-            <motion.p animate={{ color: active ? C.gray : `${C.gray}60` }} transition={{ duration: 0.4 }}
-              className="text-xs leading-snug">{s.subtitle}</motion.p>
-          </div>
+
+          <motion.h3
+            animate={{ color: active ? C.white : '#8898AA' }}
+            transition={{ duration: 0.4 }}
+            className={`font-bold leading-tight ${isRight ? 'text-right' : ''}`}
+            style={{ fontSize: 'clamp(11px, 1.1vw, 14px)' }}>
+            {s.title}
+          </motion.h3>
         </div>
 
-        {/* Active scan line */}
-        <motion.div
-          animate={{ scaleX: active ? 1 : 0, opacity: active ? 1 : 0 }}
+        {/* Description — hidden on phones (< 480px), shown on larger screens */}
+        <motion.p
+          animate={{ color: active ? '#8898AA' : '#4A5568' }}
           transition={{ duration: 0.4 }}
-          className="absolute bottom-0 inset-x-0 h-px rounded-full"
-          style={{ background: `linear-gradient(90deg, transparent, ${s.accent}, transparent)`, transformOrigin: 'center' }} />
+          className={`hidden min-[480px]:block text-xs leading-relaxed ${isRight ? 'text-right' : ''}`}
+          style={{ fontSize: 'clamp(10px, 0.85vw, 12px)' }}>
+          {s.cardDesc}
+        </motion.p>
+
+        {/* Bottom accent line */}
+        <motion.div
+          className="absolute bottom-0 inset-x-0 h-[2px] rounded-full"
+          animate={{
+            background: active
+              ? `linear-gradient(90deg, transparent, ${s.accent}, transparent)`
+              : 'transparent',
+            opacity: active ? 1 : 0,
+          }}
+          transition={{ duration: 0.4 }} />
       </motion.div>
     </motion.div>
   )
@@ -824,21 +860,47 @@ export default function AiaSomnisPage() {
             {TEAM.map((member, i) => (
               <motion.div key={member.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="rounded-2xl p-6 text-center cursor-default transition-all duration-300"
+                className="rounded-2xl overflow-hidden text-center cursor-default transition-all duration-300 group"
                 style={{ background: 'rgba(5,7,13,0.8)', border: `1px solid ${C.border}` }}
                 onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = C.blue}
                 onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.borderColor = C.border}>
-                <div className="w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center relative overflow-hidden"
-                  style={{ background: `linear-gradient(135deg, ${C.bg2}, #0D1829)`, border: `1px solid ${C.border}` }}>
-                  <span className="font-black text-xl" style={{ color: C.blue }}>{member.initials}</span>
+
+                {/* Photo / avatar area */}
+                <div className="relative w-full aspect-[3/4] overflow-hidden"
+                  style={{ background: `linear-gradient(160deg, #0D1829 0%, ${C.bg} 100%)` }}>
+                  {member.photo ? (
+                    <>
+                      <img
+                        src={member.photo}
+                        alt={member.name}
+                        className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-700"
+                      />
+                      {/* Dark gradient overlay at bottom */}
+                      <div className="absolute inset-0"
+                        style={{ background: 'linear-gradient(to top, rgba(5,7,13,0.9) 0%, rgba(5,7,13,0.1) 55%, transparent 100%)' }} />
+                    </>
+                  ) : (
+                    /* No photo yet: initials placeholder */
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                        style={{ background: `linear-gradient(135deg, ${C.bg2}, #0D1829)`, border: `1px solid ${C.border}` }}>
+                        <span className="font-black text-2xl" style={{ color: C.blue }}>{member.initials}</span>
+                      </div>
+                      <span className="text-xs" style={{ color: C.border }}>Próximamente</span>
+                    </div>
+                  )}
+                  {/* Bottom gradient to blend into card body */}
                   <div className="absolute bottom-0 inset-x-0 h-1" style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.gold})` }} />
                 </div>
-                <h3 className="font-bold text-sm mb-1" style={{ color: C.white }}>{member.name}</h3>
-                <span className="text-xs uppercase tracking-wide" style={{ color: C.gray }}>{member.role}</span>
+
+                {/* Name / role */}
+                <div className="px-4 py-4">
+                  <h3 className="font-bold text-sm mb-1" style={{ color: C.white }}>{member.name}</h3>
+                  <span className="text-xs uppercase tracking-wide" style={{ color: C.gray }}>{member.role}</span>
+                </div>
               </motion.div>
             ))}
           </div>
-          <p className="text-center text-xs mt-8" style={{ color: C.border }}>Fotos próximamente</p>
         </div>
       </section>
 
