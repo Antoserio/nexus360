@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
 import { Magazine3D } from '@/components/ui/magazine-3d'
-import { Mail, MapPin, ChevronDown, ArrowRight, Bot, Layers, Film, Globe } from 'lucide-react'
+import { Mail, MapPin, ChevronDown, ArrowRight, Bot, Layers, Film, Globe, Volume2, VolumeX } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 // Heavy components loaded only when needed
@@ -380,8 +380,22 @@ export default function AiaSomnisPage() {
   const [scrolledPastHero, setScrolledPastHero] = useState(false)
   const [splineInView, setSplineInView] = useState(false)
   const [heroQuadrant, setHeroQuadrant] = useState<0|1|2|3|null>(null)
+  const [soundOn, setSoundOn] = useState(false)
+  const audioRef = useRef<HTMLAudioElement>(null)
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
   const heroRef = useRef<HTMLElement>(null)
+
+  const toggleSound = useCallback(() => {
+    if (!audioRef.current) return
+    if (soundOn) {
+      audioRef.current.pause()
+      setSoundOn(false)
+    } else {
+      audioRef.current.volume = 0.55
+      audioRef.current.play().catch(() => {/* autoplay blocked — user gesture already happened, ignore */})
+      setSoundOn(true)
+    }
+  }, [soundOn])
 
   useEffect(() => {
     const t = setTimeout(() => setHeroVisible(true), 100)
@@ -619,15 +633,16 @@ export default function AiaSomnisPage() {
             <span className="text-xs tracking-widest uppercase" style={{ color: C.border }}>Girasomnis × Immerso</span>
           </div>
 
-          {/* RIGHT: 4 service panels — info alternates L/R, reel full-width below */}
+          {/* RIGHT: 4 service panels — TRUE 2-col side-by-side, alternating */}
           <div className="flex-1 min-w-0">
             {SERVICES.map((s, i) => {
-              const infoRight = i % 2 !== 0   // services 02 & 04 → info block floats right
+              // i=0,2: text LEFT · reel RIGHT   |   i=1,3: reel LEFT · text RIGHT
+              const textRight = i % 2 !== 0
 
               return (
                 <div key={s.id} ref={el => { sectionRefs.current[i] = el }}
-                  className="min-h-screen flex flex-col relative"
-                  style={{ padding: 0 }}>
+                  className="relative"
+                  style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column' }}>
 
                   {/* Glow bg */}
                   <div className="absolute inset-0 pointer-events-none" style={{
@@ -636,27 +651,28 @@ export default function AiaSomnisPage() {
                     transition: 'opacity 0.6s ease',
                   }} />
 
-                  {/* ── INFO BLOCK — floats left or right, full-width on mobile ── */}
-                  <div className={`relative z-10 flex ${infoRight ? 'justify-end' : 'justify-start'}`}
-                    style={{ padding: 'clamp(1.5rem,3vw,3rem) clamp(1rem,3vw,2.5rem) 1.25rem' }}>
-                    <div style={{ width: '100%', maxWidth: 'clamp(280px, 52%, 540px)' }}>
+                  {/* ── 2-COLUMN BODY (flex-row on md+, flex-col on mobile) ── */}
+                  <div className={`flex-1 flex flex-col md:flex-row relative z-10 gap-0`}
+                    style={{ minHeight: 'inherit' }}>
+
+                    {/* ── TEXT COLUMN ── narrow, full height, alternates order */}
+                    <div
+                      className={`flex flex-col justify-center gap-5 p-6 md:p-8 lg:p-10 ${textRight ? 'md:order-2' : 'md:order-1'}`}
+                      style={{ width: '100%', flexShrink: 0, borderBottom: `1px solid ${C.border}` }}
+                      ref={el => { if (el) { el.style.cssText += '; @media (min-width: 768px) { width: 300px; border-bottom: none; border-right: 1px solid #223044; }' } }}>
 
                       {/* num + title */}
-                      <div className="flex items-baseline gap-3 mb-1 flex-wrap">
-                        <span className="font-black tracking-[0.25em] text-xs uppercase flex-shrink-0"
+                      <div>
+                        <span className="block text-xs font-black tracking-[0.3em] uppercase mb-2"
                           style={{ color: s.accent }}>{s.num}</span>
-                        <h2 className="font-black leading-tight"
-                          style={{ fontSize: 'clamp(1.6rem,3vw,2.6rem)', color: C.white }}>{s.title}</h2>
+                        <h2 className="font-black leading-tight mb-2"
+                          style={{ fontSize: 'clamp(1.5rem,2.8vw,2.5rem)', color: C.white }}>{s.title}</h2>
+                        <p style={{ color: `${s.accent}CC`, fontSize: '0.9rem' }}>{s.subtitle}</p>
                       </div>
 
-                      {/* subtitle */}
-                      <p className="mb-4" style={{ color: `${s.accent}CC`, fontSize: 'clamp(0.85rem,1.1vw,1rem)' }}>
-                        {s.subtitle}
-                      </p>
-
                       {/* description */}
-                      <p className="leading-relaxed mb-5"
-                        style={{ color: C.gray, fontSize: 'clamp(0.9rem,1.1vw,1.05rem)', maxWidth: 460 }}>
+                      <p className="leading-relaxed"
+                        style={{ color: C.gray, fontSize: 'clamp(0.88rem,1vw,1rem)' }}>
                         {s.desc}
                       </p>
 
@@ -664,69 +680,70 @@ export default function AiaSomnisPage() {
                       <div className="flex flex-wrap gap-1.5">
                         {s.tags.map(tag => (
                           <span key={tag} className="px-2 py-0.5 rounded-full"
-                            style={{
-                              background: 'rgba(255,255,255,0.04)',
-                              border: `1px solid ${C.border}`,
-                              color: C.gray,
-                              fontSize: 11,
-                            }}>
+                            style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray, fontSize: 11 }}>
                             {tag}
                           </span>
                         ))}
                       </div>
                     </div>
-                  </div>
 
-                  {/* ── REEL — same full width as before (NO overflow-hidden) ── */}
-                  <div className="flex-1 relative mx-3 mb-3 md:mx-5 md:mb-5"
-                    style={{ minHeight: 'clamp(240px,40vh,420px)', borderRadius: 14, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}` }}>
+                    {/* ── REEL COLUMN ── flex-1 = takes all remaining width, full height */}
+                    {/* NO overflow-hidden — position:fixed trail images must escape to viewport */}
+                    <div className={`flex-1 relative ${textRight ? 'md:order-1' : 'md:order-2'}`}
+                      style={{ minHeight: 'clamp(280px,55vh,700px)' }}>
 
-                    {/* Active glow */}
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 pointer-events-none" style={{
-                      background: `radial-gradient(ellipse at bottom, ${s.glow} 0%, transparent 70%)`,
-                      opacity: i === activeService ? 1 : 0,
-                      transition: 'opacity 0.6s ease',
-                    }} />
+                      {/* inner rounded container with margin */}
+                      <div className="absolute inset-3 md:inset-4"
+                        style={{ borderRadius: 14, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}` }}>
 
-                    <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={38} maxImages={8} imageWidth={160} imageHeight={160} maxRotation={8}>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center cursor-none select-none">
+                        {/* Active glow */}
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 pointer-events-none" style={{
+                          background: `radial-gradient(ellipse at bottom, ${s.glow} 0%, transparent 70%)`,
+                          opacity: i === activeService ? 1 : 0,
+                          transition: 'opacity 0.6s ease',
+                        }} />
 
-                        {/* Video from s.reel path — drop file in /public, set path in SERVICES.reel */}
-                        {s.reel && (
-                          <video src={s.reel} autoPlay muted loop playsInline
-                            className="absolute inset-0 w-full h-full object-cover rounded-[13px] pointer-events-none"
-                            style={{ opacity: 0.62 }} />
-                        )}
+                        <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={38} maxImages={8} imageWidth={160} imageHeight={160} maxRotation={8}>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center cursor-none select-none">
 
-                        {/* Placeholder (no video yet) */}
-                        {!s.reel && (
-                          <>
-                            <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center mb-3"
-                              style={{ background: `${s.accent}22`, border: `1px solid ${s.accent}45` }}>
-                              <div className="w-0 h-0" style={{
-                                borderTop: '8px solid transparent', borderBottom: '8px solid transparent',
-                                borderLeft: `14px solid ${s.accent}`, marginLeft: 3,
+                            {/* Video — driven by s.reel field */}
+                            {s.reel && (
+                              <video src={s.reel} autoPlay muted loop playsInline
+                                className="absolute inset-0 w-full h-full object-cover rounded-[13px] pointer-events-none"
+                                style={{ opacity: 0.65 }} />
+                            )}
+
+                            {/* Placeholder */}
+                            {!s.reel && (
+                              <>
+                                <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center mb-3"
+                                  style={{ background: `${s.accent}22`, border: `1px solid ${s.accent}45` }}>
+                                  <div className="w-0 h-0" style={{
+                                    borderTop: '8px solid transparent', borderBottom: '8px solid transparent',
+                                    borderLeft: `14px solid ${s.accent}`, marginLeft: 3,
+                                  }} />
+                                </div>
+                                <span className="relative z-10 text-xs uppercase tracking-[0.3em]" style={{ color: `${s.accent}70` }}>
+                                  Reel {s.num}
+                                </span>
+                              </>
+                            )}
+
+                            {/* Corner brackets */}
+                            {['top-4 left-4','top-4 right-4','bottom-4 left-4','bottom-4 right-4'].map((pos, ci) => (
+                              <div key={ci} className={`absolute ${pos} z-10 w-5 h-5 pointer-events-none`} style={{
+                                borderTop:    ci < 2       ? `1px solid ${s.accent}30` : 'none',
+                                borderBottom: ci >= 2      ? `1px solid ${s.accent}30` : 'none',
+                                borderLeft:   ci % 2 === 0 ? `1px solid ${s.accent}30` : 'none',
+                                borderRight:  ci % 2 !== 0 ? `1px solid ${s.accent}30` : 'none',
                               }} />
-                            </div>
-                            <span className="relative z-10 text-xs uppercase tracking-[0.3em]" style={{ color: `${s.accent}70` }}>
-                              Reel {s.num}
-                            </span>
-                          </>
-                        )}
-
-                        {/* Corner brackets */}
-                        {['top-4 left-4','top-4 right-4','bottom-4 left-4','bottom-4 right-4'].map((pos, ci) => (
-                          <div key={ci} className={`absolute ${pos} z-10 w-5 h-5 pointer-events-none`} style={{
-                            borderTop:    ci < 2       ? `1px solid ${s.accent}30` : 'none',
-                            borderBottom: ci >= 2      ? `1px solid ${s.accent}30` : 'none',
-                            borderLeft:   ci % 2 === 0 ? `1px solid ${s.accent}30` : 'none',
-                            borderRight:  ci % 2 !== 0 ? `1px solid ${s.accent}30` : 'none',
-                          }} />
-                        ))}
+                            ))}
+                          </div>
+                        </ImageTrail>
                       </div>
-                    </ImageTrail>
-                  </div>
+                    </div>
 
+                  </div>
                 </div>
               )
             })}
@@ -977,6 +994,40 @@ export default function AiaSomnisPage() {
           </div>
         </div>
       </section>
+
+      {/* ── AUDIO + SOUND TOGGLE ── */}
+      <audio
+        ref={audioRef}
+        src="/magnific-hand-covers-bruise.mp3"
+        loop
+        preload="none"
+      />
+      <motion.button
+        onClick={toggleSound}
+        className="fixed z-50 flex items-center gap-2 rounded-full font-bold text-xs tracking-widest uppercase cursor-pointer"
+        style={{
+          bottom: '2rem',
+          right: '1.5rem',
+          padding: '10px 18px',
+          background: soundOn
+            ? `linear-gradient(135deg, ${C.blue}22, ${C.deep}44)`
+            : 'rgba(5,7,13,0.82)',
+          border: `1px solid ${soundOn ? C.blue : C.border}`,
+          color: soundOn ? C.blue : C.gray,
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+        }}
+        animate={{
+          boxShadow: soundOn
+            ? [`0 0 0px ${C.blue}`, `0 0 18px ${C.blue}88`, `0 0 0px ${C.blue}`]
+            : '0 4px 20px rgba(0,0,0,0.5)',
+        }}
+        transition={soundOn ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.3 }}
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.94 }}>
+        {soundOn ? <Volume2 size={15} /> : <VolumeX size={15} />}
+        <span>{soundOn ? 'SONIDO ON' : 'SONIDO OFF'}</span>
+      </motion.button>
 
       {/* ── FOOTER ── */}
       <footer className="py-10 px-6" style={{ borderTop: `1px solid ${C.border}`, background: C.bg }}>
