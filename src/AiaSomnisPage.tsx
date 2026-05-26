@@ -64,9 +64,9 @@ const SERVICES: {
 
 const TEAM = [
   { name: 'Paco Gramaje',      role: 'Creative Director', initials: 'PG', photo: '/team/paco.jpg'   },
-  { name: 'Leonardo Bautista', role: 'Director Creativo', initials: 'LB', photo: '/team/leo.jpg'    },
-  { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL', photo: null               },
-  { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ', photo: '/team/martin.jpg' },
+  { name: 'Leonardo Bautista', role: 'Director Creativo', initials: 'LB', photo: '/team/LEO.png'    },
+  { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL', photo: '/team/Anto.png'   },
+  { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ', photo: '/team/MARTIN.png' },
 ]
 
 // ── Pexels CDN helper ─────────────────────────────────────────────────────────
