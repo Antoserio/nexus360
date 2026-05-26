@@ -233,10 +233,10 @@ const RobotEye = memo(function RobotEye({ active }: { active: number }) {
 // ── HUD service card (hero corners) ───────────────────────────────────────────
 // corner: 0=top-left  1=top-right  2=bottom-left  3=bottom-right
 const CORNER_STYLES: React.CSSProperties[] = [
-  { top: '10%',    left: '3%'  },
-  { top: '10%',    right: '3%' },
-  { bottom: '18%', left: '3%'  },
-  { bottom: '18%', right: '3%' },
+  { top: '9%',     left: '2%'  },
+  { top: '9%',     right: '2%' },
+  { bottom: '14%', left: '2%'  },
+  { bottom: '14%', right: '2%' },
 ]
 
 function HudCard({
@@ -263,11 +263,12 @@ function HudCard({
           borderColor: active ? s.accent : C.border,
         }}
         transition={{ duration: 0.4 }}
-        className="relative p-4 rounded-xl"
+        className="relative rounded-xl"
         style={{
-          background: active ? `rgba(5,10,20,0.85)` : 'rgba(5,10,20,0.65)',
+          background: active ? `rgba(5,10,20,0.88)` : 'rgba(5,10,20,0.72)',
           backdropFilter: 'blur(16px)',
-          width: 190,
+          width: 'clamp(132px, 36vw, 190px)',
+          padding: 'clamp(8px, 2vw, 16px)',
           border: `1px solid ${C.border}`,
         }}>
         {/* HUD corner brackets */}
@@ -369,15 +370,26 @@ export default function AiaSomnisPage() {
   }, [])
 
   const lastQuadrant = useRef<number | null>(null)
-  const onHeroMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+
+  const detectQuadrant = useCallback((clientX: number, clientY: number, el: HTMLElement) => {
+    const rect = el.getBoundingClientRect()
     const cx = rect.left + rect.width / 2
     const cy = rect.top + rect.height / 2
-    const isRight = e.clientX >= cx
-    const isBottom = e.clientY >= cy
+    const isRight = clientX >= cx
+    const isBottom = clientY >= cy
     const q = (!isRight && !isBottom) ? 0 : (isRight && !isBottom) ? 1 : (!isRight && isBottom) ? 2 : 3
     if (q !== lastQuadrant.current) { lastQuadrant.current = q; setHeroQuadrant(q as 0|1|2|3) }
   }, [])
+
+  const onHeroMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    detectQuadrant(e.clientX, e.clientY, e.currentTarget as HTMLElement)
+  }, [detectQuadrant])
+
+  const onHeroTouchMove = useCallback((e: React.TouchEvent<HTMLElement>) => {
+    const touch = e.touches[0]
+    if (!touch) return
+    detectQuadrant(touch.clientX, touch.clientY, e.currentTarget as HTMLElement)
+  }, [detectQuadrant])
 
   const fadeUp = (delay: number): React.CSSProperties => ({
     opacity: heroVisible ? 1 : 0,
@@ -428,7 +440,9 @@ export default function AiaSomnisPage() {
         className="relative min-h-screen overflow-hidden"
         style={{ background: `radial-gradient(ellipse at 50% 40%, #102B4A 0%, ${C.bg2} 45%, ${C.bg} 100%)` }}
         onMouseMove={onHeroMouseMove}
-        onMouseLeave={() => setHeroQuadrant(null)}>
+        onMouseLeave={() => { lastQuadrant.current = null; setHeroQuadrant(null) }}
+        onTouchMove={onHeroTouchMove}
+        onTouchEnd={() => { lastQuadrant.current = null; setHeroQuadrant(null) }}>
 
         {/* Grid overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
@@ -444,28 +458,26 @@ export default function AiaSomnisPage() {
           }}
           transition={{ duration: 0.5 }} />
 
-        {/* ── 4 CORNER CARDS — desktop only ── */}
-        <div className="hidden lg:contents">
-          {([0, 1, 2, 3] as const).map(corner => (
-            <HudCard
-              key={corner}
-              s={SERVICES[CORNER_SERVICE[corner]]}
-              delay={300 + corner * 100}
-              corner={corner}
-              active={heroQuadrant === corner}
-              visible={heroVisible}
-            />
-          ))}
-        </div>
+        {/* ── 4 CORNER CARDS — all screen sizes ── */}
+        {([0, 1, 2, 3] as const).map(corner => (
+          <HudCard
+            key={corner}
+            s={SERVICES[CORNER_SERVICE[corner]]}
+            delay={300 + corner * 100}
+            corner={corner}
+            active={heroQuadrant === corner}
+            visible={heroVisible}
+          />
+        ))}
 
         {/* ── CENTER: Robot + title + CTA ── */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none">
 
           {/* Badge */}
-          <div className="mb-6 pointer-events-none" style={fadeUp(0)}>
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
-              style={{ background: 'rgba(0,184,255,0.08)', border: `1px solid rgba(0,184,255,0.25)`, color: C.blue }}>
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: C.blue }} />
+          <div className="mb-6 pointer-events-none px-2" style={fadeUp(0)}>
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-semibold tracking-widest uppercase"
+              style={{ background: 'rgba(0,184,255,0.08)', border: `1px solid rgba(0,184,255,0.25)`, color: C.blue, fontSize: 'clamp(9px, 2.3vw, 12px)' }}>
+              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse" style={{ background: C.blue }} />
               Artificial Intelligence Agency
             </span>
           </div>
@@ -526,17 +538,6 @@ export default function AiaSomnisPage() {
             </a>
           </div>
 
-          {/* Mobile-only service grid (corner cards hidden on mobile) */}
-          <div className="lg:hidden grid grid-cols-2 gap-2 mt-5 px-6 pointer-events-auto w-full max-w-sm" style={fadeUp(750)}>
-            {SERVICES.map((s, i) => (
-              <button key={s.id} onClick={() => scrollTo(i)}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-left"
-                style={{ background: 'rgba(5,10,20,0.75)', border: `1px solid ${C.border}` }}>
-                <span className="font-black text-xs flex-shrink-0" style={{ color: s.accent }}>{s.num}</span>
-                <span className="text-xs leading-tight truncate" style={{ color: C.gray }}>{s.title}</span>
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Horizontal scan line */}
@@ -603,10 +604,10 @@ export default function AiaSomnisPage() {
                   }} />
 
                 {/* ── TOP: compact service info ── */}
-                <div className="relative z-10 flex items-start gap-3 md:gap-5"
+                <div className="relative z-10 flex items-start gap-2 md:gap-5"
                   style={{ padding: 'clamp(1.2rem, 3vw, 3rem) clamp(1rem, 3vw, 3rem) 1rem' }}>
-                  {/* Big number watermark */}
-                  <span className="font-black leading-none select-none flex-shrink-0"
+                  {/* Big number watermark — hidden on very small screens to avoid overlap */}
+                  <span className="hidden sm:block font-black leading-none select-none flex-shrink-0"
                     style={{
                       fontSize: 'clamp(3rem,5vw,5rem)',
                       color: s.accent,
@@ -615,8 +616,10 @@ export default function AiaSomnisPage() {
                       transition: 'opacity 0.5s ease',
                     }}>{s.num}</span>
                   <div className="flex-1 min-w-0">
+                    {/* Inline small number label on tiny phones */}
+                    <span className="sm:hidden text-xs font-black tracking-widest mb-1 block" style={{ color: s.accent }}>{s.num}</span>
                     <h2 className="font-black leading-tight mb-1"
-                      style={{ fontSize: 'clamp(1.4rem,2.5vw,2.2rem)', color: C.white }}>{s.title}</h2>
+                      style={{ fontSize: 'clamp(1.25rem,2.5vw,2.2rem)', color: C.white }}>{s.title}</h2>
                     <p className="text-sm mb-3" style={{ color: s.accent }}>{s.subtitle}</p>
                     <p className="text-sm leading-relaxed mb-4" style={{ color: C.gray, maxWidth: 480 }}>{s.desc}</p>
                     <div className="flex flex-wrap gap-1.5">
@@ -651,15 +654,24 @@ export default function AiaSomnisPage() {
                     maxRotation={8}
                   >
                     <div className="absolute inset-0 flex flex-col items-center justify-center cursor-none select-none">
+                      {/* Video background for service 03 — Visuales generativos */}
+                      {i === 2 && (
+                        <video
+                          src="/reel-test.mp4"
+                          autoPlay muted loop playsInline
+                          className="absolute inset-0 w-full h-full object-cover rounded-[13px] pointer-events-none"
+                          style={{ opacity: 0.55 }}
+                        />
+                      )}
                       {/* Play icon */}
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3"
-                        style={{ background: `${s.accent}16`, border: `1px solid ${s.accent}30` }}>
+                      <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center mb-3"
+                        style={{ background: `${s.accent}22`, border: `1px solid ${s.accent}45` }}>
                         <div className="w-0 h-0" style={{
                           borderTop: '8px solid transparent', borderBottom: '8px solid transparent',
                           borderLeft: `14px solid ${s.accent}`, marginLeft: 3,
                         }} />
                       </div>
-                      <span className="text-xs uppercase tracking-[0.3em]" style={{ color: `${s.accent}55` }}>
+                      <span className="relative z-10 text-xs uppercase tracking-[0.3em]" style={{ color: `${s.accent}80` }}>
                         Reel {s.num}
                       </span>
                       {/* Corner HUD brackets */}
@@ -669,7 +681,7 @@ export default function AiaSomnisPage() {
                         'bottom-4 left-4',
                         'bottom-4 right-4',
                       ].map((pos, ci) => (
-                        <div key={ci} className={`absolute ${pos} w-5 h-5 pointer-events-none`}
+                        <div key={ci} className={`absolute ${pos} z-10 w-5 h-5 pointer-events-none`}
                           style={{
                             borderTop:    ci < 2     ? `1px solid ${s.accent}35` : 'none',
                             borderBottom: ci >= 2    ? `1px solid ${s.accent}35` : 'none',

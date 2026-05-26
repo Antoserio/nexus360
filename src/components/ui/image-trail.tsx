@@ -70,10 +70,47 @@ export function ImageTrail({
     lastPos.current = { x: -9999, y: -9999 }
   }, [])
 
+  // ── Touch support (same logic, reads touches[0]) ──────────────────────────
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0]
+    if (!touch) return
+    if (rafGate.current) return
+    rafGate.current = true
+    requestAnimationFrame(() => { rafGate.current = false })
+
+    const dx = touch.clientX - lastPos.current.x
+    const dy = touch.clientY - lastPos.current.y
+    if (dx * dx + dy * dy < triggerDistance * triggerDistance) return
+
+    lastPos.current = { x: touch.clientX, y: touch.clientY }
+
+    const id  = Date.now() + Math.random()
+    const src = images[imgIdx.current % images.length]
+    imgIdx.current++
+
+    setItems(prev => [
+      ...prev.slice(-(maxImages - 1)),
+      { id, x: touch.clientX, y: touch.clientY, src, rotate: (Math.random() - 0.5) * maxRotation * 2 },
+    ])
+
+    const t = setTimeout(
+      () => setItems(prev => prev.filter(item => item.id !== id)),
+      650,
+    )
+    timers.current.push(t)
+    if (timers.current.length > maxImages * 2) {
+      timers.current = timers.current.slice(-maxImages)
+    }
+  }, [images, triggerDistance, maxImages, maxRotation])
+
+  const onTouchEnd = useCallback(() => {
+    lastPos.current = { x: -9999, y: -9999 }
+  }, [])
+
   return (
     // absolute inset-0 → always fills the nearest positioned ancestor,
     // no dependency on height:100% chain through flex items
-    <div onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} className="absolute inset-0">
+    <div onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} className="absolute inset-0">
       {children}
       <AnimatePresence>
         {items.map(item => (
