@@ -65,7 +65,7 @@ const SERVICES: {
 const TEAM = [
   { name: 'Paco Gramaje',      role: 'Creative Director', initials: 'PG', photo: '/team/paco.jpg',   imgStyle: { objectPosition: 'center 12%' } },
   { name: 'Leonardo Bautista', role: 'Director Creativo', initials: 'LB', photo: '/team/LEO.png',    imgStyle: { objectPosition: 'center 10%' } },
-  { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL', photo: '/team/Anto.png',   imgStyle: { objectPosition: 'center 25%' } },
+  { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL', photo: '/team/anto.jpg',   imgStyle: { objectPosition: 'center 20%' } },
   { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ', photo: '/team/MARTIN.png', imgStyle: { objectPosition: 'center 10%' } },
 ]
 
