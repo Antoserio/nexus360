@@ -43,7 +43,7 @@ const SERVICES: {
     desc: 'Diseñamos experiencias donde el público interactúa con cámaras, pantallas, sensores y sistemas generativos, creando contenido visual en tiempo real.',
     tags: ['Cámara + IA', 'Visuales reactivos', 'Photocalls inteligentes', 'Tótems interactivos', 'Holográfico', '360° inmersivo'],
     accent: '#22D3FF', glow: 'rgba(34,211,255,0.28)',
-    reel: null,
+    reel: '/Preview.mp4',
   },
   {
     num: '03', id: 'visuales', Icon: Film,
@@ -652,14 +652,12 @@ export default function AiaSomnisPage() {
                   }} />
 
                   {/* ── 2-COLUMN BODY (flex-row on md+, flex-col on mobile) ── */}
-                  <div className={`flex-1 flex flex-col md:flex-row relative z-10 gap-0`}
-                    style={{ minHeight: 'inherit' }}>
+                  <div className="flex-1 flex flex-col md:flex-row relative z-10">
 
-                    {/* ── TEXT COLUMN ── narrow, full height, alternates order */}
+                    {/* ── TEXT COLUMN ── fixed width on desktop, full width on mobile */}
                     <div
-                      className={`flex flex-col justify-center gap-5 p-6 md:p-8 lg:p-10 ${textRight ? 'md:order-2' : 'md:order-1'}`}
-                      style={{ width: '100%', flexShrink: 0, borderBottom: `1px solid ${C.border}` }}
-                      ref={el => { if (el) { el.style.cssText += '; @media (min-width: 768px) { width: 300px; border-bottom: none; border-right: 1px solid #223044; }' } }}>
+                      className={`flex flex-col justify-center gap-5 p-7 md:p-10 lg:p-14 shrink-0 w-full md:w-[300px] lg:w-[360px] border-b md:border-b-0 ${textRight ? 'md:order-2 md:border-l' : 'md:order-1 md:border-r'}`}
+                      style={{ borderColor: C.border }}>
 
                       {/* num + title */}
                       <div>
