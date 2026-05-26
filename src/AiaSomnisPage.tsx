@@ -685,59 +685,68 @@ export default function AiaSomnisPage() {
                       </div>
                     </div>
 
-                    {/* ── REEL COLUMN ── flex-1 = takes all remaining width, full height */}
-                    {/* NO overflow-hidden — position:fixed trail images must escape to viewport */}
+                    {/* ── REEL COLUMN ── fills all remaining space, edge-to-edge */}
                     <div className={`flex-1 relative ${textRight ? 'md:order-1' : 'md:order-2'}`}
-                      style={{ minHeight: 'clamp(280px,55vh,700px)' }}>
+                      style={{ minHeight: 'clamp(300px,60vh,100vh)' }}>
 
-                      {/* inner rounded container with margin */}
-                      <div className="absolute inset-3 md:inset-4"
-                        style={{ borderRadius: 14, background: 'rgba(2,4,11,0.98)', border: `1px solid ${C.border}` }}>
+                      <div className="absolute inset-0" style={{ background: '#02040B' }}>
 
-                        {/* Active glow */}
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-32 pointer-events-none" style={{
-                          background: `radial-gradient(ellipse at bottom, ${s.glow} 0%, transparent 70%)`,
-                          opacity: i === activeService ? 1 : 0,
-                          transition: 'opacity 0.6s ease',
-                        }} />
+                        {s.reel ? (
+                          /* ── Real video: full-bleed, no ImageTrail ── */
+                          <>
+                            <video
+                              src={s.reel} autoPlay muted loop playsInline
+                              className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                            {/* subtle vignette on text side */}
+                            <div className="absolute inset-0 pointer-events-none" style={{
+                              background: textRight
+                                ? `linear-gradient(to left,  rgba(5,7,13,0.45), transparent 60%)`
+                                : `linear-gradient(to right, rgba(5,7,13,0.45), transparent 60%)`,
+                            }} />
+                          </>
+                        ) : (
+                          /* ── No video yet: ImageTrail + mouse hint ── */
+                          <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={38} maxImages={8} imageWidth={160} imageHeight={160} maxRotation={8}>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 cursor-none select-none">
 
-                        <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={38} maxImages={8} imageWidth={160} imageHeight={160} maxRotation={8}>
-                          <div className="absolute inset-0 flex flex-col items-center justify-center cursor-none select-none">
-
-                            {/* Video — driven by s.reel field */}
-                            {s.reel && (
-                              <video src={s.reel} autoPlay muted loop playsInline
-                                className="absolute inset-0 w-full h-full object-cover rounded-[13px] pointer-events-none"
-                                style={{ opacity: 0.65 }} />
-                            )}
-
-                            {/* Placeholder */}
-                            {!s.reel && (
-                              <>
-                                <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center mb-3"
-                                  style={{ background: `${s.accent}22`, border: `1px solid ${s.accent}45` }}>
-                                  <div className="w-0 h-0" style={{
-                                    borderTop: '8px solid transparent', borderBottom: '8px solid transparent',
-                                    borderLeft: `14px solid ${s.accent}`, marginLeft: 3,
-                                  }} />
-                                </div>
-                                <span className="relative z-10 text-xs uppercase tracking-[0.3em]" style={{ color: `${s.accent}70` }}>
-                                  Reel {s.num}
-                                </span>
-                              </>
-                            )}
-
-                            {/* Corner brackets */}
-                            {['top-4 left-4','top-4 right-4','bottom-4 left-4','bottom-4 right-4'].map((pos, ci) => (
-                              <div key={ci} className={`absolute ${pos} z-10 w-5 h-5 pointer-events-none`} style={{
-                                borderTop:    ci < 2       ? `1px solid ${s.accent}30` : 'none',
-                                borderBottom: ci >= 2      ? `1px solid ${s.accent}30` : 'none',
-                                borderLeft:   ci % 2 === 0 ? `1px solid ${s.accent}30` : 'none',
-                                borderRight:  ci % 2 !== 0 ? `1px solid ${s.accent}30` : 'none',
+                              {/* bottom glow */}
+                              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 h-36 pointer-events-none" style={{
+                                background: `radial-gradient(ellipse at bottom, ${s.glow} 0%, transparent 70%)`,
+                                opacity: i === activeService ? 1 : 0.4,
+                                transition: 'opacity 0.6s ease',
                               }} />
-                            ))}
-                          </div>
-                        </ImageTrail>
+
+                              {/* Mouse hint */}
+                              <motion.div
+                                className="relative z-10 flex flex-col items-center gap-4"
+                                animate={{ opacity: [0.5, 1, 0.5] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+                                {/* animated cursor ring */}
+                                <div className="relative w-14 h-14 flex items-center justify-center">
+                                  <motion.div
+                                    className="absolute inset-0 rounded-full"
+                                    style={{ border: `1px solid ${s.accent}` }}
+                                    animate={{ scale: [1, 1.35, 1], opacity: [0.8, 0, 0.8] }}
+                                    transition={{ duration: 2, repeat: Infinity }} />
+                                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: s.accent, boxShadow: `0 0 12px ${s.accent}` }} />
+                                </div>
+                                <span className="text-xs uppercase tracking-[0.35em] text-center" style={{ color: `${s.accent}80` }}>
+                                  Mueve el cursor
+                                </span>
+                              </motion.div>
+
+                              {/* Corner brackets */}
+                              {['top-4 left-4','top-4 right-4','bottom-4 left-4','bottom-4 right-4'].map((pos, ci) => (
+                                <div key={ci} className={`absolute ${pos} w-5 h-5 pointer-events-none`} style={{
+                                  borderTop:    ci < 2       ? `1px solid ${s.accent}30` : 'none',
+                                  borderBottom: ci >= 2      ? `1px solid ${s.accent}30` : 'none',
+                                  borderLeft:   ci % 2 === 0 ? `1px solid ${s.accent}30` : 'none',
+                                  borderRight:  ci % 2 !== 0 ? `1px solid ${s.accent}30` : 'none',
+                                }} />
+                              ))}
+                            </div>
+                          </ImageTrail>
+                        )}
                       </div>
                     </div>
 
