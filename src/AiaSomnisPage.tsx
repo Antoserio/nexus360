@@ -43,7 +43,7 @@ const SERVICES: {
     desc: 'Diseñamos experiencias donde el público interactúa con cámaras, pantallas, sensores y sistemas generativos, creando contenido visual en tiempo real.',
     tags: ['Cámara + IA', 'Visuales reactivos', 'Photocalls inteligentes', 'Tótems interactivos', 'Holográfico', '360° inmersivo'],
     accent: '#22D3FF', glow: 'rgba(34,211,255,0.28)',
-    reel: '/Preview.mp4',
+    reel: '/robot.mp4',
   },
   {
     num: '03', id: 'visuales', Icon: Film,
