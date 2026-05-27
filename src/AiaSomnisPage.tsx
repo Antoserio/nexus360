@@ -610,32 +610,8 @@ export default function AiaSomnisPage() {
       </section>
 
       {/* ══════════ SERVICIOS ══════════ */}
-      <section id="servicios">
-        <div className="flex" style={{ background: C.bg }}>
-          {/* LEFT: sticky robot eye */}
-          <div className="hidden lg:flex flex-col items-center justify-center gap-8 sticky top-0 h-screen"
-            style={{ width: '34%', flexShrink: 0, borderRight: `1px solid ${C.border}` }}>
-            <RobotEye active={activeService} />
-            <div className="flex flex-col gap-4 w-40">
-              {SERVICES.map((s, i) => (
-                <motion.button key={s.id} className="flex items-center gap-3 text-left"
-                  onClick={() => scrollTo(i)} animate={{ opacity: i === activeService ? 1 : 0.35 }}>
-                  <motion.div className="flex-shrink-0 rounded-full" style={{ width: 6, height: 6 }}
-                    animate={{ backgroundColor: i === activeService ? s.accent : C.border, boxShadow: i === activeService ? `0 0 8px ${s.accent}` : 'none' }}
-                    transition={{ duration: 0.4 }} />
-                  <div>
-                    <div className="text-xs font-black tracking-widest" style={{ color: i === activeService ? s.accent : C.gray }}>{s.num}</div>
-                    <div className="text-xs leading-tight" style={{ color: i === activeService ? C.white : C.gray }}>{s.title}</div>
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-            <span className="text-xs tracking-widest uppercase" style={{ color: C.border }}>Girasomnis × Immerso</span>
-          </div>
-
-          {/* RIGHT: 4 service panels — TRUE 2-col side-by-side, alternating */}
-          <div className="flex-1 min-w-0">
-            {SERVICES.map((s, i) => {
+      <section id="servicios" style={{ background: C.bg }}>
+        {SERVICES.map((s, i) => {
               // i=0,2: text LEFT · reel RIGHT   |   i=1,3: reel LEFT · text RIGHT
               const textRight = i % 2 !== 0
 
@@ -656,7 +632,7 @@ export default function AiaSomnisPage() {
 
                     {/* ── TEXT COLUMN ── fixed width on desktop, full width on mobile */}
                     <div
-                      className={`flex flex-col justify-center gap-4 p-6 md:p-8 lg:p-12 shrink-0 w-full md:w-[280px] lg:w-[340px] overflow-y-auto border-b md:border-b-0 ${textRight ? 'md:order-2 md:border-l' : 'md:order-1 md:border-r'}`}
+                      className={`flex flex-col justify-center gap-4 p-6 md:p-10 lg:p-14 shrink-0 w-full md:w-[320px] lg:w-[380px] overflow-y-auto border-b md:border-b-0 ${textRight ? 'md:order-2 md:border-l' : 'md:order-1 md:border-r'}`}
                       style={{ borderColor: C.border }}>
 
                       {/* num + title */}
@@ -752,9 +728,7 @@ export default function AiaSomnisPage() {
                   </div>
                 </div>
               )
-            })}
-          </div>
-        </div>
+        })}
       </section>
 
       {/* ══════════ PROYECTOS — FxSlider (immediately after services) ══════════ */}
