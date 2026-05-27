@@ -611,7 +611,7 @@ export default function AiaSomnisPage() {
           {/* CTAs — mobile: bottom center | desktop: left/right sides */}
 
           {/* Mobile only: stacked at bottom */}
-          <div style={fadeUp(600)} className="md:hidden absolute bottom-32 left-0 right-0 flex justify-center gap-3 pointer-events-auto z-20 px-6">
+          <div style={fadeUp(600)} className="md:hidden absolute bottom-40 left-0 right-0 flex justify-center gap-3 pointer-events-auto z-20 px-6">
             <button onClick={() => scrollTo(0)}
               className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm"
               style={{ background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)', color: C.white, boxShadow: '0 0 28px rgba(123,47,255,0.5)' }}>
