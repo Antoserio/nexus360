@@ -386,7 +386,7 @@ function UnfocusedImage({ src }: { src: string }) {
   const blurFilter = useTransform(blur, v => `blur(${v}px)`)
 
   return (
-    <div ref={ref} className="w-full overflow-hidden" style={{ borderRadius: 20, height: 'clamp(320px,45vh,520px)' }}>
+    <div ref={ref} className="w-full overflow-hidden" style={{ borderRadius: 16, height: 'clamp(420px,65vh,700px)' }}>
       <motion.img
         src={src}
         alt=""
@@ -608,21 +608,33 @@ export default function AiaSomnisPage() {
             </p>
           </div>
 
-          {/* CTA left-center: Ver servicios */}
-          <div style={fadeUp(600)} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 pointer-events-auto z-20">
+          {/* CTAs — mobile: bottom center | desktop: left/right sides */}
+
+          {/* Mobile only: stacked at bottom */}
+          <div style={fadeUp(600)} className="md:hidden absolute bottom-20 left-0 right-0 flex justify-center gap-3 pointer-events-auto z-20 px-6">
+            <button onClick={() => scrollTo(0)}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm"
+              style={{ background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)', color: C.white, boxShadow: '0 0 28px rgba(123,47,255,0.5)' }}>
+              Ver servicios <ArrowRight size={14} />
+            </button>
+            <a href="#contacto"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm"
+              style={{ background: 'linear-gradient(135deg, #3B1FA3 0%, #7B2FFF 100%)', color: C.white, boxShadow: '0 0 20px rgba(123,47,255,0.35)' }}>
+              Contactar
+            </a>
+          </div>
+
+          {/* Desktop only: left-center */}
+          <div style={fadeUp(600)} className="hidden md:block absolute left-8 top-1/2 -translate-y-1/2 pointer-events-auto z-20">
             <button onClick={() => scrollTo(0)}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
-              style={{
-                background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)',
-                color: C.white,
-                boxShadow: '0 0 32px rgba(123,47,255,0.5)',
-              }}>
+              style={{ background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)', color: C.white, boxShadow: '0 0 32px rgba(123,47,255,0.5)' }}>
               Ver servicios <ArrowRight size={14} />
             </button>
           </div>
 
-          {/* CTA right-center: Contactar */}
-          <div style={fadeUp(700)} className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 pointer-events-auto z-20">
+          {/* Desktop only: right-center */}
+          <div style={fadeUp(700)} className="hidden md:block absolute right-8 top-1/2 -translate-y-1/2 pointer-events-auto z-20">
             <a href="#contacto"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
               style={{ background: 'linear-gradient(135deg, #3B1FA3 0%, #7B2FFF 100%)', color: C.white, boxShadow: '0 0 24px rgba(123,47,255,0.35)' }}>
@@ -1026,29 +1038,40 @@ export default function AiaSomnisPage() {
       />
       <motion.button
         onClick={toggleSound}
-        className="fixed z-50 flex items-center gap-2 rounded-full font-bold text-xs tracking-widest uppercase cursor-pointer"
+        className="fixed z-50 flex items-center gap-2 rounded-full cursor-pointer"
         style={{
-          bottom: '2rem',
+          bottom: '1.5rem',
           right: '1.5rem',
-          padding: '10px 18px',
-          background: soundOn
-            ? `linear-gradient(135deg, ${C.blue}22, ${C.deep}44)`
-            : 'rgba(5,7,13,0.82)',
-          border: `1px solid ${soundOn ? C.blue : C.border}`,
-          color: soundOn ? C.blue : C.gray,
+          padding: '10px 16px',
+          background: soundOn ? 'rgba(123,47,255,0.18)' : 'rgba(5,7,13,0.82)',
+          border: `1px solid ${soundOn ? '#7B2FFF' : C.border}`,
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
         }}
-        animate={{
-          boxShadow: soundOn
-            ? [`0 0 0px ${C.blue}`, `0 0 18px ${C.blue}88`, `0 0 0px ${C.blue}`]
-            : '0 4px 20px rgba(0,0,0,0.5)',
-        }}
-        transition={soundOn ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.3 }}
+        animate={{ boxShadow: soundOn ? ['0 0 0px #7B2FFF', '0 0 20px #7B2FFF88', '0 0 0px #7B2FFF'] : '0 4px 20px rgba(0,0,0,0.5)' }}
+        transition={soundOn ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.3 }}
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.94 }}>
-        {soundOn ? <Volume2 size={15} /> : <VolumeX size={15} />}
-        <span>{soundOn ? 'SONIDO ON' : 'SONIDO OFF'}</span>
+        {/* Audio waveform bars */}
+        <div className="flex items-center gap-[3px]" style={{ height: 20 }}>
+          {[0.6, 1, 0.7, 1.2, 0.5, 0.9, 0.6].map((h, i) => (
+            <motion.div
+              key={i}
+              style={{ width: 3, borderRadius: 2, background: soundOn ? '#7B2FFF' : C.border }}
+              animate={soundOn ? {
+                scaleY: [h, h * 2.2, h * 0.4, h * 1.8, h],
+                backgroundColor: ['#7B2FFF', '#00B8FF', '#7B2FFF'],
+              } : { scaleY: 0.3 }}
+              transition={soundOn ? {
+                duration: 0.7 + i * 0.08,
+                repeat: Infinity,
+                delay: i * 0.09,
+                ease: 'easeInOut',
+              } : { duration: 0.3 }}
+              initial={{ scaleY: h }}
+            />
+          ))}
+        </div>
       </motion.button>
 
       {/* ── FOOTER ── */}
