@@ -1,5 +1,5 @@
 import { Suspense, lazy, memo, useEffect, useRef, useState, useCallback } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { ParticleText } from '@/components/ui/particle-text'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
@@ -376,6 +376,27 @@ const IconInstagram = ({ size = 16 }: { size?: number }) => (
   </svg>
 )
 
+// ── Unfocused scroll image ────────────────────────────────────────────────────
+function UnfocusedImage({ src }: { src: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] })
+  const blur  = useTransform(scrollYProgress, [0, 0.7], [28, 0])
+  const scale = useTransform(scrollYProgress, [0, 0.7], [1.12, 1])
+  const opacity = useTransform(scrollYProgress, [0, 0.25], [0, 1])
+  const blurFilter = useTransform(blur, v => `blur(${v}px)`)
+
+  return (
+    <div ref={ref} className="w-full overflow-hidden" style={{ borderRadius: 20, height: 'clamp(320px,45vh,520px)' }}>
+      <motion.img
+        src={src}
+        alt=""
+        className="w-full h-full object-cover"
+        style={{ filter: blurFilter, scale, opacity }}
+      />
+    </div>
+  )
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 // corner→service index mapping: top-left=0, top-right=1, bottom-left=2, bottom-right=3
 const CORNER_SERVICE = [0, 1, 2, 3] as const
@@ -587,21 +608,24 @@ export default function AiaSomnisPage() {
             </p>
           </div>
 
-          {/* CTAs — bottom-left */}
-          <div style={fadeUp(600)}
-            className="absolute bottom-12 left-6 md:left-12 flex flex-col sm:flex-row gap-3 pointer-events-auto z-20">
+          {/* CTA left-center: Ver servicios */}
+          <div style={fadeUp(600)} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 pointer-events-auto z-20">
             <button onClick={() => scrollTo(0)}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm tracking-wide"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
               style={{
                 background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)',
                 color: C.white,
-                boxShadow: '0 0 36px rgba(123,47,255,0.45)',
+                boxShadow: '0 0 32px rgba(123,47,255,0.5)',
               }}>
-              Ver servicios <ArrowRight size={15} />
+              Ver servicios <ArrowRight size={14} />
             </button>
+          </div>
+
+          {/* CTA right-center: Contactar */}
+          <div style={fadeUp(700)} className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 pointer-events-auto z-20">
             <a href="#contacto"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm tracking-wide"
-              style={{ background: 'linear-gradient(135deg, #3B1FA3 0%, #7B2FFF 100%)', color: C.white, boxShadow: '0 0 24px rgba(123,47,255,0.3)' }}>
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
+              style={{ background: 'linear-gradient(135deg, #3B1FA3 0%, #7B2FFF 100%)', color: C.white, boxShadow: '0 0 24px rgba(123,47,255,0.35)' }}>
               Contactar
             </a>
           </div>
@@ -970,9 +994,9 @@ export default function AiaSomnisPage() {
               <a href="mailto:info@girasomnis.com"
                 className="inline-flex items-center gap-3 px-9 py-4 rounded-full font-bold text-base transition-all duration-300 mb-10"
                 style={{
-                  background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`,
+                  background: 'linear-gradient(135deg, #7B2FFF 0%, #3B1FA3 100%)',
                   color: C.white,
-                  boxShadow: `0 0 40px rgba(0,184,255,0.3)`,
+                  boxShadow: '0 0 40px rgba(123,47,255,0.35)',
                 }}>
                 <Mail size={18} /> info@girasomnis.com
               </a>
@@ -986,27 +1010,8 @@ export default function AiaSomnisPage() {
               </div>
             </motion.div>
 
-            {/* RIGHT: 3D magazine */}
-            <motion.div
-              className="flex justify-center items-center"
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.15 }}>
-              {/* Scale down on mobile so it always fits the screen */}
-              <div style={{ transform: 'scale(var(--mag-scale, 1))', transformOrigin: 'center top' }}
-                className="[--mag-scale:0.82] sm:[--mag-scale:0.92] md:[--mag-scale:1]">
-                <Magazine3D
-                  cover={MAG_COVER}
-                  pages={MAG_PAGES}
-                  width={250}
-                  height={340}
-                  accent={C.blue}
-                  title="AIA-SOMNIS"
-                  subtitle="Portfolio 2024"
-                />
-              </div>
-            </motion.div>
+            {/* RIGHT: Unfocused scroll image */}
+            <UnfocusedImage src="/abstract.jpg" />
 
           </div>
         </div>
