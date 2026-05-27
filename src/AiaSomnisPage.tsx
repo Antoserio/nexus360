@@ -64,7 +64,7 @@ const SERVICES: {
     desc: 'Creamos soluciones digitales con IA para automatizar procesos, captar leads, mejorar la atención al cliente y crear experiencias web más inteligentes.',
     tags: ['Webs con IA', 'Asistentes virtuales', 'Automatización de procesos', 'CRM integration', 'Experiencias 3D web'],
     accent: '#F6B93B', glow: 'rgba(246,185,59,0.22)',
-    reel: null,
+    reel: '/design.mp4',
   },
 ]
 
@@ -96,27 +96,32 @@ const PROJECTS: SliderItem[] = [
   {
     num: '01', year: '2024', accent: '#00B8FF',
     title: 'Avatar Viky · Girasomnis', category: 'Avatares IA',
-    bg: `url('${px(8386440, 1200, 800)}') center/cover no-repeat`,
+    // Futuristic AI robot face
+    bg: `url('https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
   {
     num: '02', year: '2024', accent: '#22D3FF',
     title: 'Canet Rock IA', category: 'Visuales Generativos',
-    bg: `url('${px(1105666, 1200, 800)}') center/cover no-repeat`,
+    // Concert stage with dramatic lights
+    bg: `url('https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
   {
     num: '03', year: '2024', accent: '#FFD42A',
     title: 'Quiniela Planeta', category: 'Instalación Interactiva',
-    bg: `url('${px(3861974, 1200, 800)}') center/cover no-repeat`,
+    // Neon / immersive light installation
+    bg: `url('https://images.pexels.com/photos/2387418/pexels-photo-2387418.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
   {
     num: '04', year: '2024', accent: '#F6B93B',
     title: 'FLUGE — Avatar Demo', category: 'Avatar Interactivo',
-    bg: `url('${px(8386434, 1200, 800)}') center/cover no-repeat`,
+    // Holographic / digital human
+    bg: `url('https://images.pexels.com/photos/3862021/pexels-photo-3862021.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
   {
     num: '05', year: '2023', accent: '#1B3DFF',
     title: 'Interactivos Táctiles', category: 'Instalación Interactiva',
-    bg: `url('${px(3075993, 1200, 800)}') center/cover no-repeat`,
+    // Dramatic light art / projection mapping
+    bg: `url('https://images.pexels.com/photos/3756165/pexels-photo-3756165.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
 ]
 
@@ -267,7 +272,7 @@ function HudCard({
 
   return (
     <motion.div
-      className="absolute z-20"
+      className="absolute z-20 hidden md:block"
       style={{ ...CORNER_STYLES[corner], pointerEvents: 'none' }}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 12 }}
@@ -596,7 +601,7 @@ export default function AiaSomnisPage() {
             </button>
             <a href="#contacto"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm tracking-wide"
-              style={{ border: `1px solid ${C.border}`, color: C.gray, background: 'rgba(255,255,255,0.03)' }}>
+              style={{ background: 'linear-gradient(135deg, #3B1FA3 0%, #7B2FFF 100%)', color: C.white, boxShadow: '0 0 24px rgba(123,47,255,0.3)' }}>
               Contactar
             </a>
           </div>
@@ -628,7 +633,7 @@ export default function AiaSomnisPage() {
         <ParticleText
           text="AIA SOMNIS"
           fontSize={110}
-          colors={[C.blue, C.deep, '#7B2FFF', C.gold, C.white]}
+          colors={['#ffffff', '#ffffff', '#ffffff', '#ffffff']}
           particleSize={2}
           mouseRadius={95}
           returnSpeed={0.07}
@@ -678,12 +683,11 @@ export default function AiaSomnisPage() {
                         {s.desc}
                       </p>
 
-                      {/* tags */}
-                      <div className="flex flex-wrap gap-1.5">
+                      {/* tags — plain list, no pill boxes */}
+                      <div className="flex flex-col gap-1">
                         {s.tags.map(tag => (
-                          <span key={tag} className="px-2 py-0.5 rounded-full"
-                            style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray, fontSize: 11 }}>
-                            {tag}
+                          <span key={tag} className="text-xs" style={{ color: C.gray }}>
+                            · {tag}
                           </span>
                         ))}
                       </div>
