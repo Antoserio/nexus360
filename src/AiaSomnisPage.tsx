@@ -611,7 +611,7 @@ export default function AiaSomnisPage() {
           {/* CTAs — mobile: bottom center | desktop: left/right sides */}
 
           {/* Mobile only: stacked at bottom */}
-          <div style={fadeUp(600)} className="md:hidden absolute bottom-20 left-0 right-0 flex justify-center gap-3 pointer-events-auto z-20 px-6">
+          <div style={fadeUp(600)} className="md:hidden absolute bottom-32 left-0 right-0 flex justify-center gap-3 pointer-events-auto z-20 px-6">
             <button onClick={() => scrollTo(0)}
               className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm"
               style={{ background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)', color: C.white, boxShadow: '0 0 28px rgba(123,47,255,0.5)' }}>
@@ -1053,25 +1053,31 @@ export default function AiaSomnisPage() {
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.94 }}>
         {/* Audio waveform bars */}
-        <div className="flex items-center gap-[3px]" style={{ height: 20 }}>
-          {[0.6, 1, 0.7, 1.2, 0.5, 0.9, 0.6].map((h, i) => (
+        <div className="flex items-end gap-[3px]" style={{ height: 22 }}>
+          {[10, 16, 10, 20, 8, 16, 10].map((h, i) => (
             <motion.div
               key={i}
-              style={{ width: 3, borderRadius: 2, background: soundOn ? '#7B2FFF' : C.border }}
+              style={{ width: 3, borderRadius: 2, originY: 1 }}
               animate={soundOn ? {
-                scaleY: [h, h * 2.2, h * 0.4, h * 1.8, h],
-                backgroundColor: ['#7B2FFF', '#00B8FF', '#7B2FFF'],
-              } : { scaleY: 0.3 }}
+                height: [h, h * 0.3, h * 1.8, h * 0.5, h],
+                background: ['#7B2FFF', '#00B8FF', '#7B2FFF'],
+              } : {
+                height: 4,
+                background: C.gray,
+              }}
               transition={soundOn ? {
-                duration: 0.7 + i * 0.08,
+                duration: 0.65 + i * 0.07,
                 repeat: Infinity,
-                delay: i * 0.09,
+                delay: i * 0.08,
                 ease: 'easeInOut',
               } : { duration: 0.3 }}
-              initial={{ scaleY: h }}
             />
           ))}
         </div>
+        <span className="text-[10px] font-bold tracking-widest uppercase ml-1"
+          style={{ color: soundOn ? '#7B2FFF' : C.gray }}>
+          {soundOn ? 'ON' : 'OFF'}
+        </span>
       </motion.button>
 
       {/* ── FOOTER ── */}
