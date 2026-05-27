@@ -1,6 +1,7 @@
 import { Suspense, lazy, memo, useEffect, useRef, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { ImageTrail } from '@/components/ui/image-trail'
+import { ParticleText } from '@/components/ui/particle-text'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
 import { Magazine3D } from '@/components/ui/magazine-3d'
 import { Mail, MapPin, ChevronDown, ArrowRight, Bot, Layers, Film, Globe, Volume2, VolumeX } from 'lucide-react'
@@ -581,13 +582,20 @@ export default function AiaSomnisPage() {
             </p>
           </div>
 
-          {/* CTAs */}
-          <div style={fadeUp(600)} className="flex flex-wrap gap-3 justify-center mt-6 pointer-events-auto px-6">
-            <button onClick={() => scrollTo(0)} className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
-              style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white, boxShadow: `0 0 30px rgba(0,184,255,0.35)` }}>
+          {/* CTAs — bottom-left */}
+          <div style={fadeUp(600)}
+            className="absolute bottom-12 left-6 md:left-12 flex flex-col sm:flex-row gap-3 pointer-events-auto z-20">
+            <button onClick={() => scrollTo(0)}
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm tracking-wide"
+              style={{
+                background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)',
+                color: C.white,
+                boxShadow: '0 0 36px rgba(123,47,255,0.45)',
+              }}>
               Ver servicios <ArrowRight size={15} />
             </button>
-            <a href="#contacto" className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
+            <a href="#contacto"
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm tracking-wide"
               style={{ border: `1px solid ${C.border}`, color: C.gray, background: 'rgba(255,255,255,0.03)' }}>
               Contactar
             </a>
@@ -607,6 +615,26 @@ export default function AiaSomnisPage() {
         </div>
         <div className="absolute bottom-0 inset-x-0 h-32 pointer-events-none"
           style={{ background: `linear-gradient(to top, ${C.bg}, transparent)` }} />
+      </section>
+
+      {/* ══════════ PARTICLE TEXT TRANSITION ══════════ */}
+      <section className="relative overflow-hidden" style={{ height: '55vh', background: C.bg }}>
+        {/* top fade from hero */}
+        <div className="absolute inset-x-0 top-0 h-24 pointer-events-none z-10"
+          style={{ background: `linear-gradient(to bottom, ${C.bg2}, transparent)` }} />
+        {/* bottom fade into services */}
+        <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none z-10"
+          style={{ background: `linear-gradient(to top, ${C.bg}, transparent)` }} />
+        <ParticleText
+          text="AIA SOMNIS"
+          fontSize={110}
+          colors={[C.blue, C.deep, '#7B2FFF', C.gold, C.white]}
+          particleSize={2}
+          mouseRadius={95}
+          returnSpeed={0.07}
+          density={4}
+          className="cursor-none"
+        />
       </section>
 
       {/* ══════════ SERVICIOS ══════════ */}
