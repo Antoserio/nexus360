@@ -28,10 +28,11 @@ export const ParticleText = memo(function ParticleText({
   density = 4,
   className = '',
 }: ParticleTextProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const mouse    = useRef({ x: -9999, y: -9999 })
-  const particles = useRef<Particle[]>([])
-  const raf      = useRef(0)
+  const canvasRef  = useRef<HTMLCanvasElement>(null)
+  const mouse      = useRef({ x: -9999, y: -9999 })
+  const particles  = useRef<Particle[]>([])
+  const raf        = useRef(0)
+  const size       = useRef({ w: 0, h: 0 })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -40,34 +41,36 @@ export const ParticleText = memo(function ParticleText({
     if (!ctx) return
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
 
-    function buildParticles(w: number, h: number) {
+    // ── build particle list from text pixel-sampling ──────────────────────
+    async function buildParticles(w: number, h: number) {
+      // Wait for fonts so the text renders correctly
+      try { await document.fonts.ready } catch (_) { /* ignore */ }
+
       const off = document.createElement('canvas')
-      off.width = w; off.height = h
+      off.width = w
+      off.height = h
       const oc = off.getContext('2d')!
-      const fs = Math.min(fontSize, w * 0.18)
-      oc.font = `900 ${fs}px Inter, system-ui, sans-serif`
-      oc.fillStyle = '#fff'
+      const fs = Math.min(fontSize, w * 0.15)
+      oc.clearRect(0, 0, w, h)
+      oc.font = `900 ${fs}px "Inter", "Helvetica Neue", Arial, sans-serif`
+      oc.fillStyle = '#ffffff'
       oc.textAlign = 'center'
       oc.textBaseline = 'middle'
-      // split on space for two lines if needed
-      const words = text.split(' ')
-      if (words.length >= 2 && w < 600) {
-        const half = Math.ceil(words.length / 2)
-        const l1 = words.slice(0, half).join(' ')
-        const l2 = words.slice(half).join(' ')
-        oc.fillText(l1, w / 2, h / 2 - fs * 0.6)
-        oc.fillText(l2, w / 2, h / 2 + fs * 0.6)
-      } else {
-        oc.fillText(text, w / 2, h / 2)
-      }
-      const { data } = oc.getImageData(0, 0, w, h)
+      oc.fillText(text, w / 2, h / 2)
+
+      const imgData = oc.getImageData(0, 0, w, h)
+      const d = imgData.data
       const list: Particle[] = []
+
       for (let y = 0; y < h; y += density) {
         for (let x = 0; x < w; x += density) {
-          if (data[(y * w + x) * 4 + 3] > 128) {
+          const alpha = d[(y * w + x) * 4 + 3]
+          if (alpha > 128) {
             list.push({
-              x: Math.random() * w, y: Math.random() * h,
-              baseX: x, baseY: y,
+              x: Math.random() * w,
+              y: Math.random() * h,
+              baseX: x,
+              baseY: y,
               vx: 0, vy: 0,
               color: colors[Math.floor(Math.random() * colors.length)],
             })
@@ -77,48 +80,74 @@ export const ParticleText = memo(function ParticleText({
       particles.current = list
     }
 
+    // ── resize: reset canvas + rebuild ────────────────────────────────────
+    function resize() {
+      const el = canvas!.parentElement ?? canvas!
+      const w = el.clientWidth  || canvas!.offsetWidth
+      const h = el.clientHeight || canvas!.offsetHeight
+      if (w < 2 || h < 2) return        // not laid out yet
+
+      size.current = { w, h }
+      canvas!.width  = w * dpr
+      canvas!.height = h * dpr
+      // reset transform then apply DPR scale (avoids accumulation)
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
+      buildParticles(w, h)
+    }
+
+    // ── animation loop ─────────────────────────────────────────────────────
     function draw() {
-      const rect = canvas!.getBoundingClientRect()
-      const w = rect.width; const h = rect.height
+      raf.current = requestAnimationFrame(draw)
+      const { w, h } = size.current
+      if (w < 2 || h < 2 || particles.current.length === 0) return
+
       ctx!.clearRect(0, 0, w, h)
-      const mx = mouse.current.x; const my = mouse.current.y
+
+      const mx = mouse.current.x
+      const my = mouse.current.y
       const r2 = mouseRadius * mouseRadius
+
       for (const p of particles.current) {
-        const dx = mx - p.x; const dy = my - p.y
+        const dx = mx - p.x
+        const dy = my - p.y
         const d2 = dx * dx + dy * dy
-        if (d2 < r2) {
+
+        if (d2 < r2 && d2 > 0.01) {
           const d = Math.sqrt(d2)
           const f = (mouseRadius - d) / mouseRadius
-          const a = Math.atan2(dy, dx)
-          p.vx -= Math.cos(a) * f * 7
-          p.vy -= Math.sin(a) * f * 7
+          const angle = Math.atan2(dy, dx)
+          p.vx -= Math.cos(angle) * f * 8
+          p.vy -= Math.sin(angle) * f * 8
         }
+
+        // spring return
         p.vx += (p.baseX - p.x) * returnSpeed
         p.vy += (p.baseY - p.y) * returnSpeed
-        p.vx *= 0.91; p.vy *= 0.91
-        p.x += p.vx; p.y += p.vy
+        // damping
+        p.vx *= 0.90
+        p.vy *= 0.90
+
+        p.x += p.vx
+        p.y += p.vy
+
         ctx!.fillStyle = p.color
         ctx!.beginPath()
         ctx!.arc(p.x, p.y, particleSize, 0, Math.PI * 2)
         ctx!.fill()
       }
-      raf.current = requestAnimationFrame(draw)
     }
 
-    function resize() {
-      const rect = canvas!.getBoundingClientRect()
-      canvas!.width  = rect.width  * dpr
-      canvas!.height = rect.height * dpr
-      ctx!.scale(dpr, dpr)
-      buildParticles(rect.width, rect.height)
-    }
+    // ── init: defer one frame so layout is done ───────────────────────────
+    const initId = requestAnimationFrame(() => {
+      resize()
+      draw()
+    })
 
-    resize()
-    draw()
-
+    // resize observer for container changes
     const ro = new ResizeObserver(resize)
-    ro.observe(canvas)
+    ro.observe(canvas!.parentElement ?? canvas!)
 
+    // ── mouse / touch ──────────────────────────────────────────────────────
     const onMove = (e: MouseEvent) => {
       const r = canvas!.getBoundingClientRect()
       mouse.current = { x: e.clientX - r.left, y: e.clientY - r.top }
@@ -130,20 +159,28 @@ export const ParticleText = memo(function ParticleText({
     }
     const onLeave = () => { mouse.current = { x: -9999, y: -9999 } }
 
-    canvas.addEventListener('mousemove', onMove)
-    canvas.addEventListener('touchmove', onTouch, { passive: true })
+    // listen on window so cursor tracked even outside canvas
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('touchmove', onTouch, { passive: true })
     canvas.addEventListener('mouseleave', onLeave)
     canvas.addEventListener('touchend', onLeave)
 
     return () => {
+      cancelAnimationFrame(initId)
       cancelAnimationFrame(raf.current)
       ro.disconnect()
-      canvas.removeEventListener('mousemove', onMove)
-      canvas.removeEventListener('touchmove', onTouch)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('touchmove', onTouch)
       canvas.removeEventListener('mouseleave', onLeave)
       canvas.removeEventListener('touchend', onLeave)
     }
   }, [text, fontSize, colors, particleSize, mouseRadius, returnSpeed, density])
 
-  return <canvas ref={canvasRef} className={`w-full h-full ${className}`} />
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ display: 'block', width: '100%', height: '100%' }}
+      className={className}
+    />
+  )
 })
