@@ -33,7 +33,7 @@ const SERVICES: {
     desc: 'Creamos avatares conversacionales personalizados que pueden atender al público, presentar contenidos, responder preguntas, hablar en varios idiomas y captar leads en tiempo real.',
     tags: ['Ferias y exposiciones', 'Centros comerciales', 'Eventos corporativos', 'Presentador virtual', 'Multilingüe', 'Conectado a marca'],
     accent: '#00B8FF', glow: 'rgba(0,184,255,0.3)',
-    reel: null,
+    reel: '/robot.mp4',
   },
   {
     num: '02', id: 'instalaciones', Icon: Layers,
@@ -43,7 +43,7 @@ const SERVICES: {
     desc: 'Diseñamos experiencias donde el público interactúa con cámaras, pantallas, sensores y sistemas generativos, creando contenido visual en tiempo real.',
     tags: ['Cámara + IA', 'Visuales reactivos', 'Photocalls inteligentes', 'Tótems interactivos', 'Holográfico', '360° inmersivo'],
     accent: '#22D3FF', glow: 'rgba(34,211,255,0.28)',
-    reel: '/robot.mp4',
+    reel: null,
   },
   {
     num: '03', id: 'visuales', Icon: Film,
@@ -642,7 +642,7 @@ export default function AiaSomnisPage() {
               return (
                 <div key={s.id} ref={el => { sectionRefs.current[i] = el }}
                   className="relative"
-                  style={{ minHeight: '100svh', display: 'flex', flexDirection: 'column' }}>
+                  style={{ height: '100svh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
                   {/* Glow bg */}
                   <div className="absolute inset-0 pointer-events-none" style={{
@@ -651,12 +651,12 @@ export default function AiaSomnisPage() {
                     transition: 'opacity 0.6s ease',
                   }} />
 
-                  {/* ── 2-COLUMN BODY (flex-row on md+, flex-col on mobile) ── */}
-                  <div className="flex-1 flex flex-col md:flex-row relative z-10">
+                  {/* ── 2-COLUMN BODY ── */}
+                  <div className="flex-1 flex flex-col md:flex-row relative z-10 min-h-0">
 
                     {/* ── TEXT COLUMN ── fixed width on desktop, full width on mobile */}
                     <div
-                      className={`flex flex-col justify-center gap-5 p-7 md:p-10 lg:p-14 shrink-0 w-full md:w-[300px] lg:w-[360px] border-b md:border-b-0 ${textRight ? 'md:order-2 md:border-l' : 'md:order-1 md:border-r'}`}
+                      className={`flex flex-col justify-center gap-4 p-6 md:p-8 lg:p-12 shrink-0 w-full md:w-[280px] lg:w-[340px] overflow-y-auto border-b md:border-b-0 ${textRight ? 'md:order-2 md:border-l' : 'md:order-1 md:border-r'}`}
                       style={{ borderColor: C.border }}>
 
                       {/* num + title */}
@@ -686,8 +686,7 @@ export default function AiaSomnisPage() {
                     </div>
 
                     {/* ── REEL COLUMN ── fills all remaining space, edge-to-edge */}
-                    <div className={`flex-1 relative ${textRight ? 'md:order-1' : 'md:order-2'}`}
-                      style={{ minHeight: 'clamp(300px,60vh,100vh)' }}>
+                    <div className={`flex-1 relative min-h-0 ${textRight ? 'md:order-1' : 'md:order-2'}`}>
 
                       <div className="absolute inset-0" style={{ background: '#02040B' }}>
 
