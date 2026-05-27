@@ -618,12 +618,12 @@ export default function AiaSomnisPage() {
       </section>
 
       {/* ══════════ PARTICLE TEXT TRANSITION ══════════ */}
-      <section className="relative overflow-hidden" style={{ height: '55vh', background: C.bg }}>
+      <section className="relative overflow-hidden" style={{ height: '40vh', background: C.bg }}>
         {/* top fade from hero */}
-        <div className="absolute inset-x-0 top-0 h-24 pointer-events-none z-10"
-          style={{ background: `linear-gradient(to bottom, ${C.bg2}, transparent)` }} />
-        {/* bottom fade into services */}
-        <div className="absolute inset-x-0 bottom-0 h-24 pointer-events-none z-10"
+        <div className="absolute inset-x-0 top-0 h-20 pointer-events-none z-10"
+          style={{ background: `linear-gradient(to bottom, ${C.bg}, transparent)` }} />
+        {/* bottom fade into services — strong so video fades in cleanly */}
+        <div className="absolute inset-x-0 bottom-0 h-32 pointer-events-none z-10"
           style={{ background: `linear-gradient(to top, ${C.bg}, transparent)` }} />
         <ParticleText
           text="AIA SOMNIS"
@@ -700,11 +700,16 @@ export default function AiaSomnisPage() {
                             <video
                               src={s.reel} autoPlay muted loop playsInline
                               className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
-                            {/* subtle vignette on text side */}
+                            {/* top fade-in — stronger on first section */}
+                            <div className="absolute top-0 inset-x-0 pointer-events-none" style={{
+                              height: i === 0 ? '45%' : '25%',
+                              background: `linear-gradient(to bottom, ${C.bg} 0%, transparent 100%)`,
+                            }} />
+                            {/* vignette toward text column */}
                             <div className="absolute inset-0 pointer-events-none" style={{
                               background: textRight
-                                ? `linear-gradient(to left,  rgba(5,7,13,0.45), transparent 60%)`
-                                : `linear-gradient(to right, rgba(5,7,13,0.45), transparent 60%)`,
+                                ? `linear-gradient(to left,  rgba(5,7,13,0.5), transparent 55%)`
+                                : `linear-gradient(to right, rgba(5,7,13,0.5), transparent 55%)`,
                             }} />
                           </>
                         ) : (
