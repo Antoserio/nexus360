@@ -4,20 +4,30 @@ import { ImageTrail } from '@/components/ui/image-trail'
 import { ParticleText } from '@/components/ui/particle-text'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
 import { Magazine3D } from '@/components/ui/magazine-3d'
-import { Mail, MapPin, ChevronDown, ArrowRight, Bot, Layers, Film, Globe, Volume2, VolumeX } from 'lucide-react'
+import { Mail, MapPin, ChevronDown, ArrowRight, Cpu, Play, Share2, Volume2, VolumeX } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 // Heavy components loaded only when needed
 const Spline = lazy(() => import('@splinetool/react-spline'))
-const GaussianSplatViewer = lazy(() =>
-  import('@/components/ui/gaussian-splat-viewer').then(m => ({ default: m.GaussianSplatViewer }))
-)
 
 // ── Brand palette ─────────────────────────────────────────────────────────────
 const C = {
   bg: '#05070D', bg2: '#071120', blue: '#00B8FF', cyan: '#22D3FF',
   deep: '#1B3DFF', gold: '#FFD42A', goldSoft: '#F6B93B',
   white: '#F4F7FB', gray: '#AAB3C2', border: '#223044',
+}
+
+// ── Custom icon: scan/target ring (for Avatares IA) ──────────────────────────
+const ScanRingIcon = ({ size = 22, style }: { size?: number; style?: React.CSSProperties }) => {
+  const color = (style?.color as string) ?? 'currentColor'
+  // outer arc: ~82% of circle, gap at top-right
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ transform: 'rotate(-55deg)' }}>
+      <circle cx="12" cy="12" r="9"   stroke={color} strokeWidth="1.8" strokeDasharray="46.3 10.2" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="4.5" stroke={color} strokeWidth="1.5" fill="none" />
+      <circle cx="12" cy="12" r="1.6" fill={color} />
+    </svg>
+  )
 }
 
 // ── 4 Services ────────────────────────────────────────────────────────────────
@@ -27,7 +37,7 @@ const SERVICES: {
   reel: string | null   // drop any .mp4 in /public and put its path here e.g. '/reel-01.mp4'
 }[] = [
   {
-    num: '01', id: 'avatares', Icon: Bot,
+    num: '01', id: 'avatares', Icon: ScanRingIcon as typeof Cpu,
     title: 'Avatares IA',
     cardDesc: 'Avatares conversacionales para eventos, ferias y espacios físicos.',
     subtitle: 'para eventos, ferias y espacios físicos',
@@ -37,7 +47,7 @@ const SERVICES: {
     reel: '/robot.mp4',
   },
   {
-    num: '02', id: 'instalaciones', Icon: Layers,
+    num: '02', id: 'instalaciones', Icon: Cpu,
     title: 'Instalaciones interactivas',
     cardDesc: 'Experiencias con IA, cámaras y pantallas en tiempo real.',
     subtitle: 'con Inteligencia Artificial',
@@ -47,7 +57,7 @@ const SERVICES: {
     reel: null,
   },
   {
-    num: '03', id: 'visuales', Icon: Film,
+    num: '03', id: 'visuales', Icon: Play,
     title: 'Producción audiovisual con IA',
     cardDesc: 'Contenido publicitario, visuales generativos y videomapping.',
     subtitle: 'y producción audiovisual con IA',
@@ -57,7 +67,7 @@ const SERVICES: {
     reel: '/reel-test.mp4',   // ← cambia esta ruta cuando tengas el video real
   },
   {
-    num: '04', id: 'digital', Icon: Globe,
+    num: '04', id: 'digital', Icon: Share2,
     title: 'Soluciones digitales con IA',
     cardDesc: 'Webs, automatizaciones y agentes inteligentes para empresas.',
     subtitle: 'y automatizaciones',
@@ -125,9 +135,6 @@ const PROJECTS: SliderItem[] = [
   },
 ]
 
-// .spz file name — put your file in /public and set this
-const SPZ_FILE = '/scene.spz'
-
 // Magazine images: cover + interior pages (portrait crop)
 const MAG_COVER = px(8386440, 480, 640)
 const MAG_PAGES = [
@@ -164,10 +171,10 @@ const FRAG = `
       puv+=0.1*cos(i*vec2(0.1+0.01*i,0.8)+i*i+T*0.5+0.1*puv.x);
       vec2 pp=puv;float d=length(pp);float tt=fract(sin(i*127.1)*43758.5);
       vec3 pCol=mix(vec3(0.0,0.72,1.0),vec3(1.0,0.83,0.16),tt)*2.5;
-      col+=0.0025/d*pCol;float b=noise(i+pp+bg*1.731);
+      col+=0.0025/d*pCol;float b=max(0.0,noise(i+pp+bg*1.731));
       col+=0.004*b/length(max(pp,vec2(b*pp.x*0.02,pp.y)))*pCol;
     }
-    vec2 vig=(FC/R)*(1.0-FC/R);col*=pow(vig.x*vig.y*16.0,0.3);col=col/(col+0.6);
+    vec2 vig=(FC/R)*(1.0-FC/R);col*=pow(vig.x*vig.y*16.0,0.3);col=max(col,vec3(0.0));col=col/(col+0.6);
     gl_FragColor=vec4(col,1.0);
   }
 `
@@ -179,7 +186,7 @@ const ShaderCanvas = memo(function ShaderCanvas() {
   const ref = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return
-    const gl = canvas.getContext('webgl', { antialias: false, powerPreference: 'high-performance' })
+    const gl = canvas.getContext('webgl', { antialias: false, powerPreference: 'high-performance', alpha: false })
     if (!gl) return
     const prog = gl.createProgram()!
     gl.attachShader(prog, compileShader(gl, gl.VERTEX_SHADER, VERT))
@@ -211,6 +218,105 @@ const ShaderCanvas = memo(function ShaderCanvas() {
   }, [])
   return <canvas ref={ref} className="absolute inset-0 w-full h-full" style={{ imageRendering: 'auto' }} aria-hidden />
 })
+
+// ── Interactive Dot Grid ──────────────────────────────────────────────────────
+function useInteractiveDotGrid() {
+  const canvasRef  = useRef<HTMLCanvasElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
+  const mouseRef   = useRef({ x: -9999, y: -9999 })
+
+  useEffect(() => {
+    const canvas = canvasRef.current; if (!canvas) return
+    const section = sectionRef.current; if (!section) return
+    const ctx = canvas.getContext('2d'); if (!ctx) return
+
+    const GAP    = 28   // grid spacing
+    const BASE_R = 1.8  // resting dot radius
+    const RADIUS = 120  // influence radius
+    const PUSH   = 28   // max displacement
+
+    type Dot = { ox: number; oy: number; x: number; y: number }
+    let dots: Dot[] = []
+    let raf: number
+
+    const build = () => {
+      canvas.width  = section.offsetWidth
+      canvas.height = section.offsetHeight
+      dots = []
+      for (let x = GAP; x < canvas.width;  x += GAP)
+        for (let y = GAP; y < canvas.height; y += GAP)
+          dots.push({ ox: x, oy: y, x, y })
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      const { x: mx, y: my } = mouseRef.current
+
+      for (const d of dots) {
+        const dx = d.x - mx, dy = d.y - my
+        const dist = Math.sqrt(dx * dx + dy * dy)
+
+        if (dist < RADIUS && dist > 0) {
+          const f   = (1 - dist / RADIUS) * PUSH
+          const ang = Math.atan2(dy, dx)
+          d.x += (d.ox + Math.cos(ang) * f - d.x) * 0.22
+          d.y += (d.oy + Math.sin(ang) * f - d.y) * 0.22
+        } else {
+          d.x += (d.ox - d.x) * 0.1
+          d.y += (d.oy - d.y) * 0.1
+        }
+
+        const disp = Math.sqrt((d.x - d.ox) ** 2 + (d.y - d.oy) ** 2) / PUSH
+        const r    = BASE_R + disp * 3.5
+
+        if (disp > 0.05) {
+          // glow halo around active dots
+          const g = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, r * 4)
+          g.addColorStop(0, `rgba(0,184,255,${(disp * 0.35).toFixed(2)})`)
+          g.addColorStop(1, 'rgba(0,184,255,0)')
+          ctx.beginPath(); ctx.arc(d.x, d.y, r * 4, 0, Math.PI * 2)
+          ctx.fillStyle = g; ctx.fill()
+          // bright core
+          ctx.beginPath(); ctx.arc(d.x, d.y, r, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(0,184,255,${Math.min(0.95, 0.5 + disp * 0.8).toFixed(2)})`
+          ctx.fill()
+        } else {
+          // resting dot — clearly visible white-ish
+          ctx.beginPath(); ctx.arc(d.x, d.y, BASE_R, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(255,255,255,0.22)'
+          ctx.fill()
+        }
+      }
+
+      raf = requestAnimationFrame(draw)
+    }
+
+    const getPos = (clientX: number, clientY: number) => {
+      const r = section.getBoundingClientRect()
+      mouseRef.current = { x: clientX - r.left, y: clientY - r.top }
+    }
+    const onMove   = (e: MouseEvent)  => getPos(e.clientX, e.clientY)
+    const onLeave  = ()               => { mouseRef.current = { x: -9999, y: -9999 } }
+    const onTouch  = (e: TouchEvent)  => { const t = e.touches[0]; if (t) getPos(t.clientX, t.clientY) }
+    const onTouchEnd = ()             => { mouseRef.current = { x: -9999, y: -9999 } }
+
+    const ro = new ResizeObserver(build)
+    ro.observe(section); build(); draw()
+    section.addEventListener('mousemove',  onMove)
+    section.addEventListener('mouseleave', onLeave)
+    section.addEventListener('touchmove',  onTouch,   { passive: true })
+    section.addEventListener('touchend',   onTouchEnd)
+    return () => {
+      cancelAnimationFrame(raf); ro.disconnect()
+      section.removeEventListener('mousemove',  onMove)
+      section.removeEventListener('mouseleave', onLeave)
+      section.removeEventListener('touchmove',  onTouch)
+      section.removeEventListener('touchend',   onTouchEnd)
+    }
+  }, [])
+
+  return { canvasRef, sectionRef }
+}
 
 // ── Robot Eye ─────────────────────────────────────────────────────────────────
 const RobotEye = memo(function RobotEye({ active }: { active: number }) {
@@ -252,106 +358,245 @@ const RobotEye = memo(function RobotEye({ active }: { active: number }) {
 // ── HUD service card (hero corners) ───────────────────────────────────────────
 // corner: 0=top-left  1=top-right  2=bottom-left  3=bottom-right
 const CORNER_STYLES: React.CSSProperties[] = [
-  { top: '9%',     left: '1.5%' },
-  { top: '9%',     right: '1.5%' },
-  { bottom: '12%', left: '1.5%' },
-  { bottom: '12%', right: '1.5%' },
+  { top: '8%',     left: '1.5%' },
+  { top: '8%',     right: '1.5%' },
+  { bottom: '11%', left: '1.5%' },
+  { bottom: '11%', right: '1.5%' },
 ]
 
+// L-shaped bracket descriptor for each corner
+const BRACKET_DEFS = [
+  { top: 0,    left: 0,    borderTop: true,    borderLeft: true,    borderBottom: false, borderRight: false },
+  { top: 0,    right: 0,   borderTop: true,    borderLeft: false,   borderBottom: false, borderRight: true  },
+  { bottom: 0, left: 0,    borderTop: false,   borderLeft: true,    borderBottom: true,  borderRight: false },
+  { bottom: 0, right: 0,   borderTop: false,   borderLeft: false,   borderBottom: true,  borderRight: true  },
+] as const
+
+// Rounded corner for each bracket (outer corner only)
+const BRACKET_RADIUS = [
+  { borderTopLeftRadius: 7 },
+  { borderTopRightRadius: 7 },
+  { borderBottomLeftRadius: 7 },
+  { borderBottomRightRadius: 7 },
+] as const
+
 function HudCard({
-  s, delay, corner, active, visible,
+  s, delay, corner, active, visible, onClick,
 }: {
   s: typeof SERVICES[0]
   delay: number
   corner: 0 | 1 | 2 | 3
   active: boolean
   visible: boolean
+  onClick: () => void
 }) {
+  const [hovered, setHovered] = useState(false)
+  const lit = active || hovered
   const isRight = corner === 1 || corner === 3
   const { Icon } = s
+  const BLEN = 19
+  const R = 14 // card border radius
 
   return (
     <motion.div
       className="absolute z-20 hidden md:block"
-      style={{ ...CORNER_STYLES[corner], pointerEvents: 'none' }}
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 12 }}
-      transition={{ duration: 0.7, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}>
+      style={{ ...CORNER_STYLES[corner], cursor: 'pointer' }}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 14 }}
+      transition={{ duration: 0.7, delay: delay / 1000, ease: [0.16, 1, 0.3, 1] }}
+      onClick={onClick}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      whileHover={{ scale: 1.04 }}
+      whileTap={{ scale: 0.97 }}>
 
       <motion.div
         animate={{
           boxShadow: active
-            ? `0 8px 32px ${s.glow}, 0 0 0 1px ${s.accent}80`
-            : `0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px ${C.border}`,
+            ? `0 8px 60px ${s.glow}, 0 0 40px ${s.accent}40, inset 0 0 40px ${s.accent}10`
+            : hovered
+            ? `0 6px 40px ${s.glow}, 0 0 26px ${s.accent}30`
+            : `0 4px 28px rgba(0,0,0,0.7), 0 0 20px ${s.accent}18`,
+          borderColor: active ? `${s.accent}35` : hovered ? `${s.accent}25` : `${s.accent}15`,
         }}
-        transition={{ duration: 0.45 }}
-        className="relative rounded-2xl overflow-hidden"
+        transition={{ duration: 0.32 }}
+        className="relative"
         style={{
-          background: active ? 'rgba(4,9,20,0.92)' : 'rgba(4,9,20,0.78)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          width: 'clamp(148px, 19vw, 210px)',
-          padding: 'clamp(10px, 1.4vw, 18px)',
+          background: active ? 'rgba(3,7,18,0.97)' : 'rgba(3,7,18,0.88)',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          border: `1px solid ${s.accent}15`,
+          width: 'clamp(200px, 24vw, 295px)',
+          padding: 'clamp(16px, 2vw, 26px)',
+          borderRadius: R,
         }}>
 
-        {/* Subtle inner border gradient when active */}
-        <motion.div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
-          animate={{ opacity: active ? 1 : 0 }}
-          transition={{ duration: 0.4 }}
-          style={{
-            background: `linear-gradient(135deg, ${s.accent}14 0%, transparent 60%)`,
-          }} />
+        {/* ── Corner bloom spots (inner radial glow at each corner) ── */}
+        {[
+          { top: 0,    left: 0,  bg: `radial-gradient(circle at 0% 0%,   ${s.accent}22 0%, transparent 65%)` },
+          { top: 0,    right: 0, bg: `radial-gradient(circle at 100% 0%,  ${s.accent}22 0%, transparent 65%)` },
+          { bottom: 0, left: 0,  bg: `radial-gradient(circle at 0% 100%,  ${s.accent}22 0%, transparent 65%)` },
+          { bottom: 0, right: 0, bg: `radial-gradient(circle at 100% 100%,${s.accent}22 0%, transparent 65%)` },
+        ].map((c, i) => (
+          <motion.div key={`bloom-${i}`} className="absolute pointer-events-none"
+            style={{ ...c, width: 70, height: 70, background: c.bg }}
+            animate={{ opacity: active ? 1 : hovered ? 0.65 : 0.3 }}
+            transition={{ duration: 0.32 }} />
+        ))}
 
-        {/* Icon row */}
-        <div className={`flex items-center gap-2.5 mb-2.5 ${isRight ? 'flex-row-reverse' : ''}`}>
+        {/* ── Corner bracket accents ── */}
+        {BRACKET_DEFS.map((b, i) => (
           <motion.div
-            animate={{
-              background: active ? `${s.accent}22` : `${s.accent}0D`,
-              borderColor: active ? `${s.accent}55` : `${s.accent}28`,
-            }}
-            transition={{ duration: 0.4 }}
-            className="flex-shrink-0 rounded-xl flex items-center justify-center"
+            key={i}
+            className="absolute pointer-events-none"
             style={{
-              width: 'clamp(28px, 2.4vw, 34px)',
-              height: 'clamp(28px, 2.4vw, 34px)',
-              border: `1px solid ${s.accent}28`,
+              ...(b.top    !== undefined ? { top:    b.top    } : {}),
+              ...(b.bottom !== undefined ? { bottom: b.bottom } : {}),
+              ...(b.left   !== undefined ? { left:   b.left   } : {}),
+              ...(b.right  !== undefined ? { right:  b.right  } : {}),
+              width: BLEN, height: BLEN,
+              borderTop:    b.borderTop    ? `1.5px solid ${s.accent}` : 'none',
+              borderLeft:   b.borderLeft   ? `1.5px solid ${s.accent}` : 'none',
+              borderBottom: b.borderBottom ? `1.5px solid ${s.accent}` : 'none',
+              borderRight:  b.borderRight  ? `1.5px solid ${s.accent}` : 'none',
+              ...BRACKET_RADIUS[i],
+            }}
+            animate={{
+              opacity: active ? 1 : hovered ? 0.92 : 0.72,
+              filter: active
+                ? `drop-shadow(0 0 6px ${s.accent}) drop-shadow(0 0 14px ${s.accent}90)`
+                : hovered
+                ? `drop-shadow(0 0 5px ${s.accent}) drop-shadow(0 0 8px ${s.accent}70)`
+                : `drop-shadow(0 0 4px ${s.accent}CC)`,
+            }}
+            transition={{ duration: 0.32 }}
+          />
+        ))}
+
+        {/* Top glow line */}
+        <motion.div
+          className="absolute top-0 left-0 right-0 h-px pointer-events-none"
+          animate={{ opacity: active ? 0.75 : hovered ? 0.45 : 0.18 }}
+          transition={{ duration: 0.32 }}
+          style={{
+            background: `linear-gradient(90deg, transparent 5%, ${s.accent} 50%, transparent 95%)`,
+            borderTopLeftRadius: R, borderTopRightRadius: R,
+          }}
+        />
+
+        {/* Corner bg tint */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: `linear-gradient(135deg, ${s.accent}0E 0%, transparent 50%)`, borderRadius: R }} />
+
+        {/* ── Icon + title ── */}
+        <div className={`flex items-start gap-3 mb-3 ${isRight ? 'flex-row-reverse' : ''}`}>
+          <motion.div
+            className="flex-shrink-0 flex items-center justify-center"
+            animate={{
+              background: lit ? `${s.accent}28` : `${s.accent}10`,
+              boxShadow: active
+                ? `0 0 22px ${s.glow}, 0 0 8px ${s.accent}60`
+                : hovered
+                ? `0 0 14px ${s.glow}`
+                : `0 0 6px ${s.accent}35`,
+            }}
+            transition={{ duration: 0.32 }}
+            style={{
+              width: 'clamp(40px, 3.4vw, 52px)',
+              height: 'clamp(40px, 3.4vw, 52px)',
+              border: `1.5px solid ${s.accent}60`,
+              borderRadius: 10,
             }}>
-            <motion.div animate={{ color: active ? s.accent : `${s.accent}70` }} transition={{ duration: 0.4 }}>
-              <Icon size={14} />
-            </motion.div>
+            <Icon size={22} style={{ color: s.accent }} />
           </motion.div>
 
-          <motion.h3
-            animate={{ color: active ? C.white : '#8898AA' }}
-            transition={{ duration: 0.4 }}
-            className={`font-bold leading-tight ${isRight ? 'text-right' : ''}`}
-            style={{ fontSize: 'clamp(11px, 1.1vw, 14px)' }}>
-            {s.title}
-          </motion.h3>
+          <div className={`flex-1 pt-1 ${isRight ? 'text-right' : ''}`}>
+            <motion.h3
+              animate={{ color: lit ? C.white : '#BDD0E4' }}
+              transition={{ duration: 0.28 }}
+              className="font-black leading-snug"
+              style={{ fontSize: 'clamp(13px, 1.35vw, 18px)' }}>
+              {s.title}
+            </motion.h3>
+          </div>
         </div>
 
-        {/* Description — hidden on phones (< 480px), shown on larger screens */}
-        <motion.p
-          animate={{ color: active ? '#8898AA' : '#4A5568' }}
-          transition={{ duration: 0.4 }}
-          className={`hidden min-[480px]:block text-xs leading-relaxed ${isRight ? 'text-right' : ''}`}
-          style={{ fontSize: 'clamp(10px, 0.85vw, 12px)' }}>
+        {/* Description */}
+        <p className={`leading-relaxed ${isRight ? 'text-right' : ''}`}
+          style={{ fontSize: 'clamp(11px, 0.9vw, 13px)', color: '#6E8FAA', lineHeight: 1.6 }}>
           {s.cardDesc}
-        </motion.p>
+        </p>
 
-        {/* Bottom accent line */}
+        {/* Bottom glow line */}
         <motion.div
-          className="absolute bottom-0 inset-x-0 h-[2px] rounded-full"
-          animate={{
-            background: active
-              ? `linear-gradient(90deg, transparent, ${s.accent}, transparent)`
-              : 'transparent',
-            opacity: active ? 1 : 0,
+          className="absolute bottom-0 left-0 right-0 h-px pointer-events-none"
+          animate={{ opacity: active ? 0.55 : hovered ? 0.3 : 0.08 }}
+          transition={{ duration: 0.32 }}
+          style={{
+            background: `linear-gradient(90deg, transparent 8%, ${s.accent} 50%, transparent 92%)`,
+            borderBottomLeftRadius: R, borderBottomRightRadius: R,
           }}
-          transition={{ duration: 0.4 }} />
+        />
       </motion.div>
     </motion.div>
+  )
+}
+
+// ── Typewriter Tags ───────────────────────────────────────────────────────────
+function TypewriterTags({ tags, accent }: { tags: string[]; accent: string }) {
+  const ref      = useRef<HTMLDivElement>(null)
+  const [started, setStarted] = useState(false)
+  const [doneIdx, setDoneIdx] = useState(-1)   // last fully-typed tag index
+  const [charLen, setCharLen] = useState(0)    // chars shown on in-progress tag
+
+  useEffect(() => {
+    const el = ref.current; if (!el) return
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setStarted(true) },
+      { threshold: 0.25 },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!started) return
+    const typingIdx = doneIdx + 1
+    if (typingIdx >= tags.length) return
+    if (charLen < tags[typingIdx].length) {
+      const t = setTimeout(() => setCharLen(n => n + 1), 36)
+      return () => clearTimeout(t)
+    } else {
+      const t = setTimeout(() => { setDoneIdx(typingIdx); setCharLen(0) }, 100)
+      return () => clearTimeout(t)
+    }
+  }, [started, doneIdx, charLen, tags])
+
+  const typingIdx = doneIdx + 1
+
+  return (
+    <div ref={ref} className="flex flex-col gap-1">
+      {tags.map((tag, i) => {
+        const isDone   = i <= doneIdx
+        const isTyping = started && i === typingIdx
+        const isHidden = !isDone && !isTyping
+        return (
+          <span key={tag} className="text-sm" style={{ color: isHidden ? 'transparent' : C.gray }}>
+            {'· '}
+            {isDone || isHidden ? tag : (
+              <>
+                {tag.slice(0, charLen)}
+                <motion.span
+                  animate={{ opacity: [1, 0] }}
+                  transition={{ duration: 0.45, repeat: Infinity, repeatType: 'reverse' }}
+                  style={{ display: 'inline-block', width: 2, height: '0.72em', background: accent, marginLeft: 1, verticalAlign: 'middle', borderRadius: 1 }}
+                />
+              </>
+            )}
+          </span>
+        )
+      })}
+    </div>
   )
 }
 
@@ -401,13 +646,83 @@ function UnfocusedImage({ src }: { src: string }) {
 // corner→service index mapping: top-left=0, top-right=1, bottom-left=2, bottom-right=3
 const CORNER_SERVICE = [0, 1, 2, 3] as const
 
+// ── About Section (self-contained so it can use the hook) ─────────────────────
+function AboutSection() {
+  const { canvasRef, sectionRef } = useInteractiveDotGrid()
+  return (
+    <section ref={sectionRef} className="relative py-32 px-6 overflow-hidden" style={{ background: C.bg }}>
+      {/* Dot grid — behind content */}
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }} aria-hidden />
+
+      <div className="relative max-w-6xl mx-auto" style={{ zIndex: 1 }}>
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
+          className="grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.blue }}>Sobre nosotros</span>
+            <h2 className="font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem,4.5vw,3.5rem)', color: C.white }}>
+              Más de 20 años<br /><span style={{ color: C.gold }}>evolucionando</span>
+            </h2>
+            <div className="space-y-5 text-base leading-relaxed" style={{ color: C.gray }}>
+              <p>Esta nueva línea nace como una evolución natural de{' '}<span style={{ color: C.white, fontWeight: 600 }}>Girasomnis</span>, un estudio creativo con más de 20 años de experiencia en espectáculos audiovisuales, experiencias inmersivas, video mapping, contenido escénico e innovación visual.</p>
+              <p>Ahora aplicamos la inteligencia artificial a ese mismo universo creativo para desarrollar <span style={{ color: C.cyan }}>avatares interactivos</span>, <span style={{ color: C.cyan }}>instalaciones inteligentes</span>, producción audiovisual con IA y soluciones digitales para empresas.</p>
+              <p>Esta división surge de la unión entre Girasomnis e{' '}<span style={{ color: C.white, fontWeight: 600 }}>Immerso</span>, especializada en desarrollo de software, aplicaciones web, soluciones IA y avatares 3D en tiempo real.</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-6">
+            <div className="flex gap-6">
+              {['Girasomnis', 'Immerso'].map((brand, i) => (
+                <div key={brand} className="flex-1 rounded-2xl p-6 text-center"
+                  style={{ background: 'rgba(7,17,32,0.85)', border: `1px solid ${C.border}`, backdropFilter: 'blur(8px)' }}>
+                  <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
+                    style={{ background: `linear-gradient(135deg, ${i === 0 ? C.blue : C.gold}, ${i === 0 ? C.deep : C.goldSoft})` }}>
+                    <span className="font-black text-white text-sm">{brand[0]}</span>
+                  </div>
+                  <span className="font-bold text-sm" style={{ color: C.white }}>{brand}</span>
+                  <span className="text-xs mt-1 block" style={{ color: C.gray }}>{i === 0 ? 'Arte & Creatividad' : 'Tech & Software'}</span>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              {[['20+', 'años de experiencia'], ['4', 'líneas de servicio'], ['3', 'oficinas']].map(([n, l]) => (
+                <div key={l} className="rounded-xl p-4 text-center"
+                  style={{ background: 'rgba(0,184,255,0.06)', border: `1px solid ${C.border}`, backdropFilter: 'blur(8px)' }}>
+                  <div className="font-black text-2xl mb-1" style={{ color: C.blue }}>{n}</div>
+                  <div className="text-xs" style={{ color: C.gray }}>{l}</div>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-4 justify-center">
+              {[
+                { Icon: IconLinkedin,  url: 'https://www.linkedin.com/company/girasomnis/' },
+                { Icon: IconYoutube,   url: 'https://www.youtube.com/@PacoGramajegirasomnis' },
+                { Icon: IconInstagram, url: 'https://www.instagram.com/aiasomnis' },
+              ].map(({ Icon, url }, i) => (
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = C.blue; (e.currentTarget as HTMLAnchorElement).style.color = C.blue }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = C.border; (e.currentTarget as HTMLAnchorElement).style.color = C.gray }}>
+                  <Icon size={16} />
+                </a>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
 export default function AiaSomnisPage() {
   const [heroVisible, setHeroVisible] = useState(false)
   const [activeService, setActiveService] = useState(0)
   const [scrolledPastHero, setScrolledPastHero] = useState(false)
+  const [contactOpen, setContactOpen] = useState(false)
+  const [formSent, setFormSent] = useState(false)
   const [splineInView, setSplineInView] = useState(false)
   const [heroQuadrant, setHeroQuadrant] = useState<0|1|2|3|null>(null)
   const [soundOn, setSoundOn] = useState(false)
+  const [logoEntranceDone, setLogoEntranceDone] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
   const heroRef = useRef<HTMLElement>(null)
@@ -494,9 +809,9 @@ export default function AiaSomnisPage() {
         <div className="absolute inset-0 backdrop-blur-md"
           style={{ background: 'rgba(5,7,13,0.85)', borderBottom: `1px solid ${C.border}` }} />
         <div className="relative z-10 flex items-center justify-between w-full">
-          <span className="font-black text-base tracking-widest" style={{ color: C.blue }}>AIA-SOMNIS</span>
+          <img src="/logo2.png" alt="AIA-SOMNIS" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
           {/* Mobile: just contact link */}
-          <a href="#contacto" className="md:hidden px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+          <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }} className="md:hidden px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
             style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white }}>
             Contacto
           </a>
@@ -508,7 +823,7 @@ export default function AiaSomnisPage() {
                 {s.num}
               </button>
             ))}
-            <a href="#contacto" className="px-5 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+            <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }} className="px-5 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
               style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white }}>
               Contacto
             </a>
@@ -549,6 +864,7 @@ export default function AiaSomnisPage() {
             corner={corner}
             active={heroQuadrant === corner}
             visible={heroVisible}
+            onClick={() => scrollTo(CORNER_SERVICE[corner])}
           />
         ))}
 
@@ -569,8 +885,8 @@ export default function AiaSomnisPage() {
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.95)',
             transition: 'opacity 1.1s ease 300ms, transform 1.1s ease 300ms',
-            width: 'clamp(220px, 55vw, 520px)',
-            height: 'clamp(220px, 55vw, 520px)',
+            width: 'clamp(220px, 58vw, 620px)',
+            height: 'clamp(220px, 58vw, 620px)',
             position: 'relative',
             pointerEvents: 'auto',
           }}>
@@ -595,15 +911,90 @@ export default function AiaSomnisPage() {
           </div>
 
           {/* Title */}
-          <div className="text-center px-4 -mt-6" style={fadeUp(200)}>
-            <h1 className="font-black leading-none tracking-tight" style={{ fontSize: 'clamp(2.6rem,7vw,6rem)' }}>
-              <span className="block" style={{ color: C.white }}>AIA</span>
-              <span className="block" style={{
-                backgroundImage: `linear-gradient(90deg, ${C.blue} 0%, ${C.deep} 55%, ${C.gold} 100%)`,
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-              }}>SOMNIS</span>
-            </h1>
-            <p className="text-sm mt-3 max-w-xs mx-auto" style={{ color: C.gray }}>
+          <div className="text-center px-4 -mt-6 flex flex-col items-center gap-3">
+
+            {/* ── Animated logo ── */}
+            <div className="relative flex items-center justify-center">
+
+              {/* Ambient glow layer — breathes in idle */}
+              <motion.div
+                className="absolute pointer-events-none"
+                style={{
+                  width: 'clamp(120px, 20vw, 240px)',
+                  height: 'clamp(60px, 10vw, 120px)',
+                  background: `radial-gradient(ellipse, ${C.blue}55 0%, transparent 68%)`,
+                  filter: 'blur(24px)',
+                }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={logoEntranceDone
+                  ? { opacity: [0.45, 1, 0.45], scale: [0.85, 1.3, 0.85] }
+                  : { opacity: heroVisible ? 0.4 : 0, scale: 1 }}
+                transition={logoEntranceDone
+                  ? { duration: 2.8, repeat: Infinity, ease: 'easeInOut' }
+                  : { duration: 0.7, delay: 1.1 }}
+              />
+
+              {/* Shockwave ring — one-shot on entrance complete */}
+              {logoEntranceDone && (
+                <motion.div
+                  className="absolute rounded-full pointer-events-none"
+                  style={{ width: 'clamp(80px, 12vw, 150px)', height: 'clamp(80px, 12vw, 150px)', border: `1.5px solid ${C.blue}` }}
+                  initial={{ scale: 0.7, opacity: 0.9 }}
+                  animate={{ scale: 3, opacity: 0 }}
+                  transition={{ duration: 1.0, ease: 'easeOut' }}
+                />
+              )}
+
+              {/* Logo with glitch entrance + idle breathing */}
+              <motion.img
+                src="/logo2.png"
+                alt="AIA-SOMNIS"
+                initial={{ opacity: 0, scale: 0.78, filter: 'blur(14px)' }}
+                animate={
+                  !heroVisible
+                    ? { opacity: 0, scale: 0.78, filter: 'blur(14px)' }
+                    : logoEntranceDone
+                      ? {
+                          scale:  [1, 1.018, 1],
+                          filter: [
+                            'drop-shadow(0 0 22px rgba(0,184,255,0.45))',
+                            'drop-shadow(0 0 52px rgba(0,184,255,0.9))',
+                            'drop-shadow(0 0 22px rgba(0,184,255,0.45))',
+                          ],
+                        }
+                      : {
+                          opacity: [0, 0.25, 0.04, 0.75, 0.6, 1],
+                          scale:   [0.78, 0.86, 0.83, 0.97, 1.03, 1],
+                          filter:  [
+                            'blur(14px)',
+                            'blur(5px) brightness(2)',
+                            'blur(11px) brightness(0.6)',
+                            'blur(2px) brightness(1.4)',
+                            'blur(0.5px)',
+                            'drop-shadow(0 0 22px rgba(0,184,255,0.45))',
+                          ],
+                        }
+                }
+                transition={logoEntranceDone ? {
+                  duration: 2.8, repeat: Infinity, ease: 'easeInOut',
+                } : {
+                  duration: 1.25, delay: 0.25, ease: 'easeInOut',
+                  times: [0, 0.16, 0.32, 0.62, 0.82, 1],
+                }}
+                onAnimationComplete={() => {
+                  if (!logoEntranceDone && heroVisible) setLogoEntranceDone(true)
+                }}
+                style={{
+                  height: 'clamp(60px, 10vw, 110px)',
+                  width: 'auto',
+                  objectFit: 'contain',
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              />
+            </div>
+
+            <p className="text-sm max-w-xs mx-auto" style={{ ...fadeUp(1400), color: C.gray }}>
               Para <span style={{ color: C.white }}>eventos, marcas y cultura.</span>
             </p>
           </div>
@@ -617,7 +1008,7 @@ export default function AiaSomnisPage() {
               style={{ background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)', color: C.white, boxShadow: '0 0 28px rgba(123,47,255,0.5)' }}>
               Ver servicios <ArrowRight size={14} />
             </button>
-            <a href="#contacto"
+            <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }}
               className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm"
               style={{ background: 'linear-gradient(135deg, #3B1FA3 0%, #7B2FFF 100%)', color: C.white, boxShadow: '0 0 20px rgba(123,47,255,0.35)' }}>
               Contactar
@@ -635,13 +1026,51 @@ export default function AiaSomnisPage() {
 
           {/* Desktop only: right-center */}
           <div style={fadeUp(700)} className="hidden md:block absolute right-8 top-1/2 -translate-y-1/2 pointer-events-auto z-20">
-            <a href="#contacto"
+            <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
               style={{ background: 'linear-gradient(135deg, #3B1FA3 0%, #7B2FFF 100%)', color: C.white, boxShadow: '0 0 24px rgba(123,47,255,0.35)' }}>
               Contactar
             </a>
           </div>
 
+        </div>
+
+        {/* ── Mobile-only lateral 01/02/03/04 nav ── */}
+        <div
+          className="md:hidden absolute right-3 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2.5 pointer-events-auto"
+          style={{ opacity: heroVisible ? 1 : 0, transition: 'opacity 0.8s ease 500ms' }}
+        >
+          {SERVICES.map((s, i) => {
+            const isActive = activeService === i
+            return (
+              <motion.button
+                key={s.num}
+                onClick={() => scrollTo(i)}
+                whileTap={{ scale: 0.82 }}
+                style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+              >
+                <motion.div
+                  animate={{
+                    background: isActive ? `${s.accent}20` : 'rgba(255,255,255,0.04)',
+                    borderColor: isActive ? s.accent : C.border,
+                    boxShadow: isActive ? `0 0 12px ${s.glow}` : 'none',
+                    scale: isActive ? 1.12 : 1,
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="rounded-full flex items-center justify-center"
+                  style={{ width: 28, height: 28, border: `1.5px solid ${C.border}` }}
+                >
+                  <motion.span
+                    animate={{ color: isActive ? s.accent : C.gray }}
+                    transition={{ duration: 0.3 }}
+                    style={{ fontSize: 9, fontWeight: 800, fontFamily: 'monospace', letterSpacing: '0.03em', lineHeight: 1 }}
+                  >
+                    {s.num}
+                  </motion.span>
+                </motion.div>
+              </motion.button>
+            )
+          })}
         </div>
 
         {/* Horizontal scan line */}
@@ -706,10 +1135,10 @@ export default function AiaSomnisPage() {
 
                       {/* num + title */}
                       <div>
-                        <span className="block text-xs font-black tracking-[0.3em] uppercase mb-2"
-                          style={{ color: s.accent }}>{s.num}</span>
+                        <span className="block font-black leading-none mb-1"
+                          style={{ fontSize: 'clamp(2.5rem,5vw,6rem)', color: `${s.accent}30`, letterSpacing: '-0.04em', lineHeight: 1 }}>{s.num}</span>
                         <h2 className="font-black leading-tight mb-2"
-                          style={{ fontSize: 'clamp(1.5rem,2.8vw,2.5rem)', color: C.white }}>{s.title}</h2>
+                          style={{ fontSize: 'clamp(1.5rem,2.8vw,2.5rem)', color: C.white, marginTop: '-0.5rem' }}>{s.title}</h2>
                         <p style={{ color: `${s.accent}CC`, fontSize: '0.9rem' }}>{s.subtitle}</p>
                       </div>
 
@@ -719,14 +1148,8 @@ export default function AiaSomnisPage() {
                         {s.desc}
                       </p>
 
-                      {/* tags — plain list, no pill boxes */}
-                      <div className="flex flex-col gap-1">
-                        {s.tags.map(tag => (
-                          <span key={tag} className="text-xs" style={{ color: C.gray }}>
-                            · {tag}
-                          </span>
-                        ))}
-                      </div>
+                      {/* tags — typewriter reveal on scroll */}
+                      <TypewriterTags tags={s.tags} accent={s.accent} />
                     </div>
 
                     {/* ── REEL COLUMN ── fills all remaining space, edge-to-edge */}
@@ -804,7 +1227,30 @@ export default function AiaSomnisPage() {
         })}
       </section>
 
-      {/* ══════════ PROYECTOS — FxSlider (immediately after services) ══════════ */}
+      {/* ══════════ TICKER — transición hacia proyectos ══════════ */}
+      <div className="relative overflow-hidden py-5 select-none" style={{ background: C.bg, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
+        {/* fade edges */}
+        <div className="absolute inset-y-0 left-0 w-24 pointer-events-none z-10" style={{ background: `linear-gradient(to right, ${C.bg}, transparent)` }} />
+        <div className="absolute inset-y-0 right-0 w-24 pointer-events-none z-10" style={{ background: `linear-gradient(to left, ${C.bg}, transparent)` }} />
+        <motion.div
+          className="flex gap-12 whitespace-nowrap"
+          animate={{ x: ['0%', '-50%'] }}
+          transition={{ duration: 22, ease: 'linear', repeat: Infinity }}
+        >
+          {[...Array(2)].map((_, rep) => (
+            <div key={rep} className="flex gap-12 items-center">
+              {['Avatar Viky', 'Canet Rock IA', 'Quiniela Planeta', 'FLUGE', 'Interactivos Táctiles'].map((name) => (
+                <span key={name} className="flex items-center gap-12">
+                  <span className="font-black uppercase tracking-widest text-sm" style={{ color: C.white }}>{name}</span>
+                  <span className="text-lg font-black" style={{ color: C.blue }}>·</span>
+                </span>
+              ))}
+            </div>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* ══════════ PROYECTOS — FxSlider ══════════ */}
       <section id="proyectos">
         <FxSlider items={PROJECTS} headerText="Proyectos seleccionados" duration={0.64} parallaxAmount={5} />
       </section>
@@ -827,100 +1273,15 @@ export default function AiaSomnisPage() {
         <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none" style={{ background: `linear-gradient(to top, ${C.bg}, transparent)` }} />
       </section>
 
-      {/* ══════════ ESCENA 3D — Gaussian Splat ══════════ */}
-      <section className="relative flex flex-col items-center justify-center py-16 px-6" style={{ background: C.bg2 }}>
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          style={{ backgroundImage: `linear-gradient(${C.border} 1px, transparent 1px), linear-gradient(90deg, ${C.border} 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
-          className="text-center mb-10 relative z-10">
-          <span className="text-xs uppercase tracking-[0.3em] mb-4 block" style={{ color: C.gold }}>Experiencia Interactiva</span>
-          <h2 className="font-black mb-2" style={{ fontSize: 'clamp(2rem,5vw,4rem)', color: C.white }}>Escena 3D</h2>
-          <p className="text-sm" style={{ color: C.gray }}>
-            Pon tu archivo <code style={{ color: C.blue }}>.spz</code> en <code style={{ color: C.blue }}>/public/scene.spz</code> para verlo aquí
-          </p>
-        </motion.div>
+      {/* ══════════ ABOUT US — Dot Grid ══════════ */}
+      <AboutSection />
 
-        <div className="relative w-full max-w-6xl mx-auto rounded-3xl overflow-hidden"
-          style={{ height: '80vh', border: `1px solid ${C.border}` }}>
-          <Suspense fallback={
-            <div className="w-full h-full flex items-center justify-center" style={{ background: '#05070D' }}>
-              <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
-                style={{ borderTopColor: '#00B8FF', borderRightColor: 'rgba(0,184,255,0.2)' }} />
-            </div>
-          }>
-            <GaussianSplatViewer src={SPZ_FILE} className="w-full h-full" />
-          </Suspense>
-          {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
-            <div key={i} className={`absolute ${pos} w-8 h-8 pointer-events-none z-10`}
-              style={{ borderTop: i < 2 ? `2px solid ${C.gold}` : 'none', borderBottom: i >= 2 ? `2px solid ${C.gold}` : 'none', borderLeft: i % 2 === 0 ? `2px solid ${C.gold}` : 'none', borderRight: i % 2 !== 0 ? `2px solid ${C.gold}` : 'none' }} />
-          ))}
-        </div>
-        <p className="mt-6 text-xs text-center" style={{ color: C.border }}>
-          Arrastra para orbitar · Scroll para zoom · Click derecho para desplazar
-        </p>
-      </section>
-
-      {/* ══════════ ABOUT US ══════════ */}
-      <section className="relative py-32 px-6" style={{ background: C.bg }}>
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
-            className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.blue }}>Sobre nosotros</span>
-              <h2 className="font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem,4.5vw,3.5rem)', color: C.white }}>
-                Más de 20 años<br /><span style={{ color: C.gold }}>evolucionando</span>
-              </h2>
-              <div className="space-y-5 text-base leading-relaxed" style={{ color: C.gray }}>
-                <p>Esta nueva línea nace como una evolución natural de{' '}<span style={{ color: C.white, fontWeight: 600 }}>Girasomnis</span>, un estudio creativo con más de 20 años de experiencia en espectáculos audiovisuales, experiencias inmersivas, video mapping, contenido escénico e innovación visual.</p>
-                <p>Ahora aplicamos la inteligencia artificial a ese mismo universo creativo para desarrollar <span style={{ color: C.cyan }}>avatares interactivos</span>, <span style={{ color: C.cyan }}>instalaciones inteligentes</span>, producción audiovisual con IA y soluciones digitales para empresas.</p>
-                <p>Esta división surge de la unión entre Girasomnis e{' '}<span style={{ color: C.white, fontWeight: 600 }}>Immerso</span>, especializada en desarrollo de software, aplicaciones web, soluciones IA y avatares 3D en tiempo real.</p>
-              </div>
-            </div>
-            <div className="flex flex-col gap-6">
-              <div className="flex gap-6">
-                {['Girasomnis', 'Immerso'].map((brand, i) => (
-                  <div key={brand} className="flex-1 rounded-2xl p-6 text-center"
-                    style={{ background: 'rgba(7,17,32,0.8)', border: `1px solid ${C.border}` }}>
-                    <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
-                      style={{ background: `linear-gradient(135deg, ${i === 0 ? C.blue : C.gold}, ${i === 0 ? C.deep : C.goldSoft})` }}>
-                      <span className="font-black text-white text-sm">{brand[0]}</span>
-                    </div>
-                    <span className="font-bold text-sm" style={{ color: C.white }}>{brand}</span>
-                    <span className="text-xs mt-1 block" style={{ color: C.gray }}>{i === 0 ? 'Arte & Creatividad' : 'Tech & Software'}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                {[['20+', 'años de experiencia'], ['4', 'líneas de servicio'], ['3', 'oficinas']].map(([n, l]) => (
-                  <div key={l} className="rounded-xl p-4 text-center"
-                    style={{ background: 'rgba(0,184,255,0.05)', border: `1px solid ${C.border}` }}>
-                    <div className="font-black text-2xl mb-1" style={{ color: C.blue }}>{n}</div>
-                    <div className="text-xs" style={{ color: C.gray }}>{l}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-4 justify-center">
-                {[
-                  { Icon: IconLinkedin,  url: 'https://www.linkedin.com/company/girasomnis/' },
-                  { Icon: IconYoutube,   url: 'https://www.youtube.com/@PacoGramajegirasomnis' },
-                  { Icon: IconInstagram, url: 'https://www.instagram.com/aiasomnis' },
-                ].map(({ Icon, url }, i) => (
-                  <a key={i} href={url} target="_blank" rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = C.blue; (e.currentTarget as HTMLAnchorElement).style.color = C.blue }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = C.border; (e.currentTarget as HTMLAnchorElement).style.color = C.gray }}>
-                    <Icon size={16} />
-                  </a>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
       {/* ══════════ TEAM ══════════ */}
-      <section className="py-24 px-6" style={{ background: C.bg2, borderTop: `1px solid ${C.border}` }}>
+      <section className="relative py-24 px-6" style={{ background: C.bg2 }}>
+        {/* fade from About bg (#05070D) into this section */}
+        <div className="absolute top-0 inset-x-0 h-24 pointer-events-none"
+          style={{ background: `linear-gradient(to bottom, ${C.bg}, ${C.bg2})` }} />
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="text-center mb-16">
             <span className="text-xs uppercase tracking-[0.3em] mb-4 block" style={{ color: C.blue }}>El equipo</span>
@@ -1084,7 +1445,7 @@ export default function AiaSomnisPage() {
       <footer className="py-10 px-6" style={{ borderTop: `1px solid ${C.border}`, background: C.bg }}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="font-black tracking-widest" style={{ backgroundImage: `linear-gradient(90deg, ${C.blue}, ${C.gold})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>AIA-SOMNIS</span>
+            <img src="/logo2.png" alt="AIA-SOMNIS" style={{ height: 28, width: 'auto', objectFit: 'contain' }} />
             <span className="text-xs" style={{ color: C.border }}>by Girasomnis × Immerso</span>
           </div>
           <div className="flex gap-4">
@@ -1104,6 +1465,115 @@ export default function AiaSomnisPage() {
           <span className="text-xs" style={{ color: C.border }}>© 2025 AIA-SOMNIS · Madrid · Valencia · Barcelona</span>
         </div>
       </footer>
+
+      {/* ══════════ CONTACT MODAL ══════════ */}
+      {contactOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          onClick={() => setContactOpen(false)}>
+          {/* Backdrop */}
+          <div className="absolute inset-0" style={{ background: 'rgba(5,7,13,0.92)', backdropFilter: 'blur(12px)' }} />
+
+          {/* Panel */}
+          <motion.div
+            className="relative w-full max-w-lg rounded-2xl p-8 md:p-10"
+            style={{ background: '#071120', border: `1px solid ${C.border}`, boxShadow: '0 32px 80px rgba(0,0,0,0.6)' }}
+            initial={{ opacity: 0, y: 40, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            onClick={e => e.stopPropagation()}>
+
+            {/* Close */}
+            <button onClick={() => { setContactOpen(false); setFormSent(false) }}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-all"
+              style={{ background: 'rgba(255,255,255,0.06)', color: C.gray }}>✕</button>
+
+            {formSent ? (
+              <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center"
+                  style={{ background: 'rgba(123,47,255,0.15)', border: '1px solid #7B2FFF' }}>
+                  <span style={{ fontSize: 28 }}>✓</span>
+                </div>
+                <h3 className="font-black text-xl" style={{ color: C.white }}>¡Mensaje enviado!</h3>
+                <p style={{ color: C.gray }}>Te responderemos lo antes posible.</p>
+                <button onClick={() => { setContactOpen(false); setFormSent(false) }}
+                  className="mt-2 px-6 py-2 rounded-full text-sm font-bold"
+                  style={{ background: 'linear-gradient(135deg,#7B2FFF,#1B3DFF)', color: C.white }}>
+                  Cerrar
+                </button>
+              </div>
+            ) : (
+              <>
+                <img src="/logo2.png" alt="AIA-SOMNIS" style={{ height: 28, objectFit: 'contain', marginBottom: 20 }} />
+                <h2 className="font-black text-2xl mb-1" style={{ color: C.white }}>Cuéntanos tu proyecto</h2>
+                <p className="text-sm mb-6" style={{ color: C.gray }}>Responderemos en menos de 24h.</p>
+
+                <form
+                  name="contacto-aiasomnis"
+                  method="POST"
+                  data-netlify="true"
+                  onSubmit={async e => {
+                    e.preventDefault()
+                    const form = e.currentTarget as HTMLFormElement
+                    const data = new FormData(form)
+                    await fetch('/', { method: 'POST', body: data })
+                    setFormSent(true)
+                  }}
+                  className="flex flex-col gap-4">
+
+                  <input type="hidden" name="form-name" value="contacto-aiasomnis" />
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Nombre</label>
+                      <input name="nombre" required placeholder="Tu nombre"
+                        className="rounded-xl px-4 py-3 text-sm outline-none transition-all"
+                        style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
+                        onFocus={e => e.currentTarget.style.borderColor = '#7B2FFF'}
+                        onBlur={e => e.currentTarget.style.borderColor = C.border} />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Email</label>
+                      <input name="email" type="email" required placeholder="tu@email.com"
+                        className="rounded-xl px-4 py-3 text-sm outline-none transition-all"
+                        style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
+                        onFocus={e => e.currentTarget.style.borderColor = '#7B2FFF'}
+                        onBlur={e => e.currentTarget.style.borderColor = C.border} />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Tipo de proyecto</label>
+                    <select name="tipo" style={{ background: '#0D1829', border: `1px solid ${C.border}`, color: C.white }}
+                      className="rounded-xl px-4 py-3 text-sm outline-none">
+                      <option value="">Selecciona una opción</option>
+                      <option>Avatar IA</option>
+                      <option>Instalación interactiva</option>
+                      <option>Producción audiovisual con IA</option>
+                      <option>Solución digital / Web</option>
+                      <option>Otro</option>
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Cuéntanos tu idea</label>
+                    <textarea name="mensaje" required rows={4} placeholder="Describe tu proyecto, evento, marca o lo que necesitas..."
+                      className="rounded-xl px-4 py-3 text-sm outline-none transition-all resize-none"
+                      style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
+                      onFocus={e => e.currentTarget.style.borderColor = '#7B2FFF'}
+                      onBlur={e => e.currentTarget.style.borderColor = C.border} />
+                  </div>
+
+                  <button type="submit"
+                    className="w-full py-3.5 rounded-xl font-bold text-sm tracking-wide mt-1"
+                    style={{ background: 'linear-gradient(135deg,#7B2FFF 0%,#1B3DFF 60%,#00B8FF 100%)', color: C.white, boxShadow: '0 0 32px rgba(123,47,255,0.4)' }}>
+                    Enviar proyecto →
+                  </button>
+                </form>
+              </>
+            )}
+          </motion.div>
+        </div>
+      )}
     </div>
   )
 }
