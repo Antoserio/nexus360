@@ -1373,6 +1373,7 @@ export default function AiaSomnisPage() {
                 }}>
                 <Mail size={18} /> info@girasomnis.com
               </a>
+
               <div className="flex gap-6 mt-2">
                 {['Madrid', 'Valencia', 'Barcelona'].map(city => (
                   <div key={city} className="flex items-center gap-2">
