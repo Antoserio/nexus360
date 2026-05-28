@@ -9,5 +9,14 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Netlify Forms detection: hidden form mirrors the React modal form -->
+    <form name="contacto-aiasomnis" data-netlify="true" hidden>
+      <input type="hidden" name="form-name" value="contacto-aiasomnis" />
+      <input name="nombre" />
+      <input name="email" type="email" />
+      <select name="tipo"></select>
+      <textarea name="mensaje"></textarea>
+    </form>
   </body>
 </html>
