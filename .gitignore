@@ -22,4 +22,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Large/temp videos and cache — never commit these
 public/Preview.mp4
+public/Preview*.mp4
+public/Hero.mp4
+public/reel-test.mp4
+public/robot.mp4
+public/design.mp4
+public/*.zip
+video web/
+.next/
+.netlify/
+*.spz
+*.ply
+*.sog
+public/ezgif-*.zip

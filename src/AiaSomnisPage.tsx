@@ -1,10 +1,11 @@
 import { Suspense, lazy, memo, useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
+import { ScrollFramesSection } from './components/ScrollFramesSection'
+import { CuboFramesSection } from './components/CuboFramesSection'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { ParticleText } from '@/components/ui/particle-text'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
-import { Magazine3D } from '@/components/ui/magazine-3d'
-import { Mail, MapPin, ChevronDown, ArrowRight, Cpu, Play, Share2, Volume2, VolumeX } from 'lucide-react'
+import { Mail, MapPin, ChevronDown, ArrowRight, Cpu, Play, Share2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 // Heavy components loaded only when needed
@@ -44,7 +45,7 @@ const SERVICES: {
     desc: 'Creamos avatares conversacionales personalizados que pueden atender al público, presentar contenidos, responder preguntas, hablar en varios idiomas y captar leads en tiempo real.',
     tags: ['Ferias y exposiciones', 'Centros comerciales', 'Eventos corporativos', 'Presentador virtual', 'Multilingüe', 'Conectado a marca'],
     accent: '#00B8FF', glow: 'rgba(0,184,255,0.3)',
-    reel: '/robot.mp4',
+    reel: '/Avatares IA.mp4',
   },
   {
     num: '02', id: 'instalaciones', Icon: Cpu,
@@ -64,7 +65,7 @@ const SERVICES: {
     desc: 'Creamos imágenes, animaciones y mundos visuales con IA, combinando dirección artística, 3D, motion graphics y producción audiovisual profesional.',
     tags: ['Campañas publicitarias', 'Pantallas LED', 'Videomapping IA', 'Animaciones generativas', 'Conciertos y espectáculos'],
     accent: '#FFD42A', glow: 'rgba(255,212,42,0.22)',
-    reel: '/reel-test.mp4',   // ← cambia esta ruta cuando tengas el video real
+    reel: '/Produccion Audiovisual_1.mp4',
   },
   {
     num: '04', id: 'digital', Icon: Share2,
@@ -74,12 +75,12 @@ const SERVICES: {
     desc: 'Creamos soluciones digitales con IA para automatizar procesos, captar leads, mejorar la atención al cliente y crear experiencias web más inteligentes.',
     tags: ['Webs con IA', 'Asistentes virtuales', 'Automatización de procesos', 'CRM integration', 'Experiencias 3D web'],
     accent: '#F6B93B', glow: 'rgba(246,185,59,0.22)',
-    reel: '/design.mp4',
+    reel: '/Soluciones Digitales.mp4',
   },
 ]
 
 const TEAM = [
-  { name: 'Paco Gramaje',      role: 'Creative Director', initials: 'PG', photo: '/team/paco.jpg',   imgStyle: { objectPosition: 'center 12%' } },
+  { name: 'Paco Gramaje',      role: 'Business Developer', initials: 'PG', photo: '/team/paco.jpg',   imgStyle: { objectPosition: 'center 12%' } },
   { name: 'Leonardo Bautista', role: 'Director Creativo', initials: 'LB', photo: '/team/LEO.png',    imgStyle: { objectPosition: 'center 10%' } },
   { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL', photo: '/team/anto.jpg',   imgStyle: { objectPosition: 'center 20%' } },
   { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ', photo: '/team/MARTIN.png', imgStyle: { objectPosition: 'center 10%' } },
@@ -133,16 +134,6 @@ const PROJECTS: SliderItem[] = [
     // Dramatic light art / projection mapping
     bg: `url('https://images.pexels.com/photos/3756165/pexels-photo-3756165.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
-]
-
-// Magazine images: cover + interior pages (portrait crop)
-const MAG_COVER = px(8386440, 480, 640)
-const MAG_PAGES = [
-  px(1105666, 480, 640),
-  px(3861974, 480, 640),
-  px(8386434, 480, 640),
-  px(3075993, 480, 640),
-  px(2387418, 480, 640),
 ]
 
 // ── WebGL shader (blue / gold) ────────────────────────────────────────────────
@@ -318,43 +309,6 @@ function useInteractiveDotGrid() {
   return { canvasRef, sectionRef }
 }
 
-// ── Robot Eye ─────────────────────────────────────────────────────────────────
-const RobotEye = memo(function RobotEye({ active }: { active: number }) {
-  const s = SERVICES[active]
-  const dotPos = [{ top: '4%', left: '50%' }, { top: '50%', left: '96%' }, { top: '96%', left: '50%' }, { top: '50%', left: '4%' }]
-  const lines = [{ x2: '100', y2: '8' }, { x2: '192', y2: '100' }, { x2: '100', y2: '192' }, { x2: '8', y2: '100' }]
-  return (
-    <div className="relative" style={{ width: 200, height: 200 }}>
-      <div className="absolute inset-0 rounded-full" style={{ border: `1px solid ${C.border}` }} />
-      <motion.div className="absolute inset-0 rounded-full" animate={{ boxShadow: `0 0 40px ${s.glow}, 0 0 80px ${s.glow}` }} transition={{ duration: 0.6 }} />
-      <motion.div className="absolute inset-5 rounded-full flex flex-col items-center justify-center gap-2"
-        style={{ background: 'radial-gradient(circle, #0D1829 0%, #05070D 100%)' }}
-        animate={{ boxShadow: `inset 0 0 20px ${s.glow}` }} transition={{ duration: 0.6 }}>
-        <div className="flex gap-3">
-          {[0, 1].map(i => (
-            <motion.div key={i} className="rounded-full" style={{ width: 12, height: 12 }}
-              animate={{ backgroundColor: s.accent, boxShadow: `0 0 10px ${s.accent}` }} transition={{ duration: 0.4 }} />
-          ))}
-        </div>
-        <motion.div className="rounded-full" style={{ width: 32, height: 4 }} animate={{ backgroundColor: s.accent }} transition={{ duration: 0.4 }} />
-        <motion.span className="text-xs font-black tracking-widest" animate={{ color: s.accent }} transition={{ duration: 0.4 }}>{s.num}</motion.span>
-      </motion.div>
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 200" style={{ overflow: 'visible' }}>
-        {SERVICES.map((sv, i) => (
-          <motion.line key={i} x1="100" y1="100" x2={lines[i].x2} y2={lines[i].y2} stroke={sv.accent}
-            animate={{ opacity: i === active ? 1 : 0.12, strokeWidth: i === active ? 2 : 0.8 }} transition={{ duration: 0.5 }} />
-        ))}
-      </svg>
-      {SERVICES.map((sv, i) => (
-        <motion.div key={i} className="absolute rounded-full -translate-x-1/2 -translate-y-1/2"
-          style={{ width: 12, height: 12, top: dotPos[i].top, left: dotPos[i].left }}
-          animate={{ backgroundColor: i === active ? sv.accent : C.border, boxShadow: i === active ? `0 0 14px ${sv.accent}` : 'none', scale: i === active ? 1.4 : 1 }}
-          transition={{ duration: 0.4 }} />
-      ))}
-    </div>
-  )
-})
-
 // ── HUD service card (hero corners) ───────────────────────────────────────────
 // corner: 0=top-left  1=top-right  2=bottom-left  3=bottom-right
 const CORNER_STYLES: React.CSSProperties[] = [
@@ -365,12 +319,15 @@ const CORNER_STYLES: React.CSSProperties[] = [
 ]
 
 // L-shaped bracket descriptor for each corner
-const BRACKET_DEFS = [
+const BRACKET_DEFS: Array<{
+  top?: 0; bottom?: 0; left?: 0; right?: 0;
+  borderTop: boolean; borderLeft: boolean; borderBottom: boolean; borderRight: boolean;
+}> = [
   { top: 0,    left: 0,    borderTop: true,    borderLeft: true,    borderBottom: false, borderRight: false },
   { top: 0,    right: 0,   borderTop: true,    borderLeft: false,   borderBottom: false, borderRight: true  },
   { bottom: 0, left: 0,    borderTop: false,   borderLeft: true,    borderBottom: true,  borderRight: false },
   { bottom: 0, right: 0,   borderTop: false,   borderLeft: false,   borderBottom: true,  borderRight: true  },
-] as const
+]
 
 // Rounded corner for each bracket (outer corner only)
 const BRACKET_RADIUS = [
@@ -493,29 +450,29 @@ function HudCard({
           <motion.div
             className="flex-shrink-0 flex items-center justify-center"
             animate={{
-              background: lit ? `${s.accent}28` : `${s.accent}10`,
+              background: lit ? `${s.accent}30` : `${s.accent}14`,
               boxShadow: active
-                ? `0 0 22px ${s.glow}, 0 0 8px ${s.accent}60`
+                ? `0 0 28px ${s.glow}, 0 0 12px ${s.accent}70`
                 : hovered
-                ? `0 0 14px ${s.glow}`
-                : `0 0 6px ${s.accent}35`,
+                ? `0 0 18px ${s.glow}`
+                : `0 0 8px ${s.accent}40`,
             }}
             transition={{ duration: 0.32 }}
             style={{
-              width: 'clamp(40px, 3.4vw, 52px)',
-              height: 'clamp(40px, 3.4vw, 52px)',
-              border: `1.5px solid ${s.accent}60`,
-              borderRadius: 10,
+              width: 'clamp(44px, 3.8vw, 58px)',
+              height: 'clamp(44px, 3.8vw, 58px)',
+              border: `1.5px solid ${s.accent}70`,
+              borderRadius: 12,
             }}>
-            <Icon size={22} style={{ color: s.accent }} />
+            <Icon size={24} style={{ color: s.accent }} />
           </motion.div>
 
           <div className={`flex-1 pt-1 ${isRight ? 'text-right' : ''}`}>
             <motion.h3
-              animate={{ color: lit ? C.white : '#BDD0E4' }}
+              animate={{ color: lit ? C.white : '#D0E4F4' }}
               transition={{ duration: 0.28 }}
               className="font-black leading-snug"
-              style={{ fontSize: 'clamp(13px, 1.35vw, 18px)' }}>
+              style={{ fontSize: 'clamp(16px, 1.6vw, 22px)' }}>
               {s.title}
             </motion.h3>
           </div>
@@ -523,7 +480,7 @@ function HudCard({
 
         {/* Description */}
         <p className={`leading-relaxed ${isRight ? 'text-right' : ''}`}
-          style={{ fontSize: 'clamp(11px, 0.9vw, 13px)', color: '#6E8FAA', lineHeight: 1.6 }}>
+          style={{ fontSize: 'clamp(12px, 1vw, 14px)', color: '#8AABB8', lineHeight: 1.65 }}>
           {s.cardDesc}
         </p>
 
@@ -646,6 +603,258 @@ function UnfocusedImage({ src }: { src: string }) {
 // corner→service index mapping: top-left=0, top-right=1, bottom-left=2, bottom-right=3
 const CORNER_SERVICE = [0, 1, 2, 3] as const
 
+// ── Ticker items ──────────────────────────────────────────────────────────────
+const TICKER_ITEMS = ['AI PARA EVENTOS', 'MARCAS Y CULTURA', 'AI FOR EVENTS', 'BRANDS AND CULTURE', 'CREATIVIDAD + IA', 'EXPERIENCIAS INMERSIVAS']
+
+// ── Loading Screen ────────────────────────────────────────────────────────────
+function LoadingScreen({ onDone }: { onDone: () => void }) {
+  const [pct, setPct] = useState(0)
+  const [leaving, setLeaving] = useState(false)
+
+  useEffect(() => {
+    let p = 0
+    const start = Date.now()
+    const MIN_MS = 2800
+    const interval = setInterval(() => {
+      p += Math.random() * 3 + 0.8
+      if (p >= 100) {
+        p = 100
+        clearInterval(interval)
+        const elapsed = Date.now() - start
+        const wait = Math.max(0, MIN_MS - elapsed)
+        setTimeout(() => { setLeaving(true); setTimeout(onDone, 700) }, wait)
+      }
+      setPct(Math.floor(p))
+    }, 50)
+    return () => clearInterval(interval)
+  }, [onDone])
+
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      animate={{ opacity: leaving ? 0 : 1 }}
+      transition={{ duration: 0.7 }}
+      style={{ position: 'fixed', inset: 0, background: C.bg, zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}
+    >
+      {/* Ticker background */}
+      <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, transform: 'translateY(-50%)', overflow: 'hidden', pointerEvents: 'none' }}>
+        {[-1, 0, 1].map(row => (
+          <motion.div key={row}
+            animate={{ x: row % 2 === 0 ? ['0%', '-50%'] : ['-50%', '0%'] }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+            style={{ display: 'flex', gap: 64, whiteSpace: 'nowrap', padding: '12px 0', opacity: 0.06 + Math.abs(row) * 0.03 }}>
+            {[...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
+              <span key={i} style={{ fontSize: 'clamp(2rem,5vw,4rem)', fontWeight: 900, color: C.white, letterSpacing: '-0.02em', textTransform: 'uppercase' }}>
+                {item} <span style={{ color: C.blue }}>·</span>
+              </span>
+            ))}
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Logo */}
+      <motion.img src="/MAIGIA-LOGO-V1.png" alt="AIA SOMNIS"
+        initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        style={{ height: 60, marginBottom: 48, position: 'relative', zIndex: 1 }} />
+
+      {/* Counter */}
+      <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+        <motion.div
+          key={pct}
+          initial={{ opacity: 0.6, y: 4 }} animate={{ opacity: 1, y: 0 }}
+          style={{ fontSize: 'clamp(4rem,12vw,9rem)', fontWeight: 900, color: C.white, lineHeight: 1, letterSpacing: '-0.04em' }}>
+          {String(pct).padStart(2, '0')}
+          <span style={{ fontSize: '0.35em', color: C.blue }}>%</span>
+        </motion.div>
+        <div style={{ width: 200, height: 1, background: C.border, borderRadius: 1, margin: '16px auto 0', overflow: 'hidden' }}>
+          <motion.div style={{ height: '100%', background: C.blue, width: `${pct}%`, transition: 'width 0.05s linear' }} />
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Sticky Robot Section (desktop hero) ───────────────────────────────────────
+function StickyRobotSection() {
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress: p } = useScroll({ target: wrapperRef, offset: ['start start', 'end end'] })
+
+  // Animations complete by p≈0.32 (288vh of 900vh total)
+  // Cards stay fully visible for remaining ~612vh ≈ 6 full screens
+  const robotX      = useTransform(p, [0.06, 0.26],  ['0vw', '-28vw'])
+  const robotScale  = useTransform(p, [0, 0.15],     [1, 1.1])
+  const textOpacity = useTransform(p, [0.04, 0.14],  [0, 1])
+  const textX       = useTransform(p, [0.04, 0.14],  ['-40px', '0px'])
+
+  // Logo + tagline — aparece con robot, desaparece antes de que lleguen las tarjetas
+  const logoOpacity = useTransform(p, [0.06, 0.14, 0.22, 0.30], [0, 1, 1, 0])
+  const logoX       = useTransform(p, [0.06, 0.14],  ['40px', '0px'])
+
+  const cardOpacity0 = useTransform(p, [0.18, 0.22], [0, 1])
+  const cardX0       = useTransform(p, [0.18, 0.22], ['50px', '0px'])
+  const cardOpacity1 = useTransform(p, [0.22, 0.26], [0, 1])
+  const cardX1       = useTransform(p, [0.22, 0.26], ['50px', '0px'])
+  const cardOpacity2 = useTransform(p, [0.26, 0.29], [0, 1])
+  const cardX2       = useTransform(p, [0.26, 0.29], ['50px', '0px'])
+  const cardOpacity3 = useTransform(p, [0.29, 0.32], [0, 1])
+  const cardX3       = useTransform(p, [0.29, 0.32], ['50px', '0px'])
+
+  const cardOpacities = [cardOpacity0, cardOpacity1, cardOpacity2, cardOpacity3]
+  const cardXs        = [cardX0, cardX1, cardX2, cardX3]
+
+  return (
+    <div ref={wrapperRef} style={{ height: '900vh', position: 'relative', background: C.bg }}>
+      <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'clip' }}>
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'radial-gradient(ellipse 60% 70% at 50% 60%, rgba(0,184,255,0.10) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Spline robot — center, translates left on scroll */}
+        <motion.div style={{
+          position: 'absolute',
+          top: '50%', left: '50%',
+          x: robotX,
+          scale: robotScale,
+          translateX: '-50%',
+          translateY: '-50%',
+          width: 'clamp(320px, 55vw, 700px)',
+          height: 'clamp(320px, 55vw, 700px)',
+          zIndex: 1,
+        }}>
+          <Suspense fallback={
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="w-12 h-12 rounded-full border-2 border-transparent animate-spin"
+                style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
+            </div>
+          }>
+            <Spline
+              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+              style={{ width: '100%', height: '100%' }}
+            />
+          </Suspense>
+        </motion.div>
+
+        {/* Logo MAIGIA + tagline — aparece a la derecha del robot */}
+        <motion.div style={{
+          position: 'absolute',
+          right: '5vw',
+          top: '50%',
+          translateY: '-50%',
+          opacity: logoOpacity,
+          x: logoX,
+          zIndex: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 16,
+          pointerEvents: 'none',
+        }}>
+          <img
+            src="/MAIGIA-LOGO-V1.png"
+            alt="MAIGIA"
+            style={{ height: 'clamp(90px, 13vw, 180px)', width: 'auto', objectFit: 'contain',
+              filter: 'drop-shadow(0 0 40px rgba(0,184,255,0.75)) drop-shadow(0 0 20px rgba(0,184,255,0.4))' }}
+          />
+          <p style={{
+            color: C.blue,
+            fontSize: 'clamp(0.58rem, 0.8vw, 0.78rem)',
+            fontWeight: 700,
+            fontFamily: "'Orbitron', monospace",
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            textAlign: 'center',
+            lineHeight: 1.6,
+            textShadow: `0 0 20px rgba(0,184,255,0.7), 0 0 40px rgba(0,184,255,0.3)`,
+          }}>
+            AI AGENCY FOR<br />EXTRAORDINARY EXPERIENCES
+          </p>
+        </motion.div>
+
+        {/* Left — ¿Qué hacemos? */}
+        <motion.div style={{
+          position: 'absolute',
+          left: '5vw',
+          top: '50%',
+          translateY: '-50%',
+          opacity: textOpacity,
+          x: textX,
+          zIndex: 2,
+        }}>
+          <h2 style={{ fontSize: 'clamp(3rem, 7vw, 6rem)', fontWeight: 900, color: C.white, lineHeight: 1.05, margin: 0 }}>
+            <span style={{ display: 'block' }}>¿Qué</span>
+            <span style={{ display: 'block' }}>hacemos?</span>
+          </h2>
+          <p style={{ color: C.blue, letterSpacing: '0.18em', fontSize: '0.9rem', marginTop: 16, textTransform: 'uppercase' }}>
+            Creatividad · Tecnología · IA
+          </p>
+        </motion.div>
+
+        {/* Right — 4 service cards (más iluminadas) */}
+        <div style={{
+          position: 'absolute',
+          right: '5vw',
+          top: '50%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20,
+          zIndex: 4,
+          transform: 'translateY(-50%)',
+        }}>
+          {SERVICES.map((s, i) => {
+            const { Icon } = s
+            return (
+              <motion.div key={s.id} style={{ opacity: cardOpacities[i], x: cardXs[i] }}>
+                <button
+                  onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
+                  style={{
+                    display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16,
+                    padding: '14px 24px',
+                    borderRadius: 14,
+                    background: `rgba(5,7,13,0.88)`,
+                    border: `1px solid ${s.accent}65`,
+                    backdropFilter: 'blur(16px)',
+                    boxShadow: `0 0 22px ${s.accent}28, 0 4px 24px rgba(0,0,0,0.5), inset 0 0 18px ${s.accent}0A`,
+                    cursor: 'pointer',
+                    outline: 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = `${s.accent}CC`
+                    e.currentTarget.style.boxShadow = `0 0 45px ${s.accent}55, 0 4px 30px rgba(0,0,0,0.6), inset 0 0 28px ${s.accent}18`
+                    e.currentTarget.style.background = `rgba(5,7,13,0.95)`
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = `${s.accent}65`
+                    e.currentTarget.style.boxShadow = `0 0 22px ${s.accent}28, 0 4px 24px rgba(0,0,0,0.5), inset 0 0 18px ${s.accent}0A`
+                    e.currentTarget.style.background = `rgba(5,7,13,0.88)`
+                  }}
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: `${s.accent}20`,
+                    border: `1px solid ${s.accent}60`,
+                    boxShadow: `0 0 16px ${s.accent}40`,
+                  }}>
+                    <Icon size={20} style={{ color: s.accent }} />
+                  </div>
+                  <span style={{ color: C.white, fontSize: 17, fontWeight: 700, whiteSpace: 'nowrap',
+                    textShadow: `0 0 12px ${s.accent}30` }}>
+                    {s.title}
+                  </span>
+                </button>
+              </motion.div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── About Section (self-contained so it can use the hook) ─────────────────────
 function AboutSection() {
   const { canvasRef, sectionRef } = useInteractiveDotGrid()
@@ -714,12 +923,14 @@ function AboutSection() {
 }
 
 export default function AiaSomnisPage() {
+  const [loading, setLoading] = useState(true)
   const [heroVisible, setHeroVisible] = useState(false)
   const [activeService, setActiveService] = useState(0)
   const [scrolledPastHero, setScrolledPastHero] = useState(false)
   const [contactOpen, setContactOpen] = useState(false)
   const [formSent, setFormSent] = useState(false)
   const [splineInView, setSplineInView] = useState(false)
+  const [splineReady, setSplineReady] = useState(false)
   const [heroQuadrant, setHeroQuadrant] = useState<0|1|2|3|null>(null)
   const [soundOn, setSoundOn] = useState(false)
   const [logoEntranceDone, setLogoEntranceDone] = useState(false)
@@ -740,9 +951,16 @@ export default function AiaSomnisPage() {
   }, [soundOn])
 
   useEffect(() => {
-    const t = setTimeout(() => setHeroVisible(true), 100)
+    if (loading) return
+    const t = setTimeout(() => setHeroVisible(true), 200)
     return () => clearTimeout(t)
-  }, [])
+  }, [loading])
+
+  useEffect(() => {
+    if (loading) { document.body.style.overflow = 'hidden' }
+    else { document.body.style.overflow = '' }
+    return () => { document.body.style.overflow = '' }
+  }, [loading])
 
   useEffect(() => {
     const onScroll = () => setScrolledPastHero(window.scrollY > window.innerHeight * 0.6)
@@ -753,7 +971,8 @@ export default function AiaSomnisPage() {
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setSplineInView(true) }, { threshold: 0.05 })
     if (heroRef.current) obs.observe(heroRef.current)
-    return () => obs.disconnect()
+    const t = setTimeout(() => setSplineReady(true), 800)
+    return () => { clearTimeout(t); obs.disconnect() }
   }, [])
 
   useEffect(() => {
@@ -798,62 +1017,118 @@ export default function AiaSomnisPage() {
     sectionRefs.current[i]?.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
+  const handleLoadDone = useCallback(() => setLoading(false), [])
+
   return (
-    <div style={{ background: C.bg, color: C.white, overflowX: 'hidden' }}>
+    <div style={{ background: C.bg, color: C.white, overflowX: 'clip' }}>
+      {loading && <LoadingScreen onDone={handleLoadDone} />}
 
       {/* ── STICKY NAV ── */}
-      <motion.nav className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10"
-        style={{ height: 64 }}
-        animate={{ opacity: scrolledPastHero ? 1 : 0, y: scrolledPastHero ? 0 : -20 }}
-        transition={{ duration: 0.4 }}>
-        <div className="absolute inset-0 backdrop-blur-md"
-          style={{ background: 'rgba(5,7,13,0.85)', borderBottom: `1px solid ${C.border}` }} />
+      <nav className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10"
+        style={{ height: 64 }}>
+        <div className="absolute inset-0 backdrop-blur-md transition-all duration-500"
+          style={{
+            background: scrolledPastHero ? 'rgba(5,7,13,0.92)' : 'rgba(5,7,13,0.25)',
+            borderBottom: `1px solid ${scrolledPastHero ? C.border : 'rgba(34,48,68,0.2)'}`,
+          }} />
         <div className="relative z-10 flex items-center justify-between w-full">
-          <img src="/logo2.png" alt="AIA-SOMNIS" style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
-          {/* Mobile: just contact link */}
-          <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }} className="md:hidden px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
-            style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white }}>
-            Contacto
-          </a>
-          <div className="hidden md:flex items-center gap-6">
-            {SERVICES.map((s, i) => (
-              <button key={s.id} onClick={() => scrollTo(i)}
-                className="text-xs font-semibold tracking-widest uppercase transition-all duration-300"
-                style={{ color: i === activeService && scrolledPastHero ? s.accent : C.gray }}>
-                {s.num}
-              </button>
+          {/* Logo */}
+          <img src="/MAIGIA-LOGO-V1.png" alt="MAIGIA"
+            style={{ height: 42, width: 'auto', objectFit: 'contain',
+              filter: 'drop-shadow(0 0 12px rgba(0,184,255,0.4))' }} />
+
+          {/* Desktop nav links */}
+          <div className="hidden md:flex items-center gap-8">
+            {[
+              { label: 'Servicios',  href: '#servicios' },
+              { label: 'Proyectos', href: '#proyectos' },
+              { label: 'Equipo',    href: '#equipo' },
+            ].map(({ label, href }) => (
+              <a key={label} href={href}
+                className="text-[13px] font-semibold tracking-widest uppercase transition-all duration-300"
+                style={{ color: C.gray, letterSpacing: '0.12em', textDecoration: 'none' }}
+                onMouseEnter={e => (e.currentTarget.style.color = C.white)}
+                onMouseLeave={e => (e.currentTarget.style.color = C.gray)}>
+                {label}
+              </a>
             ))}
-            <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }} className="px-5 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
-              style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white }}>
+            <a href="#contacto"
+              onClick={e => { e.preventDefault(); setContactOpen(true) }}
+              className="px-5 py-2 rounded-full text-[11px] font-bold tracking-widest uppercase transition-all duration-300"
+              style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white,
+                boxShadow: `0 0 18px rgba(0,184,255,0.3)`, textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 30px rgba(0,184,255,0.6)`)}
+              onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 18px rgba(0,184,255,0.3)`)}>
               Contacto
             </a>
           </div>
-        </div>
-      </motion.nav>
 
-      {/* ══════════ HERO — 4-corner HUD layout ══════════ */}
+          {/* Mobile: contact button */}
+          <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }}
+            className="md:hidden px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase"
+            style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white }}>
+            Contacto
+          </a>
+        </div>
+      </nav>
+
+      {/* ── SOCIAL ICONS — fixed bottom-left ── */}
+      <div className="fixed bottom-8 left-6 z-50 flex flex-col gap-4"
+        style={{ opacity: heroVisible ? 1 : 0, transition: 'opacity 0.8s ease 1s' }}>
+        {/* Vertical line above icons */}
+        <div style={{ width: 1, height: 40, background: `linear-gradient(to bottom, transparent, ${C.border})`, margin: '0 auto' }} />
+        {[
+          { Icon: IconLinkedin,  url: 'https://www.linkedin.com/company/girasomnis/', label: 'LinkedIn' },
+          { Icon: IconYoutube,   url: 'https://www.youtube.com/@PacoGramajegirasomnis',  label: 'YouTube' },
+          { Icon: IconInstagram, url: 'https://www.instagram.com/aiasomnis',             label: 'Instagram' },
+        ].map(({ Icon, url, label }) => (
+          <a key={label} href={url} target="_blank" rel="noopener noreferrer"
+            aria-label={label}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 group"
+            style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray }}
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLAnchorElement
+              el.style.borderColor = C.blue
+              el.style.color = C.blue
+              el.style.boxShadow = `0 0 18px rgba(0,184,255,0.55)`
+              el.style.background = `rgba(0,184,255,0.12)`
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget as HTMLAnchorElement
+              el.style.borderColor = C.border
+              el.style.color = C.gray
+              el.style.boxShadow = 'none'
+              el.style.background = 'rgba(255,255,255,0.04)'
+            }}>
+            <Icon size={15} />
+          </a>
+        ))}
+        {/* Vertical line below icons */}
+        <div style={{ width: 1, height: 40, background: `linear-gradient(to top, transparent, ${C.border})`, margin: '0 auto' }} />
+      </div>
+
+      {/* ══════════ HERO — mobile only ══════════ */}
+      <div className="lg:hidden">
       <section
         ref={heroRef}
         className="relative min-h-screen overflow-hidden"
-        style={{ background: `radial-gradient(ellipse at 50% 40%, #102B4A 0%, ${C.bg2} 45%, ${C.bg} 100%)` }}
+        style={{ background: C.bg }}
         onMouseMove={onHeroMouseMove}
         onMouseLeave={() => { lastQuadrant.current = null; setHeroQuadrant(null) }}
         onTouchMove={onHeroTouchMove}
         onTouchEnd={() => { lastQuadrant.current = null; setHeroQuadrant(null) }}>
 
-        {/* Grid overlay */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          style={{ backgroundImage: `linear-gradient(${C.blue} 1px, transparent 1px), linear-gradient(90deg, ${C.blue} 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
 
-        {/* Dynamic center glow that follows active quadrant card color */}
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full pointer-events-none"
-          animate={{
-            background: heroQuadrant !== null
-              ? `radial-gradient(circle, ${SERVICES[CORNER_SERVICE[heroQuadrant]].glow} 0%, transparent 65%)`
-              : `radial-gradient(circle, rgba(0,184,255,0.07) 0%, transparent 65%)`
-          }}
-          transition={{ duration: 0.5 }} />
+        {/* Dynamic subtle glow — only when hovering a quadrant */}
+        {heroQuadrant !== null && (
+          <motion.div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full pointer-events-none"
+            animate={{ background: `radial-gradient(circle, ${SERVICES[CORNER_SERVICE[heroQuadrant]].glow} 0%, transparent 65%)` }}
+            initial={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          />
+        )}
 
         {/* ── 4 CORNER CARDS — all screen sizes ── */}
         {([0, 1, 2, 3] as const).map(corner => (
@@ -873,9 +1148,9 @@ export default function AiaSomnisPage() {
 
           {/* Badge */}
           <div className="mb-6 pointer-events-none px-2" style={fadeUp(0)}>
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-semibold tracking-widest uppercase"
-              style={{ background: 'rgba(0,184,255,0.08)', border: `1px solid rgba(0,184,255,0.25)`, color: C.blue, fontSize: 'clamp(9px, 2.3vw, 12px)' }}>
-              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 animate-pulse" style={{ background: C.blue }} />
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold tracking-widest uppercase"
+              style={{ background: 'rgba(0,184,255,0.10)', border: `1px solid rgba(0,184,255,0.35)`, color: C.blue, fontSize: 'clamp(12px, 2.8vw, 17px)' }}>
+              <span className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse" style={{ background: C.blue }} />
               Artificial Intelligence Agency
             </span>
           </div>
@@ -885,12 +1160,12 @@ export default function AiaSomnisPage() {
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.95)',
             transition: 'opacity 1.1s ease 300ms, transform 1.1s ease 300ms',
-            width: 'clamp(220px, 58vw, 620px)',
-            height: 'clamp(220px, 58vw, 620px)',
+            width: 'clamp(280px, 72vw, 780px)',
+            height: 'clamp(280px, 72vw, 780px)',
             position: 'relative',
             pointerEvents: 'auto',
           }}>
-            {splineInView ? (
+            {splineInView && splineReady ? (
               <Suspense fallback={
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
@@ -905,9 +1180,6 @@ export default function AiaSomnisPage() {
                   style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
               </div>
             )}
-            {/* Gold ground glow */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-56 h-8 blur-2xl pointer-events-none"
-              style={{ background: `radial-gradient(ellipse, ${C.gold}50, transparent)` }} />
           </div>
 
           {/* Title */}
@@ -947,7 +1219,7 @@ export default function AiaSomnisPage() {
 
               {/* Logo with glitch entrance + idle breathing */}
               <motion.img
-                src="/logo2.png"
+                src="/MAIGIA-LOGO-V1.png"
                 alt="AIA-SOMNIS"
                 initial={{ opacity: 0, scale: 0.78, filter: 'blur(14px)' }}
                 animate={
@@ -957,9 +1229,9 @@ export default function AiaSomnisPage() {
                       ? {
                           scale:  [1, 1.018, 1],
                           filter: [
-                            'drop-shadow(0 0 22px rgba(0,184,255,0.45))',
-                            'drop-shadow(0 0 52px rgba(0,184,255,0.9))',
-                            'drop-shadow(0 0 22px rgba(0,184,255,0.45))',
+                            'drop-shadow(0 0 28px rgba(0,184,255,0.55))',
+                            'drop-shadow(0 0 64px rgba(0,184,255,1))',
+                            'drop-shadow(0 0 28px rgba(0,184,255,0.55))',
                           ],
                         }
                       : {
@@ -971,7 +1243,7 @@ export default function AiaSomnisPage() {
                             'blur(11px) brightness(0.6)',
                             'blur(2px) brightness(1.4)',
                             'blur(0.5px)',
-                            'drop-shadow(0 0 22px rgba(0,184,255,0.45))',
+                            'drop-shadow(0 0 28px rgba(0,184,255,0.55))',
                           ],
                         }
                 }
@@ -985,7 +1257,7 @@ export default function AiaSomnisPage() {
                   if (!logoEntranceDone && heroVisible) setLogoEntranceDone(true)
                 }}
                 style={{
-                  height: 'clamp(60px, 10vw, 110px)',
+                  height: 'clamp(50px, 8vw, 100px)',
                   width: 'auto',
                   objectFit: 'contain',
                   position: 'relative',
@@ -994,43 +1266,9 @@ export default function AiaSomnisPage() {
               />
             </div>
 
-            <p className="text-sm max-w-xs mx-auto" style={{ ...fadeUp(1400), color: C.gray }}>
+            <p className="text-base max-w-sm mx-auto font-medium" style={{ ...fadeUp(1400), color: C.gray }}>
               Para <span style={{ color: C.white }}>eventos, marcas y cultura.</span>
             </p>
-          </div>
-
-          {/* CTAs — mobile: bottom center | desktop: left/right sides */}
-
-          {/* Mobile only: stacked at bottom */}
-          <div style={fadeUp(600)} className="md:hidden absolute bottom-40 left-0 right-0 flex justify-center gap-3 pointer-events-auto z-20 px-6">
-            <button onClick={() => scrollTo(0)}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm"
-              style={{ background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)', color: C.white, boxShadow: '0 0 28px rgba(123,47,255,0.5)' }}>
-              Ver servicios <ArrowRight size={14} />
-            </button>
-            <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm"
-              style={{ background: 'linear-gradient(135deg, #3B1FA3 0%, #7B2FFF 100%)', color: C.white, boxShadow: '0 0 20px rgba(123,47,255,0.35)' }}>
-              Contactar
-            </a>
-          </div>
-
-          {/* Desktop only: left-center */}
-          <div style={fadeUp(600)} className="hidden md:block absolute left-8 top-1/2 -translate-y-1/2 pointer-events-auto z-20">
-            <button onClick={() => scrollTo(0)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
-              style={{ background: 'linear-gradient(135deg, #7B2FFF 0%, #1B3DFF 60%, #00B8FF 100%)', color: C.white, boxShadow: '0 0 32px rgba(123,47,255,0.5)' }}>
-              Ver servicios <ArrowRight size={14} />
-            </button>
-          </div>
-
-          {/* Desktop only: right-center */}
-          <div style={fadeUp(700)} className="hidden md:block absolute right-8 top-1/2 -translate-y-1/2 pointer-events-auto z-20">
-            <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm tracking-wide"
-              style={{ background: 'linear-gradient(135deg, #3B1FA3 0%, #7B2FFF 100%)', color: C.white, boxShadow: '0 0 24px rgba(123,47,255,0.35)' }}>
-              Contactar
-            </a>
           </div>
 
         </div>
@@ -1073,8 +1311,6 @@ export default function AiaSomnisPage() {
           })}
         </div>
 
-        {/* Horizontal scan line */}
-        <div className="absolute left-0 right-0 pointer-events-none" style={{ top: '50%', height: 1, background: `linear-gradient(90deg, transparent, ${C.blue}20, ${C.blue}40, ${C.blue}20, transparent)` }} />
 
         {/* Scroll indicator */}
         <div style={fadeUp(900)} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20">
@@ -1086,6 +1322,15 @@ export default function AiaSomnisPage() {
         <div className="absolute bottom-0 inset-x-0 h-32 pointer-events-none"
           style={{ background: `linear-gradient(to top, ${C.bg}, transparent)` }} />
       </section>
+      </div>
+
+      {/* ══════════ HERO — desktop only (sticky robot) ══════════ */}
+      <div className="hidden lg:block">
+        <StickyRobotSection />
+      </div>
+
+      {/* ══════════ SCROLL FRAMES ══════════ */}
+      <ScrollFramesSection />
 
       {/* ══════════ PARTICLE TEXT TRANSITION ══════════ */}
       <section className="relative overflow-hidden" style={{ height: '40vh', background: C.bg }}>
@@ -1098,11 +1343,11 @@ export default function AiaSomnisPage() {
         <ParticleText
           text="AIA SOMNIS"
           fontSize={110}
-          colors={['#ffffff', '#ffffff', '#ffffff', '#ffffff']}
+          colors={['#00B8FF', '#22D3FF', '#1B3DFF', '#0099FF', '#4DA6FF', '#00B8FF', '#22D3FF', '#00B8FF', '#FFD42A']}
           particleSize={2}
-          mouseRadius={95}
+          mouseRadius={100}
           returnSpeed={0.07}
-          density={4}
+          density={5}
           className="cursor-none"
         />
       </section>
@@ -1176,9 +1421,21 @@ export default function AiaSomnisPage() {
                             }} />
                           </>
                         ) : (
-                          /* ── No video yet: ImageTrail + mouse hint ── */
+                          /* ── No video yet: ImageTrail + dark bg image + mouse hint ── */
                           <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={38} maxImages={8} imageWidth={160} imageHeight={160} maxRotation={8}>
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 cursor-none select-none">
+
+                              {/* Dark background image for sections without reel */}
+                              <div className="absolute inset-0 pointer-events-none" style={{
+                                backgroundImage: 'url(/abstract.jpg)',
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                opacity: 0.35,
+                              }} />
+                              {/* Dark overlay to keep contrast */}
+                              <div className="absolute inset-0 pointer-events-none" style={{
+                                background: `linear-gradient(to bottom, rgba(2,4,11,0.55) 0%, rgba(2,4,11,0.2) 50%, rgba(2,4,11,0.6) 100%)`,
+                              }} />
 
                               {/* bottom glow */}
                               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 h-36 pointer-events-none" style={{
@@ -1255,17 +1512,23 @@ export default function AiaSomnisPage() {
         <FxSlider items={PROJECTS} headerText="Proyectos seleccionados" duration={0.64} parallaxAmount={5} />
       </section>
 
+      {/* ══════════ CUBO FRAMES ══════════ */}
+      <CuboFramesSection />
+
       {/* ══════════ LÍNEAS DE LUZ ══════════ */}
       <section className="relative overflow-hidden" style={{ height: '70vh', background: C.bg }}>
         <ShaderCanvas />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <span className="block text-xs uppercase tracking-[0.3em] mb-4" style={{ color: C.blue }}>Creatividad · Tecnología · IA</span>
+            <span className="block text-xs uppercase tracking-[0.3em] mb-4" style={{ color: C.cyan }}>Creatividad · Tecnología · IA</span>
             <h2 className="font-black leading-none mb-6" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)', color: C.white }}>
               Experiencias que{' '}
-              <span style={{ backgroundImage: `linear-gradient(90deg, ${C.blue}, ${C.gold})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>conectan</span>
+              <span style={{
+                backgroundImage: `linear-gradient(90deg, ${C.deep} 0%, ${C.blue} 45%, ${C.cyan} 100%)`,
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              }}>conectan</span>
             </h2>
-            <p className="max-w-xl mx-auto text-base md:text-lg" style={{ color: C.gray }}>
+            <p className="max-w-xl mx-auto text-base md:text-lg" style={{ color: '#B8CCE0' }}>
               La fusión entre la experiencia artística de Girasomnis y la capacidad tecnológica de Immerso.
             </p>
           </motion.div>
@@ -1278,7 +1541,7 @@ export default function AiaSomnisPage() {
 
 
       {/* ══════════ TEAM ══════════ */}
-      <section className="relative py-24 px-6" style={{ background: C.bg2 }}>
+      <section id="equipo" className="relative py-24 px-6" style={{ background: C.bg2 }}>
         {/* fade from About bg (#05070D) into this section */}
         <div className="absolute top-0 inset-x-0 h-24 pointer-events-none"
           style={{ background: `linear-gradient(to bottom, ${C.bg}, ${C.bg2})` }} />
@@ -1322,7 +1585,7 @@ export default function AiaSomnisPage() {
                     </div>
                   )}
                   {/* Bottom gradient to blend into card body */}
-                  <div className="absolute bottom-0 inset-x-0 h-1" style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.gold})` }} />
+                  <div className="absolute bottom-0 inset-x-0 h-1" style={{ background: `linear-gradient(90deg, ${C.deep} 0%, ${C.blue} 45%, ${C.cyan} 100%)` }} />
                 </div>
 
                 {/* Name / role */}
@@ -1357,19 +1620,19 @@ export default function AiaSomnisPage() {
               <h2 className="font-black leading-none mb-6" style={{ fontSize: 'clamp(2.5rem,5vw,4.5rem)', color: C.white }}>
                 ¿Tienes un{' '}
                 <span style={{
-                  backgroundImage: `linear-gradient(90deg, ${C.blue}, ${C.gold})`,
+                  backgroundImage: `linear-gradient(90deg, ${C.deep} 0%, ${C.blue} 45%, ${C.cyan} 100%)`,
                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
                 }}>proyecto?</span>
               </h2>
-              <p className="text-base md:text-lg mb-10 max-w-md" style={{ color: C.gray, lineHeight: 1.7 }}>
+              <p className="text-base md:text-lg mb-10 max-w-md" style={{ color: '#B8CCE0', lineHeight: 1.7 }}>
                 Cuéntanos tu idea. Transformamos creatividad, tecnología e inteligencia artificial en experiencias que impactan.
               </p>
               <a href="mailto:info@girasomnis.com"
                 className="inline-flex items-center gap-3 px-9 py-4 rounded-full font-bold text-base transition-all duration-300 mb-10"
                 style={{
-                  background: 'linear-gradient(135deg, #7B2FFF 0%, #3B1FA3 100%)',
+                  background: `linear-gradient(135deg, ${C.deep} 0%, ${C.blue} 60%, ${C.cyan} 100%)`,
                   color: C.white,
-                  boxShadow: '0 0 40px rgba(123,47,255,0.35)',
+                  boxShadow: `0 0 40px ${C.blue}55`,
                 }}>
                 <Mail size={18} /> info@girasomnis.com
               </a>
@@ -1446,7 +1709,7 @@ export default function AiaSomnisPage() {
       <footer className="py-10 px-6" style={{ borderTop: `1px solid ${C.border}`, background: C.bg }}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src="/logo2.png" alt="AIA-SOMNIS" style={{ height: 28, width: 'auto', objectFit: 'contain' }} />
+            <img src="/MAIGIA-LOGO-V1.png" alt="AIA-SOMNIS" style={{ height: 28, width: 'auto', objectFit: 'contain' }} />
             <span className="text-xs" style={{ color: C.border }}>by Girasomnis × Immerso</span>
           </div>
           <div className="flex gap-4">
@@ -1504,7 +1767,7 @@ export default function AiaSomnisPage() {
               </div>
             ) : (
               <>
-                <img src="/logo2.png" alt="AIA-SOMNIS" style={{ height: 28, objectFit: 'contain', marginBottom: 20 }} />
+                <img src="/MAIGIA-LOGO-V1.png" alt="AIA-SOMNIS" style={{ height: 28, objectFit: 'contain', marginBottom: 20 }} />
                 <h2 className="font-black text-2xl mb-1" style={{ color: C.white }}>Cuéntanos tu proyecto</h2>
                 <p className="text-sm mb-6" style={{ color: C.gray }}>Responderemos en menos de 24h.</p>
 
@@ -1529,7 +1792,7 @@ export default function AiaSomnisPage() {
                       <input name="nombre" required placeholder="Tu nombre"
                         className="rounded-xl px-4 py-3 text-sm outline-none transition-all"
                         style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
-                        onFocus={e => e.currentTarget.style.borderColor = '#7B2FFF'}
+                        onFocus={e => e.currentTarget.style.borderColor = C.blue}
                         onBlur={e => e.currentTarget.style.borderColor = C.border} />
                     </div>
                     <div className="flex flex-col gap-1">
@@ -1537,7 +1800,7 @@ export default function AiaSomnisPage() {
                       <input name="email" type="email" required placeholder="tu@email.com"
                         className="rounded-xl px-4 py-3 text-sm outline-none transition-all"
                         style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
-                        onFocus={e => e.currentTarget.style.borderColor = '#7B2FFF'}
+                        onFocus={e => e.currentTarget.style.borderColor = C.blue}
                         onBlur={e => e.currentTarget.style.borderColor = C.border} />
                     </div>
                   </div>
@@ -1560,13 +1823,13 @@ export default function AiaSomnisPage() {
                     <textarea name="mensaje" required rows={4} placeholder="Describe tu proyecto, evento, marca o lo que necesitas..."
                       className="rounded-xl px-4 py-3 text-sm outline-none transition-all resize-none"
                       style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
-                      onFocus={e => e.currentTarget.style.borderColor = '#7B2FFF'}
+                      onFocus={e => e.currentTarget.style.borderColor = C.blue}
                       onBlur={e => e.currentTarget.style.borderColor = C.border} />
                   </div>
 
                   <button type="submit"
                     className="w-full py-3.5 rounded-xl font-bold text-sm tracking-wide mt-1"
-                    style={{ background: 'linear-gradient(135deg,#7B2FFF 0%,#1B3DFF 60%,#00B8FF 100%)', color: C.white, boxShadow: '0 0 32px rgba(123,47,255,0.4)' }}>
+                    style={{ background: `linear-gradient(135deg, ${C.deep} 0%, ${C.blue} 60%, ${C.cyan} 100%)`, color: C.white, boxShadow: `0 0 32px ${C.blue}66` }}>
                     Enviar proyecto →
                   </button>
                 </form>

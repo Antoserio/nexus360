@@ -42,8 +42,8 @@ export const ParticleText = memo(function ParticleText({
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
 
     // ── build particle list from text pixel-sampling ──────────────────────
+    // Particles start at their base position so a resize never causes scatter
     async function buildParticles(w: number, h: number) {
-      // Wait for fonts so the text renders correctly
       try { await document.fonts.ready } catch (_) { /* ignore */ }
 
       const off = document.createElement('canvas')
@@ -67,8 +67,9 @@ export const ParticleText = memo(function ParticleText({
           const alpha = d[(y * w + x) * 4 + 3]
           if (alpha > 128) {
             list.push({
-              x: Math.random() * w,
-              y: Math.random() * h,
+              // Start at base — no scatter on rebuild
+              x,
+              y,
               baseX: x,
               baseY: y,
               vx: 0, vy: 0,
@@ -80,17 +81,17 @@ export const ParticleText = memo(function ParticleText({
       particles.current = list
     }
 
-    // ── resize: reset canvas + rebuild ────────────────────────────────────
+    // ── resize: only rebuild if dimensions actually changed ───────────────
     function resize() {
       const el = canvas!.parentElement ?? canvas!
       const w = el.clientWidth  || canvas!.offsetWidth
       const h = el.clientHeight || canvas!.offsetHeight
-      if (w < 2 || h < 2) return        // not laid out yet
+      if (w < 2 || h < 2) return
+      if (w === size.current.w && h === size.current.h) return  // no change → skip
 
       size.current = { w, h }
       canvas!.width  = w * dpr
       canvas!.height = h * dpr
-      // reset transform then apply DPR scale (avoids accumulation)
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0)
       buildParticles(w, h)
     }
@@ -137,42 +138,49 @@ export const ParticleText = memo(function ParticleText({
       }
     }
 
-    // ── init: defer one frame so layout is done ───────────────────────────
     const initId = requestAnimationFrame(() => {
       resize()
       draw()
     })
 
-    // resize observer for container changes
     const ro = new ResizeObserver(resize)
     ro.observe(canvas!.parentElement ?? canvas!)
 
-    // ── mouse / touch ──────────────────────────────────────────────────────
-    const onMove = (e: MouseEvent) => {
-      const r = canvas!.getBoundingClientRect()
-      mouse.current = { x: e.clientX - r.left, y: e.clientY - r.top }
-    }
-    const onTouch = (e: TouchEvent) => {
-      const t = e.touches[0]; if (!t) return
-      const r = canvas!.getBoundingClientRect()
-      mouse.current = { x: t.clientX - r.left, y: t.clientY - r.top }
-    }
-    const onLeave = () => { mouse.current = { x: -9999, y: -9999 } }
+    // ── Pointer events (mouse + touch) ────────────────────────────────────
+    // For touch: only track if the user deliberately presses the canvas,
+    // NOT while scrolling past it.
+    let pointerDown = false
 
-    // listen on window so cursor tracked even outside canvas
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('touchmove', onTouch, { passive: true })
-    canvas.addEventListener('mouseleave', onLeave)
-    canvas.addEventListener('touchend', onLeave)
+    const getPos = (clientX: number, clientY: number) => {
+      const r = canvas!.getBoundingClientRect()
+      mouse.current = { x: clientX - r.left, y: clientY - r.top }
+    }
+
+    const onPointerDown = (e: PointerEvent) => { pointerDown = true; getPos(e.clientX, e.clientY) }
+    const onPointerMove = (e: PointerEvent) => {
+      // Mouse always works; touch only if pointer was pressed on canvas first
+      if (e.pointerType === 'mouse' || pointerDown) getPos(e.clientX, e.clientY)
+    }
+    const onPointerUp   = () => { pointerDown = false; mouse.current = { x: -9999, y: -9999 } }
+    const onPointerLeave = () => { pointerDown = false; mouse.current = { x: -9999, y: -9999 } }
+    // Reset on scroll so particles don't scatter
+    const onScroll = () => { pointerDown = false; mouse.current = { x: -9999, y: -9999 } }
+
+    canvas.addEventListener('pointerdown',  onPointerDown)
+    canvas.addEventListener('pointermove',  onPointerMove)
+    canvas.addEventListener('pointerup',    onPointerUp)
+    canvas.addEventListener('pointerleave', onPointerLeave)
+    window.addEventListener('scroll', onScroll, { passive: true })
 
     return () => {
       cancelAnimationFrame(initId)
       cancelAnimationFrame(raf.current)
       ro.disconnect()
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('touchmove', onTouch)
-      canvas.removeEventListener('mouseleave', onLeave)
-      canvas.removeEventListener('touchend', onLeave)
+      canvas.removeEventListener('pointerdown',  onPointerDown)
+      canvas.removeEventListener('pointermove',  onPointerMove)
+      canvas.removeEventListener('pointerup',    onPointerUp)
+      canvas.removeEventListener('pointerleave', onPointerLeave)
+      window.removeEventListener('scroll', onScroll)
     }
   }, [text, fontSize, colors, particleSize, mouseRadius, returnSpeed, density])
 

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Convertir SPZ → KSPLAT</title>
+  <style>
+    body { font-family: monospace; background: #05070D; color: #00B8FF; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; gap: 20px; }
+    h2 { color: #fff; margin: 0; }
+    p  { color: #AAB3C2; margin: 0; text-align: center; max-width: 500px; }
+    #dropzone { border: 2px dashed #00B8FF; border-radius: 16px; padding: 40px 60px; cursor: pointer; text-align: center; transition: background 0.2s; }
+    #dropzone:hover, #dropzone.drag { background: rgba(0,184,255,0.08); }
+    #status { color: #FFD42A; min-height: 24px; }
+    #downloadBtn { display: none; padding: 12px 32px; background: linear-gradient(90deg, #1B3DFF, #00B8FF); color: #fff; border: none; border-radius: 999px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    canvas { display: none; }
+  </style>
+</head>
+<body>
+  <h2>Convertir SPZ → KSPLAT</h2>
+  <p>Arrastra tu archivo .spz aquí. Se cargará en el visor y podrás descargar el .ksplat optimizado.</p>
+
+  <div id="dropzone">
+    📂 Arrastra el archivo .spz aquí<br/>o haz clic para seleccionarlo
+    <input type="file" id="fileInput" accept=".spz,.splat,.ply" style="display:none" />
+  </div>
+
+  <div id="status">Esperando archivo…</div>
+  <canvas id="canvas"></canvas>
+  <button id="downloadBtn">⬇ Descargar scene.ksplat</button>
+
+  <script type="module">
+    import { Viewer, SceneFormat, LogLevel } from '/node_modules/@mkkellogg/gaussian-splats-3d/src/index.js'
+
+    const dropzone   = document.getElementById('dropzone')
+    const fileInput  = document.getElementById('fileInput')
+    const status     = document.getElementById('status')
+    const dlBtn      = document.getElementById('downloadBtn')
+    const canvas     = document.getElementById('canvas')
+
+    dropzone.addEventListener('click', () => fileInput.click())
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag') })
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'))
+    dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('drag'); handleFile(e.dataTransfer.files[0]) })
+    fileInput.addEventListener('change', e => handleFile(e.target.files[0]))
+
+    async function handleFile(file) {
+      if (!file) return
+      status.textContent = `Cargando ${file.name} (${(file.size/1024/1024).toFixed(1)} MB)…`
+
+      try {
+        const arrayBuffer = await file.arrayBuffer()
+        const objectURL   = URL.createObjectURL(new Blob([arrayBuffer]))
+
+        canvas.style.display = 'block'
+        canvas.width  = 256
+        canvas.height = 256
+
+        const viewer = new Viewer({
+          canvas,
+          selfDrivenMode:      false,
+          useBuiltInControls:  false,
+          logLevel:            LogLevel.Error,
+        })
+
+        status.textContent = 'Procesando escena 3D…'
+
+        await viewer.addSplatScene(objectURL, {
+          format:                   SceneFormat.Spz,
+          splatAlphaRemovalThreshold: 5,
+          showLoadingUI:            false,
+        })
+
+        status.textContent = 'Generando .ksplat…'
+
+        const splatBuffer = viewer.splatMesh.getSplatBuffers()[0]
+        const ksplatData  = splatBuffer.toUint8Array()
+
+        const blob = new Blob([ksplatData], { type: 'application/octet-stream' })
+        const url  = URL.createObjectURL(blob)
+
+        dlBtn.style.display = 'block'
+        dlBtn.onclick = () => {
+          const a = document.createElement('a')
+          a.href = url; a.download = 'scene.ksplat'; a.click()
+        }
+
+        const outMB = (ksplatData.byteLength / 1024 / 1024).toFixed(1)
+        status.textContent = `✓ Listo. Original: ${(file.size/1024/1024).toFixed(1)}MB → KSPLAT: ${outMB}MB`
+        URL.revokeObjectURL(objectURL)
+        viewer.dispose?.()
+        canvas.style.display = 'none'
+
+      } catch (err) {
+        status.textContent = `Error: ${err.message}`
+        console.error(err)
+      }
+    }
+  </script>
+</body>
+</html>
