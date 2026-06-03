@@ -1790,8 +1790,16 @@ export default function AiaSomnisPage() {
                   onSubmit={async e => {
                     e.preventDefault()
                     const form = e.currentTarget as HTMLFormElement
-                    const data = new FormData(form)
-                    await fetch('/', { method: 'POST', body: data })
+                    const params = new URLSearchParams()
+                    new FormData(form).forEach((v, k) => params.append(k, v.toString()))
+                    const data = params.toString()
+                    try {
+                      await fetch('/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: data,
+                      })
+                    } catch (_) { /* en local puede fallar, en Netlify funciona */ }
                     setFormSent(true)
                   }}
                   className="flex flex-col gap-4">
