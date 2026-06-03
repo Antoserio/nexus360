@@ -1,4 +1,16 @@
 @import "tailwindcss";
+
+/* Cursor personalizado — oculta el cursor del sistema en toda la app */
+* { cursor: none !important; }
+
+/* Scan line animation para las tarjetas de servicio */
+@keyframes scanline {
+  0%   { top: -4px; opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.scanline-anim { animation: scanline 2.8s linear infinite; }
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";

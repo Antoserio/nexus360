@@ -2,6 +2,7 @@ import { Suspense, lazy, memo, useEffect, useRef, useState, useCallback } from '
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
 import { ScrollFramesSection } from './components/ScrollFramesSection'
 import { CuboFramesSection } from './components/CuboFramesSection'
+import { GlowCursor } from './components/GlowCursor'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { ParticleText } from '@/components/ui/particle-text'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
@@ -356,7 +357,7 @@ function HudCard({
 
   return (
     <motion.div
-      className="absolute z-20 hidden md:block"
+      className="absolute z-20 hidden lg:block"
       style={{ ...CORNER_STYLES[corner], cursor: 'pointer' }}
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 14 }}
@@ -675,6 +676,105 @@ function LoadingScreen({ onDone }: { onDone: () => void }) {
   )
 }
 
+// ── Tilt 3D + Scan Line card ─────────────────────────────────────────────────
+function TiltScanCard({
+  s, index, opacity, x,
+}: {
+  s: typeof SERVICES[0]
+  index: number
+  opacity: ReturnType<typeof useTransform>
+  x: ReturnType<typeof useTransform>
+}) {
+  const cardRef  = useRef<HTMLDivElement>(null)
+  const [tilt,   setTilt]   = useState({ rx: 0, ry: 0 })
+  const [shine,  setShine]  = useState({ x: 50, y: 50 })
+  const [active, setActive] = useState(false)
+  const { Icon } = s
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = cardRef.current; if (!el) return
+    const r  = el.getBoundingClientRect()
+    const dx = ((e.clientX - r.left) / r.width  - 0.5) * 2   // -1→1
+    const dy = ((e.clientY - r.top)  / r.height - 0.5) * 2
+    setTilt({ rx: -dy * 14, ry: dx * 14 })
+    setShine({ x: ((e.clientX - r.left) / r.width)  * 100,
+               y: ((e.clientY - r.top)  / r.height) * 100 })
+  }
+  const onLeave = () => { setTilt({ rx: 0, ry: 0 }); setActive(false) }
+  const onEnter = () => setActive(true)
+
+  return (
+    <motion.div style={{ opacity, x, perspective: 700 }}>
+      <div
+        ref={cardRef}
+        onMouseMove={onMove}
+        onMouseEnter={onEnter}
+        onMouseLeave={onLeave}
+        onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: 16,
+          cursor: 'pointer',
+          transform: `perspective(700px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(${active ? 1.04 : 1})`,
+          transition: active ? 'transform 0.08s ease' : 'transform 0.5s ease',
+          display: 'flex', alignItems: 'center', gap: 18,
+          padding: '16px 28px',
+          background: `linear-gradient(135deg, rgba(5,7,13,0.97) 0%, ${s.accent}12 100%)`,
+          border: `1px solid ${active ? s.accent : `${s.accent}80`}`,
+          backdropFilter: 'blur(20px)',
+          boxShadow: active
+            ? `0 0 60px ${s.accent}70, 0 0 120px ${s.accent}28, 0 12px 40px rgba(0,0,0,0.7), inset 0 0 40px ${s.accent}18`
+            : `0 0 40px ${s.accent}35, 0 0 80px ${s.accent}15, 0 8px 32px rgba(0,0,0,0.6), inset 0 0 28px ${s.accent}10`,
+        }}
+      >
+        {/* ── Scan line ── */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 10 }}>
+          <div
+            className="scanline-anim"
+            style={{
+              position: 'absolute', left: 0, right: 0, height: 3,
+              background: `linear-gradient(90deg, transparent 0%, ${s.accent}90 40%, ${s.accent} 50%, ${s.accent}90 60%, transparent 100%)`,
+              boxShadow: `0 0 10px ${s.accent}, 0 0 20px ${s.accent}80`,
+              animationDelay: `${index * 0.65}s`,
+            }}
+          />
+        </div>
+
+        {/* ── Shine on hover ── */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', borderRadius: 16,
+          background: `radial-gradient(circle at ${shine.x}% ${shine.y}%, ${s.accent}22 0%, transparent 55%)`,
+          opacity: active ? 1 : 0,
+          transition: 'opacity 0.2s',
+          zIndex: 5,
+        }} />
+
+        {/* ── Icon ── */}
+        <div style={{
+          width: 50, height: 50, borderRadius: 12, flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: `${s.accent}22`,
+          border: `1.5px solid ${s.accent}`,
+          boxShadow: `0 0 22px ${s.accent}60, 0 0 44px ${s.accent}20`,
+          position: 'relative', zIndex: 6,
+        }}>
+          <Icon size={24} style={{ color: s.accent, filter: `drop-shadow(0 0 8px ${s.accent})` }} />
+        </div>
+
+        {/* ── Title ── */}
+        <span style={{
+          color: '#fff', fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap',
+          textShadow: `0 0 24px ${s.accent}60, 0 2px 8px rgba(0,0,0,0.9)`,
+          position: 'relative', zIndex: 6,
+        }}>
+          {s.title}
+        </span>
+      </div>
+    </motion.div>
+  )
+}
+
 // ── Sticky Robot Section (desktop hero) ───────────────────────────────────────
 function StickyRobotSection({ ready }: { ready: boolean }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -810,45 +910,7 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
           {SERVICES.map((s, i) => {
             const { Icon } = s
             return (
-              <motion.div key={s.id} style={{ opacity: cardOpacities[i], x: cardXs[i] }}>
-                <button
-                  onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
-                  style={{
-                    display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 18,
-                    padding: '16px 28px',
-                    borderRadius: 16,
-                    background: `linear-gradient(135deg, rgba(5,7,13,0.95) 0%, ${s.accent}10 100%)`,
-                    border: `1px solid ${s.accent}90`,
-                    backdropFilter: 'blur(20px)',
-                    boxShadow: `0 0 40px ${s.accent}40, 0 0 80px ${s.accent}18, 0 8px 32px rgba(0,0,0,0.6), inset 0 0 30px ${s.accent}12`,
-                    cursor: 'pointer',
-                    outline: 'none',
-                    transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = s.accent
-                    e.currentTarget.style.boxShadow = `0 0 60px ${s.accent}70, 0 0 120px ${s.accent}28, 0 8px 40px rgba(0,0,0,0.7), inset 0 0 40px ${s.accent}20`
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = `${s.accent}90`
-                    e.currentTarget.style.boxShadow = `0 0 40px ${s.accent}40, 0 0 80px ${s.accent}18, 0 8px 32px rgba(0,0,0,0.6), inset 0 0 30px ${s.accent}12`
-                  }}
-                >
-                  <div style={{
-                    width: 48, height: 48, borderRadius: 12, flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `${s.accent}25`,
-                    border: `1.5px solid ${s.accent}`,
-                    boxShadow: `0 0 20px ${s.accent}60, 0 0 40px ${s.accent}20`,
-                  }}>
-                    <Icon size={22} style={{ color: s.accent, filter: `drop-shadow(0 0 6px ${s.accent})` }} />
-                  </div>
-                  <span style={{ color: '#fff', fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap',
-                    textShadow: `0 0 20px ${s.accent}50, 0 2px 8px rgba(0,0,0,0.8)` }}>
-                    {s.title}
-                  </span>
-                </button>
-              </motion.div>
+              <TiltScanCard key={s.id} s={s} index={i} opacity={cardOpacities[i]} x={cardXs[i]} />
             )
           })}
         </div>
@@ -1023,6 +1085,7 @@ export default function AiaSomnisPage() {
 
   return (
     <div style={{ background: C.bg, color: C.white, overflowX: 'clip' }}>
+      <GlowCursor />
       {loading && <LoadingScreen onDone={handleLoadDone} />}
 
       {/* ── STICKY NAV ── */}
