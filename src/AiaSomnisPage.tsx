@@ -1,5 +1,5 @@
 import { Suspense, lazy, memo, useEffect, useRef, useState, useCallback } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
 import { ScrollFramesSection } from './components/ScrollFramesSection'
 import { CuboFramesSection } from './components/CuboFramesSection'
 import { ImageTrail } from '@/components/ui/image-trail'
@@ -676,20 +676,23 @@ function LoadingScreen({ onDone }: { onDone: () => void }) {
 }
 
 // ── Sticky Robot Section (desktop hero) ───────────────────────────────────────
-function StickyRobotSection() {
+function StickyRobotSection({ ready }: { ready: boolean }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress: p } = useScroll({ target: wrapperRef, offset: ['start start', 'end end'] })
+  const [logoVisible, setLogoVisible] = useState(false)
+
+  // Logo aparece cuando ready=true, desaparece cuando las cards empiezan a llegar
+  useEffect(() => { if (ready) setLogoVisible(true) }, [ready])
+  useMotionValueEvent(p, 'change', v => {
+    if (v > 0.14) setLogoVisible(false)
+    else if (ready) setLogoVisible(true)
+  })
 
   // Animations complete by p≈0.32 (288vh of 900vh total)
-  // Cards stay fully visible for remaining ~612vh ≈ 6 full screens
   const robotX      = useTransform(p, [0.06, 0.26],  ['0vw', '-28vw'])
   const robotScale  = useTransform(p, [0, 0.15],     [1, 1.1])
   const textOpacity = useTransform(p, [0.04, 0.14],  [0, 1])
   const textX       = useTransform(p, [0.04, 0.14],  ['-40px', '0px'])
-
-  // Logo + tagline — aparece con robot, desaparece antes de que lleguen las tarjetas
-  const logoOpacity = useTransform(p, [0.06, 0.14, 0.22, 0.30], [0, 1, 1, 0])
-  const logoX       = useTransform(p, [0.06, 0.14],  ['40px', '0px'])
 
   const cardOpacity0 = useTransform(p, [0.18, 0.22], [0, 1])
   const cardX0       = useTransform(p, [0.18, 0.22], ['50px', '0px'])
@@ -737,20 +740,20 @@ function StickyRobotSection() {
           </Suspense>
         </motion.div>
 
-        {/* Logo MAIGIA + tagline — aparece a la derecha del robot */}
-        <motion.div style={{
+        {/* Logo MAIGIA + tagline — aparece al cargar, se desvanece antes de que lleguen las cards */}
+        <div style={{
           position: 'absolute',
-          right: '5vw',
+          left: '58%',
           top: '50%',
-          translateY: '-50%',
-          opacity: logoOpacity,
-          x: logoX,
+          transform: 'translateY(-50%)',
           zIndex: 3,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 16,
+          gap: 18,
           pointerEvents: 'none',
+          opacity: logoVisible ? 1 : 0,
+          transition: logoVisible ? 'opacity 0.9s ease 0.2s' : 'opacity 0.35s ease',
         }}>
           <img
             src="/MAIGIA-LOGO-V1.png"
@@ -760,18 +763,19 @@ function StickyRobotSection() {
           />
           <p style={{
             color: C.blue,
-            fontSize: 'clamp(0.58rem, 0.8vw, 0.78rem)',
-            fontWeight: 700,
+            fontSize: 'clamp(0.56rem, 0.75vw, 0.72rem)',
+            fontWeight: 600,
             fontFamily: "'Orbitron', monospace",
-            letterSpacing: '0.18em',
+            letterSpacing: '0.2em',
             textTransform: 'uppercase',
             textAlign: 'center',
-            lineHeight: 1.6,
+            lineHeight: 1.7,
             textShadow: `0 0 20px rgba(0,184,255,0.7), 0 0 40px rgba(0,184,255,0.3)`,
+            margin: 0,
           }}>
-            AI AGENCY FOR<br />EXTRAORDINARY EXPERIENCES
+            AI Agency for<br />Extraordinary Experiences
           </p>
-        </motion.div>
+        </div>
 
         {/* Left — ¿Qué hacemos? */}
         <motion.div style={{
@@ -792,14 +796,14 @@ function StickyRobotSection() {
           </p>
         </motion.div>
 
-        {/* Right — 4 service cards (más iluminadas) */}
+        {/* Right — 4 service cards (máximo protagonismo) */}
         <div style={{
           position: 'absolute',
           right: '5vw',
           top: '50%',
           display: 'flex',
           flexDirection: 'column',
-          gap: 20,
+          gap: 16,
           zIndex: 4,
           transform: 'translateY(-50%)',
         }}>
@@ -810,39 +814,37 @@ function StickyRobotSection() {
                 <button
                   onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
                   style={{
-                    display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 16,
-                    padding: '14px 24px',
-                    borderRadius: 14,
-                    background: `rgba(5,7,13,0.88)`,
-                    border: `1px solid ${s.accent}65`,
-                    backdropFilter: 'blur(16px)',
-                    boxShadow: `0 0 22px ${s.accent}28, 0 4px 24px rgba(0,0,0,0.5), inset 0 0 18px ${s.accent}0A`,
+                    display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 18,
+                    padding: '16px 28px',
+                    borderRadius: 16,
+                    background: `linear-gradient(135deg, rgba(5,7,13,0.95) 0%, ${s.accent}10 100%)`,
+                    border: `1px solid ${s.accent}90`,
+                    backdropFilter: 'blur(20px)',
+                    boxShadow: `0 0 40px ${s.accent}40, 0 0 80px ${s.accent}18, 0 8px 32px rgba(0,0,0,0.6), inset 0 0 30px ${s.accent}12`,
                     cursor: 'pointer',
                     outline: 'none',
                     transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s',
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = `${s.accent}CC`
-                    e.currentTarget.style.boxShadow = `0 0 45px ${s.accent}55, 0 4px 30px rgba(0,0,0,0.6), inset 0 0 28px ${s.accent}18`
-                    e.currentTarget.style.background = `rgba(5,7,13,0.95)`
+                    e.currentTarget.style.borderColor = s.accent
+                    e.currentTarget.style.boxShadow = `0 0 60px ${s.accent}70, 0 0 120px ${s.accent}28, 0 8px 40px rgba(0,0,0,0.7), inset 0 0 40px ${s.accent}20`
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = `${s.accent}65`
-                    e.currentTarget.style.boxShadow = `0 0 22px ${s.accent}28, 0 4px 24px rgba(0,0,0,0.5), inset 0 0 18px ${s.accent}0A`
-                    e.currentTarget.style.background = `rgba(5,7,13,0.88)`
+                    e.currentTarget.style.borderColor = `${s.accent}90`
+                    e.currentTarget.style.boxShadow = `0 0 40px ${s.accent}40, 0 0 80px ${s.accent}18, 0 8px 32px rgba(0,0,0,0.6), inset 0 0 30px ${s.accent}12`
                   }}
                 >
                   <div style={{
-                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                    width: 48, height: 48, borderRadius: 12, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: `${s.accent}20`,
-                    border: `1px solid ${s.accent}60`,
-                    boxShadow: `0 0 16px ${s.accent}40`,
+                    background: `${s.accent}25`,
+                    border: `1.5px solid ${s.accent}`,
+                    boxShadow: `0 0 20px ${s.accent}60, 0 0 40px ${s.accent}20`,
                   }}>
-                    <Icon size={20} style={{ color: s.accent }} />
+                    <Icon size={22} style={{ color: s.accent, filter: `drop-shadow(0 0 6px ${s.accent})` }} />
                   </div>
-                  <span style={{ color: C.white, fontSize: 17, fontWeight: 700, whiteSpace: 'nowrap',
-                    textShadow: `0 0 12px ${s.accent}30` }}>
+                  <span style={{ color: '#fff', fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap',
+                    textShadow: `0 0 20px ${s.accent}50, 0 2px 8px rgba(0,0,0,0.8)` }}>
                     {s.title}
                   </span>
                 </button>
@@ -1045,8 +1047,13 @@ export default function AiaSomnisPage() {
               { label: 'Equipo',    href: '#equipo' },
             ].map(({ label, href }) => (
               <a key={label} href={href}
-                className="text-[13px] font-semibold tracking-widest uppercase transition-all duration-300"
-                style={{ color: C.gray, letterSpacing: '0.12em', textDecoration: 'none' }}
+                className="transition-all duration-300"
+                style={{
+                  color: C.gray, textDecoration: 'none',
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: '14px', fontWeight: 600,
+                  letterSpacing: '0.04em',
+                }}
                 onMouseEnter={e => (e.currentTarget.style.color = C.white)}
                 onMouseLeave={e => (e.currentTarget.style.color = C.gray)}>
                 {label}
@@ -1054,9 +1061,14 @@ export default function AiaSomnisPage() {
             ))}
             <a href="#contacto"
               onClick={e => { e.preventDefault(); setContactOpen(true) }}
-              className="px-5 py-2 rounded-full text-[11px] font-bold tracking-widest uppercase transition-all duration-300"
-              style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white,
-                boxShadow: `0 0 18px rgba(0,184,255,0.3)`, textDecoration: 'none' }}
+              className="transition-all duration-300"
+              style={{
+                background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white,
+                boxShadow: `0 0 18px rgba(0,184,255,0.3)`, textDecoration: 'none',
+                padding: '8px 22px', borderRadius: 999,
+                fontFamily: "'Syne', sans-serif",
+                fontSize: '13px', fontWeight: 700, letterSpacing: '0.04em',
+              }}
               onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 30px rgba(0,184,255,0.6)`)}
               onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 18px rgba(0,184,255,0.3)`)}>
               Contacto
@@ -1326,7 +1338,7 @@ export default function AiaSomnisPage() {
 
       {/* ══════════ HERO — desktop only (sticky robot) ══════════ */}
       <div className="hidden lg:block">
-        <StickyRobotSection />
+        <StickyRobotSection ready={!loading} />
       </div>
 
       {/* ══════════ SCROLL FRAMES ══════════ */}
