@@ -90,16 +90,20 @@ const TEAM = [
 const px = (id: number, w = 600, h = 400) =>
   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${w}&h=${h}&fit=crop`
 
-// Trail images per service (6 Pexels photos each — swap for real project images)
+// Trail images — logo descompuesto en 6 letras (mismo set para todos los servicios)
+const LETRA_IMAGES = [
+  '/letras/Letra01.png',
+  '/letras/Letra02.png',
+  '/letras/Letra03.png',
+  '/letras/Letra04.png',
+  '/letras/Letra05.png',
+  '/letras/Letra06.png',
+]
 const TRAIL_IMAGES: string[][] = [
-  // 01 Avatares IA — robots, AI, holograms, tech
-  [8386440, 8386434, 8386422, 3861969, 8294404, 3862021].map(id => px(id, 400, 400)),
-  // 02 Instalaciones interactivas — events, screens, exhibitions
-  [1190297, 2608517, 1449940, 3861974, 1105666, 3075993].map(id => px(id, 400, 400)),
-  // 03 Visuales generativos — neon, abstract art, colorful
-  [2387418, 3756165, 1762851, 3612885, 2685229, 1279813].map(id => px(id, 400, 400)),
-  // 04 Digital / dev — code, laptops, web
-  [574069, 1181271, 546819, 3183150, 270360, 1181244].map(id => px(id, 400, 400)),
+  LETRA_IMAGES,
+  LETRA_IMAGES,
+  LETRA_IMAGES,
+  LETRA_IMAGES,
 ]
 
 // Projects for FxSlider — real Pexels backgrounds
@@ -918,6 +922,30 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
   )
 }
 
+// ── Lazy video — solo carga cuando entra en viewport ────────────────────────
+function LazyVideo({ src, className, style }: { src: string; className?: string; style?: React.CSSProperties }) {
+  const ref  = useRef<HTMLVideoElement>(null)
+  const [canPlay, setCanPlay] = useState(false)
+  useEffect(() => {
+    const el = ref.current; if (!el) return
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setCanPlay(true); obs.disconnect() }
+    }, { rootMargin: '200px' })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return (
+    <video
+      ref={ref}
+      src={canPlay ? src : undefined}
+      autoPlay muted loop playsInline
+      preload="none"
+      className={className}
+      style={style}
+    />
+  )
+}
+
 // ── About tilt card — mismo efecto 3D que las tarjetas de hero ───────────────
 function AboutTiltCard({ children, accent, delay = 0, compact = false }: {
   children: React.ReactNode; accent: string; delay?: number; compact?: boolean
@@ -1547,8 +1575,8 @@ export default function AiaSomnisPage() {
                         {s.reel ? (
                           /* ── Real video: full-bleed, no ImageTrail ── */
                           <>
-                            <video
-                              src={s.reel} autoPlay muted loop playsInline
+                            <LazyVideo
+                              src={s.reel}
                               className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
                             {/* top fade-in — stronger on first section */}
                             <div className="absolute top-0 inset-x-0 pointer-events-none" style={{
@@ -1564,7 +1592,10 @@ export default function AiaSomnisPage() {
                           </>
                         ) : (
                           /* ── No video yet: ImageTrail + dark bg image + mouse hint ── */
-                          <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={38} maxImages={8} imageWidth={160} imageHeight={160} maxRotation={8}>
+                          <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={30} maxImages={8}
+                            imageWidth={window.innerWidth < 768 ? 90 : 160}
+                            imageHeight={window.innerWidth < 768 ? 90 : 160}
+                            maxRotation={8}>
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 cursor-none select-none">
 
                               {/* Dark background image for sections without reel */}
