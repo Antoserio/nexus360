@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-const FRAME_COUNT = 100
+const FRAME_COUNT = 300
 const FRAMES = Array.from({ length: FRAME_COUNT }, (_, i) =>
   `/cubo frames/ezgif-frame-${String(i + 1).padStart(3, '0')}.jpg`
 )

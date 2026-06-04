@@ -1,6 +1,5 @@
 import { Suspense, lazy, memo, useEffect, useRef, useState, useCallback } from 'react'
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
-import { ScrollFramesSection } from './components/ScrollFramesSection'
 import { CuboFramesSection } from './components/CuboFramesSection'
 import { GlowCursor } from './components/GlowCursor'
 import { ImageTrail } from '@/components/ui/image-trail'
@@ -919,6 +918,72 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
   )
 }
 
+// ── About tilt card — mismo efecto 3D que las tarjetas de hero ───────────────
+function AboutTiltCard({ children, accent, delay = 0, compact = false }: {
+  children: React.ReactNode; accent: string; delay?: number; compact?: boolean
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [tilt,  setTilt]  = useState({ rx: 0, ry: 0 })
+  const [shine, setShine] = useState({ x: 50, y: 50 })
+  const [active, setActive] = useState(false)
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current; if (!el) return
+    const r  = el.getBoundingClientRect()
+    const dx = ((e.clientX - r.left) / r.width  - 0.5) * 2
+    const dy = ((e.clientY - r.top)  / r.height - 0.5) * 2
+    setTilt({ rx: -dy * 12, ry: dx * 12 })
+    setShine({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 })
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }} transition={{ duration: 0.6, delay }}
+      style={{ flex: compact ? undefined : 1 }}
+    >
+      <div
+        ref={ref}
+        onMouseMove={onMove}
+        onMouseEnter={() => setActive(true)}
+        onMouseLeave={() => { setTilt({ rx: 0, ry: 0 }); setActive(false) }}
+        style={{
+          position: 'relative', overflow: 'hidden',
+          borderRadius: compact ? 14 : 18,
+          padding: compact ? '16px 8px' : '24px',
+          textAlign: 'center',
+          background: `linear-gradient(135deg, rgba(7,17,32,0.92) 0%, ${accent}0D 100%)`,
+          border: `1px solid ${active ? `${accent}80` : `${accent}30`}`,
+          backdropFilter: 'blur(12px)',
+          boxShadow: active
+            ? `0 0 40px ${accent}35, 0 0 80px ${accent}12, inset 0 0 24px ${accent}10`
+            : `0 0 20px ${accent}15, inset 0 0 12px ${accent}06`,
+          transform: `perspective(600px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(${active ? 1.04 : 1})`,
+          transition: active ? 'transform 0.08s ease, border-color 0.2s, box-shadow 0.2s' : 'transform 0.5s ease, border-color 0.3s, box-shadow 0.3s',
+        }}
+      >
+        {/* Scan line */}
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+          <div className="scanline-anim" style={{
+            position: 'absolute', left: 0, right: 0, height: 2,
+            background: `linear-gradient(90deg, transparent, ${accent}80, transparent)`,
+            boxShadow: `0 0 8px ${accent}`,
+            animationDuration: '3s',
+            animationDelay: `${delay}s`,
+          }} />
+        </div>
+        {/* Shine */}
+        <div style={{
+          position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none',
+          background: `radial-gradient(circle at ${shine.x}% ${shine.y}%, ${accent}18 0%, transparent 60%)`,
+          opacity: active ? 1 : 0, transition: 'opacity 0.2s', zIndex: 0,
+        }} />
+        <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
+      </div>
+    </motion.div>
+  )
+}
+
 // ── About Section (self-contained so it can use the hook) ─────────────────────
 function AboutSection() {
   const { canvasRef, sectionRef } = useInteractiveDotGrid()
@@ -943,25 +1008,30 @@ function AboutSection() {
           </div>
           <div className="flex flex-col gap-6">
             <div className="flex gap-6">
-              {['Girasomnis', 'Immerso'].map((brand, i) => (
-                <div key={brand} className="flex-1 rounded-2xl p-6 text-center"
-                  style={{ background: 'rgba(7,17,32,0.85)', border: `1px solid ${C.border}`, backdropFilter: 'blur(8px)' }}>
+              {([
+                { brand: 'Girasomnis', sub: 'Arte & Creatividad', accent: C.blue,  grad: `${C.blue}, ${C.deep}` },
+                { brand: 'Immerso',    sub: 'Tech & Software',    accent: C.gold,  grad: `${C.gold}, ${C.goldSoft}` },
+              ] as const).map(({ brand, sub, accent, grad }, i) => (
+                <AboutTiltCard key={brand} accent={accent} delay={i * 0.1}>
                   <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
-                    style={{ background: `linear-gradient(135deg, ${i === 0 ? C.blue : C.gold}, ${i === 0 ? C.deep : C.goldSoft})` }}>
+                    style={{ background: `linear-gradient(135deg, ${grad})` }}>
                     <span className="font-black text-white text-sm">{brand[0]}</span>
                   </div>
-                  <span className="font-bold text-sm" style={{ color: C.white }}>{brand}</span>
-                  <span className="text-xs mt-1 block" style={{ color: C.gray }}>{i === 0 ? 'Arte & Creatividad' : 'Tech & Software'}</span>
-                </div>
+                  <span className="font-bold text-sm block" style={{ color: C.white }}>{brand}</span>
+                  <span className="text-xs mt-1 block" style={{ color: C.gray }}>{sub}</span>
+                </AboutTiltCard>
               ))}
             </div>
             <div className="grid grid-cols-3 gap-4">
-              {[['20+', 'años de experiencia'], ['4', 'líneas de servicio'], ['3', 'oficinas']].map(([n, l]) => (
-                <div key={l} className="rounded-xl p-4 text-center"
-                  style={{ background: 'rgba(0,184,255,0.06)', border: `1px solid ${C.border}`, backdropFilter: 'blur(8px)' }}>
-                  <div className="font-black text-2xl mb-1" style={{ color: C.blue }}>{n}</div>
+              {([
+                { n: '20+', l: 'años de experiencia', accent: C.blue },
+                { n: '4',   l: 'líneas de servicio',  accent: C.cyan },
+                { n: '3',   l: 'oficinas',             accent: C.gold },
+              ] as const).map(({ n, l, accent }, i) => (
+                <AboutTiltCard key={l} accent={accent} delay={i * 0.08} compact>
+                  <div className="font-black text-2xl mb-1" style={{ color: accent }}>{n}</div>
                   <div className="text-xs" style={{ color: C.gray }}>{l}</div>
-                </div>
+                </AboutTiltCard>
               ))}
             </div>
             <div className="flex gap-4 justify-center">
@@ -1404,9 +1474,6 @@ export default function AiaSomnisPage() {
         <StickyRobotSection ready={!loading} />
       </div>
 
-      {/* ══════════ SCROLL FRAMES ══════════ */}
-      <ScrollFramesSection />
-
       {/* ══════════ PARTICLE TEXT TRANSITION ══════════ */}
       <section className="relative overflow-hidden" style={{ height: '40vh', background: C.bg }}>
         {/* top fade from hero */}
@@ -1590,25 +1657,41 @@ export default function AiaSomnisPage() {
       {/* ══════════ CUBO FRAMES ══════════ */}
       <CuboFramesSection />
 
-      {/* ══════════ LÍNEAS DE LUZ ══════════ */}
-      <section className="relative overflow-hidden" style={{ height: '70vh', background: C.bg }}>
-        <ShaderCanvas />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
-            <span className="block text-xs uppercase tracking-[0.3em] mb-4" style={{ color: C.cyan }}>Creatividad · Tecnología · IA</span>
-            <h2 className="font-black leading-none mb-6" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)', color: C.white }}>
-              Experiencias que{' '}
-              <span style={{
-                backgroundImage: `linear-gradient(90deg, ${C.deep} 0%, ${C.blue} 45%, ${C.cyan} 100%)`,
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-              }}>conectan</span>
-            </h2>
-            <p className="max-w-xl mx-auto text-base md:text-lg" style={{ color: '#B8CCE0' }}>
-              La fusión entre la experiencia artística de Girasomnis y la capacidad tecnológica de Immerso.
-            </p>
-          </motion.div>
+      {/* ══════════ AURORA — Experiencias que conectan ══════════ */}
+      <section className="relative overflow-hidden" style={{ minHeight: '70vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+
+        {/* Aurora orbs */}
+        <div className="absolute inset-0 pointer-events-none" style={{ overflow: 'hidden' }}>
+          <div className="aurora1 absolute" style={{ width: '70vw', height: '70vw', borderRadius: '50%', top: '-20%', left: '-15%', background: `radial-gradient(circle, ${C.deep}55 0%, ${C.blue}22 40%, transparent 70%)`, filter: 'blur(60px)' }} />
+          <div className="aurora2 absolute" style={{ width: '60vw', height: '60vw', borderRadius: '50%', bottom: '-25%', right: '-10%', background: `radial-gradient(circle, ${C.blue}40 0%, ${C.cyan}18 45%, transparent 70%)`, filter: 'blur(70px)' }} />
+          <div className="aurora3 absolute" style={{ width: '40vw', height: '40vw', borderRadius: '50%', top: '30%', left: '35%', background: `radial-gradient(circle, rgba(27,61,255,0.35) 0%, transparent 65%)`, filter: 'blur(50px)' }} />
+          {/* Grid lines */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: `linear-gradient(${C.border}18 1px, transparent 1px), linear-gradient(90deg, ${C.border}18 1px, transparent 1px)`,
+            backgroundSize: '80px 80px',
+            maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)',
+          }} />
         </div>
-        <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none" style={{ background: `linear-gradient(to top, ${C.bg}, transparent)` }} />
+
+        {/* Content */}
+        <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.9 }}
+          className="relative z-10 flex flex-col items-center text-center gap-6 px-6 py-24">
+          <span className="text-xs uppercase tracking-[0.3em]" style={{ color: C.cyan, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>Creatividad · Tecnología · IA</span>
+          <h2 className="font-black leading-tight" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)', color: C.white, maxWidth: 800 }}>
+            Experiencias que{' '}
+            <span style={{ backgroundImage: `linear-gradient(90deg, ${C.blue} 0%, ${C.cyan} 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+              conectan
+            </span>
+          </h2>
+          <p className="max-w-xl text-base md:text-lg leading-relaxed" style={{ color: '#B8CCE0' }}>
+            La fusión entre la experiencia artística de Girasomnis y la capacidad tecnológica de Immerso.
+          </p>
+          {/* Divider line */}
+          <div style={{ width: 80, height: 1, background: `linear-gradient(90deg, transparent, ${C.blue}, transparent)`, marginTop: 8 }} />
+        </motion.div>
+
+        <div className="absolute bottom-0 inset-x-0 h-32 pointer-events-none" style={{ background: `linear-gradient(to top, ${C.bg}, transparent)` }} />
+        <div className="absolute top-0 inset-x-0 h-32 pointer-events-none" style={{ background: `linear-gradient(to bottom, ${C.bg}, transparent)` }} />
       </section>
 
       {/* ══════════ ABOUT US — Dot Grid ══════════ */}

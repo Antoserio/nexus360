@@ -3,6 +3,14 @@
 /* Cursor personalizado — oculta el cursor del sistema en toda la app */
 * { cursor: none !important; }
 
+/* Aurora orbs */
+@keyframes aurora1 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(6%,-4%) scale(1.08)} 66%{transform:translate(-4%,6%) scale(0.94)} }
+@keyframes aurora2 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-7%,5%) scale(1.1)} 66%{transform:translate(5%,-7%) scale(0.92)} }
+@keyframes aurora3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(4%,4%) scale(1.06)} }
+.aurora1 { animation: aurora1 12s ease-in-out infinite; }
+.aurora2 { animation: aurora2 16s ease-in-out infinite; }
+.aurora3 { animation: aurora3 9s ease-in-out infinite; }
+
 /* Scan line animation para las tarjetas de servicio */
 @keyframes scanline {
   0%   { top: -4px; opacity: 0; }
