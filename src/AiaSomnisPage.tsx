@@ -1,11 +1,11 @@
-import { Suspense, lazy, memo, useEffect, useRef, useState, useCallback } from 'react'
-import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
+import { Suspense, lazy, useEffect, useRef, useState, useCallback } from 'react'
+import { motion, useScroll, useTransform, useMotionValueEvent, type MotionValue } from 'framer-motion'
 import { CuboFramesSection } from './components/CuboFramesSection'
-import { GlowCursor } from './components/GlowCursor'
+import { GlowCursor, CursorParticles } from './components/GlowCursor'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { ParticleText } from '@/components/ui/particle-text'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
-import { Mail, MapPin, ChevronDown, ArrowRight, Cpu, Play, Share2 } from 'lucide-react'
+import { Mail, MapPin, ChevronDown, Cpu, Play, Share2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 // Heavy components loaded only when needed
@@ -86,9 +86,6 @@ const TEAM = [
   { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ', photo: '/team/MARTIN.png', imgStyle: { objectPosition: 'center 10%' } },
 ]
 
-// ── Pexels CDN helper ─────────────────────────────────────────────────────────
-const px = (id: number, w = 600, h = 400) =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=${w}&h=${h}&fit=crop`
 
 // Trail images — logo descompuesto en 6 letras (mismo set para todos los servicios)
 const LETRA_IMAGES = [
@@ -140,79 +137,6 @@ const PROJECTS: SliderItem[] = [
   },
 ]
 
-// ── WebGL shader (blue / gold) ────────────────────────────────────────────────
-const VERT = `attribute vec2 a_position; void main(){gl_Position=vec4(a_position,0,1);}`
-// Shader runs at half resolution — same visual, ~4× less GPU load
-const FRAG = `
-  precision mediump float;
-  uniform float u_time; uniform vec2 u_resolution;
-  vec2 hash2(vec2 p){p=vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));return -1.0+2.0*fract(sin(p)*43758.5453123);}
-  float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.0-2.0*f);return mix(mix(dot(hash2(i),f),dot(hash2(i+vec2(1,0)),f-vec2(1,0)),u.x),mix(dot(hash2(i+vec2(0,1)),f-vec2(0,1)),dot(hash2(i+vec2(1,1)),f-vec2(1,1)),u.x),u.y);}
-  float fbm(vec2 p){float v=0.0,a=0.5;for(int i=0;i<4;i++){v+=a*noise(p);p=p*2.0+vec2(100.0);a*=0.5;}return v;}
-  float clouds(vec2 p){float f=0.0,a=0.5;for(int i=0;i<3;i++){f+=a*noise(p);p*=2.1;a*=0.5;}return f*0.5+0.5;}
-  void main(){
-    vec2 FC=gl_FragCoord.xy,R=u_resolution;float T=u_time;
-    vec2 uv=(FC-0.5*R)/min(R.x,R.y),st=uv*vec2(2,1);
-    float bg=clouds(vec2(st.x+T*0.35,-st.y));
-    vec2 q=vec2(fbm(uv*2.5),fbm(uv*2.5+vec2(5.2,1.3)));
-    vec2 r=vec2(fbm(uv*2.5+4.0*q+vec2(1.7+T*0.07,9.2)),fbm(uv*2.5+4.0*q+vec2(8.3,2.8+T*0.07)));
-    float f=fbm(uv*2.5+4.0*r);
-    vec3 cA=vec3(0.02,0.03,0.07),cB=vec3(0.04,0.07,0.15),cC=vec3(0.00,0.07,0.20),cD=vec3(0.02,0.04,0.13);
-    vec3 col=mix(cA,cB,clamp(f*f*4.0,0.0,1.0));
-    col=mix(col,cC,clamp(length(q),0.0,1.0));col=mix(col,cD,clamp(r.x+r.y,0.0,1.0));
-    col=mix(col,vec3(0.0,bg*0.04,bg*0.12),0.35);
-    vec2 puv=uv*(1.0-0.3*(sin(T*0.2)*0.5+0.5));
-    for(float i=1.0;i<9.0;i++){
-      puv+=0.1*cos(i*vec2(0.1+0.01*i,0.8)+i*i+T*0.5+0.1*puv.x);
-      vec2 pp=puv;float d=length(pp);float tt=fract(sin(i*127.1)*43758.5);
-      vec3 pCol=mix(vec3(0.0,0.72,1.0),vec3(1.0,0.83,0.16),tt)*2.5;
-      col+=0.0025/d*pCol;float b=max(0.0,noise(i+pp+bg*1.731));
-      col+=0.004*b/length(max(pp,vec2(b*pp.x*0.02,pp.y)))*pCol;
-    }
-    vec2 vig=(FC/R)*(1.0-FC/R);col*=pow(vig.x*vig.y*16.0,0.3);col=max(col,vec3(0.0));col=col/(col+0.6);
-    gl_FragColor=vec4(col,1.0);
-  }
-`
-function compileShader(gl: WebGLRenderingContext, type: number, src: string) {
-  const s = gl.createShader(type)!; gl.shaderSource(s, src); gl.compileShader(s); return s
-}
-// Memoized — never re-renders, runs its own RAF loop
-const ShaderCanvas = memo(function ShaderCanvas() {
-  const ref = useRef<HTMLCanvasElement>(null)
-  useEffect(() => {
-    const canvas = ref.current; if (!canvas) return
-    const gl = canvas.getContext('webgl', { antialias: false, powerPreference: 'high-performance', alpha: false })
-    if (!gl) return
-    const prog = gl.createProgram()!
-    gl.attachShader(prog, compileShader(gl, gl.VERTEX_SHADER, VERT))
-    gl.attachShader(prog, compileShader(gl, gl.FRAGMENT_SHADER, FRAG))
-    gl.linkProgram(prog); gl.useProgram(prog)
-    const buf = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW)
-    const pos = gl.getAttribLocation(prog, 'a_position')
-    gl.enableVertexAttribArray(pos); gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0)
-    const uT = gl.getUniformLocation(prog, 'u_time'), uR = gl.getUniformLocation(prog, 'u_resolution')
-    let raf: number, t0 = performance.now()
-    // Render at 55% resolution — canvas CSS fills container via object-fit stretch
-    const resize = () => {
-      const scale = 0.55
-      canvas.width  = Math.floor(canvas.clientWidth  * scale)
-      canvas.height = Math.floor(canvas.clientHeight * scale)
-      gl.viewport(0, 0, canvas.width, canvas.height)
-    }
-    const draw = () => {
-      gl.uniform1f(uT, (performance.now() - t0) / 1000)
-      gl.uniform2f(uR, canvas.width, canvas.height)
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
-      raf = requestAnimationFrame(draw)
-    }
-    const ro = new ResizeObserver(resize)
-    ro.observe(canvas); resize(); draw()
-    return () => { cancelAnimationFrame(raf); ro.disconnect() }
-  }, [])
-  return <canvas ref={ref} className="absolute inset-0 w-full h-full" style={{ imageRendering: 'auto' }} aria-hidden />
-})
 
 // ── Interactive Dot Grid ──────────────────────────────────────────────────────
 function useInteractiveDotGrid() {
@@ -685,8 +609,8 @@ function TiltScanCard({
 }: {
   s: typeof SERVICES[0]
   index: number
-  opacity: ReturnType<typeof useTransform>
-  x: ReturnType<typeof useTransform>
+  opacity: MotionValue<number>
+  x: MotionValue<string>
 }) {
   const cardRef  = useRef<HTMLDivElement>(null)
   const [tilt,   setTilt]   = useState({ rx: 0, ry: 0 })
@@ -910,12 +834,9 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
           zIndex: 4,
           transform: 'translateY(-50%)',
         }}>
-          {SERVICES.map((s, i) => {
-            const { Icon } = s
-            return (
-              <TiltScanCard key={s.id} s={s} index={i} opacity={cardOpacities[i]} x={cardXs[i]} />
-            )
-          })}
+          {SERVICES.map((s, i) => (
+            <TiltScanCard key={s.id} s={s} index={i} opacity={cardOpacities[i]} x={cardXs[i]} />
+          ))}
         </div>
       </div>
     </div>
@@ -1184,6 +1105,7 @@ export default function AiaSomnisPage() {
   return (
     <div style={{ background: C.bg, color: C.white, overflowX: 'clip' }}>
       <GlowCursor />
+      <CursorParticles />
       {loading && <LoadingScreen onDone={handleLoadDone} />}
 
       {/* ── STICKY NAV ── */}
@@ -1511,8 +1433,9 @@ export default function AiaSomnisPage() {
         <div className="absolute inset-x-0 bottom-0 h-32 pointer-events-none z-10"
           style={{ background: `linear-gradient(to top, ${C.bg}, transparent)` }} />
         <ParticleText
-          text="AIA SOMNIS"
-          fontSize={110}
+          text="MAIGIA"
+          fontSize={130}
+          fontWeight={200}
           colors={['#00B8FF', '#22D3FF', '#1B3DFF', '#0099FF', '#4DA6FF', '#00B8FF', '#22D3FF', '#00B8FF', '#FFD42A']}
           particleSize={2}
           mouseRadius={100}
@@ -1898,8 +1821,8 @@ export default function AiaSomnisPage() {
       <footer className="py-10 px-6" style={{ borderTop: `1px solid ${C.border}`, background: C.bg }}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src="/MAIGIA-LOGO-V1.png" alt="AIA-SOMNIS" style={{ height: 28, width: 'auto', objectFit: 'contain' }} />
-            <span className="text-xs" style={{ color: C.border }}>by Girasomnis × Immerso</span>
+            <img src="/MAIGIA-LOGO-V1.png" alt="MAIGIA" style={{ height: 24, width: 'auto', objectFit: 'contain', opacity: 0.6 }} />
+            <span className="text-xs" style={{ color: C.border }}>MAIGIA 2026</span>
           </div>
           <div className="flex gap-4">
             {[
@@ -1915,7 +1838,15 @@ export default function AiaSomnisPage() {
               </a>
             ))}
           </div>
-          <span className="text-xs" style={{ color: C.border }}>© 2025 AIA-SOMNIS · Madrid · Valencia · Barcelona</span>
+          <span className="text-xs" style={{ color: C.border, opacity: 0.5 }}>
+            Powered by{' '}
+            <a href="https://immerso.live" target="_blank" rel="noopener noreferrer"
+              style={{ color: C.border, textDecoration: 'none', opacity: 0.7 }}
+              onMouseEnter={e => (e.currentTarget.style.color = C.gray)}
+              onMouseLeave={e => (e.currentTarget.style.color = C.border)}>
+              immerso.live
+            </a>
+          </span>
         </div>
       </footer>
 

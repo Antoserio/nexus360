@@ -10,6 +10,7 @@ interface Particle {
 interface ParticleTextProps {
   text: string
   fontSize?: number
+  fontWeight?: number | string
   colors?: string[]
   particleSize?: number
   mouseRadius?: number
@@ -19,8 +20,9 @@ interface ParticleTextProps {
 }
 
 export const ParticleText = memo(function ParticleText({
-  text = 'AIA SOMNIS',
+  text = 'MAIGIA',
   fontSize = 100,
+  fontWeight = 900,
   colors = ['#00B8FF', '#1B3DFF', '#FFD42A', '#F4F7FB'],
   particleSize = 2,
   mouseRadius = 90,
@@ -52,7 +54,7 @@ export const ParticleText = memo(function ParticleText({
       const oc = off.getContext('2d')!
       const fs = Math.min(fontSize, w * 0.15)
       oc.clearRect(0, 0, w, h)
-      oc.font = `900 ${fs}px "Inter", "Helvetica Neue", Arial, sans-serif`
+      oc.font = `${fontWeight} ${fs}px "Inter", "Helvetica Neue", Arial, sans-serif`
       oc.fillStyle = '#ffffff'
       oc.textAlign = 'center'
       oc.textBaseline = 'middle'
@@ -182,7 +184,7 @@ export const ParticleText = memo(function ParticleText({
       canvas.removeEventListener('pointerleave', onPointerLeave)
       window.removeEventListener('scroll', onScroll)
     }
-  }, [text, fontSize, colors, particleSize, mouseRadius, returnSpeed, density])
+  }, [text, fontSize, fontWeight, colors, particleSize, mouseRadius, returnSpeed, density])
 
   return (
     <canvas

@@ -1,5 +1,83 @@
 import { useEffect, useRef, useState } from 'react'
 
+// ── Partículas ligeras que siguen el cursor ───────────────────────────────────
+export function CursorParticles() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current; if (!canvas) return
+    const ctx = canvas.getContext('2d'); if (!ctx) return
+
+    canvas.width  = window.innerWidth
+    canvas.height = window.innerHeight
+
+    const onResize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight }
+    window.addEventListener('resize', onResize)
+
+    type P = { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; r: number; color: string }
+    const particles: P[] = []
+    const COLORS = ['#00B8FF', '#22D3FF', '#1B3DFF', '#ffffff', '#00B8FF']
+    let mx = -999, my = -999, moving = false, moveTimer = 0
+
+    const onMove = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; moving = true; clearTimeout(moveTimer); moveTimer = window.setTimeout(() => { moving = false }, 80) }
+    window.addEventListener('mousemove', onMove)
+
+    let raf: number
+    const loop = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      // Spawn partículas solo al mover
+      if (moving && Math.random() < 0.6) {
+        particles.push({
+          x: mx + (Math.random() - 0.5) * 8,
+          y: my + (Math.random() - 0.5) * 8,
+          vx: (Math.random() - 0.5) * 1.2,
+          vy: (Math.random() - 0.8) * 1.4,
+          life: 0,
+          maxLife: 28 + Math.random() * 18,
+          r: 1.2 + Math.random() * 2,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        })
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i]
+        p.life++
+        p.x += p.vx; p.y += p.vy
+        p.vy -= 0.03  // leve flotación hacia arriba
+        const t = p.life / p.maxLife
+        const alpha = Math.max(0, (1 - t) * 0.85)
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.r * (1 - t * 0.4), 0, Math.PI * 2)
+        ctx.fillStyle = p.color
+        ctx.globalAlpha = alpha
+        ctx.shadowBlur = 8
+        ctx.shadowColor = p.color
+        ctx.fill()
+        ctx.globalAlpha = 1
+        ctx.shadowBlur = 0
+        if (p.life >= p.maxLife) particles.splice(i, 1)
+      }
+
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('resize', onResize)
+      cancelAnimationFrame(raf)
+    }
+  }, [])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 99997, mixBlendMode: 'screen' }}
+    />
+  )
+}
+
 export function GlowCursor() {
   const dotRef  = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
@@ -83,7 +161,6 @@ export function GlowCursor() {
   }, [])
 
   if (typeof window === 'undefined') return null
-
   return (
     <>
       {/* Dot — sigue exacto */}
