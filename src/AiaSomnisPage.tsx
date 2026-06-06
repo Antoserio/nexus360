@@ -1017,9 +1017,16 @@ export default function AiaSomnisPage() {
   const [heroQuadrant, setHeroQuadrant] = useState<0|1|2|3|null>(null)
   const [soundOn, setSoundOn] = useState(false)
   const [logoEntranceDone, setLogoEntranceDone] = useState(false)
+  const [trackIdx, setTrackIdx] = useState(0)
   const audioRef = useRef<HTMLAudioElement>(null)
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
   const heroRef = useRef<HTMLElement>(null)
+
+  const TRACKS = [
+    '/magnific-hand-covers-bruise.mp3',
+    '/magnific-in-motion.mp3',
+    '/magnific-you-were-right.mp3',
+  ]
 
   const toggleSound = useCallback(() => {
     if (!audioRef.current) return
@@ -1028,10 +1035,23 @@ export default function AiaSomnisPage() {
       setSoundOn(false)
     } else {
       audioRef.current.volume = 0.55
-      audioRef.current.play().catch(() => {/* autoplay blocked — user gesture already happened, ignore */})
+      audioRef.current.play().catch(() => {})
       setSoundOn(true)
     }
   }, [soundOn])
+
+  // Avanza al siguiente track al terminar
+  const handleTrackEnd = useCallback(() => {
+    setTrackIdx(i => (i + 1) % TRACKS.length)
+  }, [TRACKS.length])
+
+  // Cuando cambia el track y el sonido está activo, reproduce el nuevo
+  useEffect(() => {
+    const audio = audioRef.current; if (!audio || !soundOn) return
+    audio.src = TRACKS[trackIdx]
+    audio.volume = 0.55
+    audio.play().catch(() => {})
+  }, [trackIdx]) // eslint-disable-line
 
   useEffect(() => {
     if (loading) return
@@ -1769,9 +1789,9 @@ export default function AiaSomnisPage() {
       {/* ── AUDIO + SOUND TOGGLE ── */}
       <audio
         ref={audioRef}
-        src="/magnific-hand-covers-bruise.mp3"
-        loop
+        src={TRACKS[trackIdx]}
         preload="none"
+        onEnded={handleTrackEnd}
       />
       <motion.button
         onClick={toggleSound}
