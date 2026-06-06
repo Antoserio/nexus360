@@ -1,0 +1,54 @@
+# MAIGIA — AI Agency for Extraordinary Experiences
+# https://maigia.tech
+
+## Who we are
+
+MAIGIA is a Spanish AI agency that creates extraordinary experiences combining artificial intelligence, creativity and technology. We were founded in 2024 as the union between Girasomnis (a creative studio with 20+ years in audiovisual shows, immersive experiences and video mapping) and Immerso (specialists in software development, web applications, AI solutions and real-time 3D avatars).
+
+We operate from Madrid, Valencia and Barcelona (Spain).
+
+## What we do
+
+### 1. Conversational AI Avatars
+We create custom conversational AI avatars that attend the public at trade shows, shopping centers, corporate events and physical spaces. These avatars can present content, answer questions in multiple languages and capture leads in real time.
+- Use cases: trade fairs, exhibitions, shopping centers, corporate events, virtual presenters
+- Key features: multilingual, connected to brand, real-time responses
+
+### 2. Interactive AI Installations
+We design experiences where the public interacts with cameras, screens, sensors and generative AI systems, creating visual content in real time.
+- Use cases: photocalls, interactive totems, holographic displays, 360° immersive experiences
+- Key features: camera + AI, reactive visuals, intelligent photocalls
+
+### 3. Audiovisual Production with AI
+We create images, animations and visual worlds using AI, combining artistic direction, 3D, motion graphics and professional audiovisual production.
+- Use cases: advertising campaigns, LED screens, video mapping with AI, generative animations, concerts and shows
+- Key features: AI-generated content, video mapping, motion graphics
+
+### 4. Digital Solutions with AI
+We create digital solutions with AI to automate processes, capture leads, improve customer service and create smarter web experiences.
+- Use cases: AI-powered websites, virtual assistants, process automation, CRM integration, 3D web experiences
+- Key features: AI agents, web development, automation
+
+## Team
+
+- Paco Gramaje — Business Developer
+- Leonardo Bautista — Creative Director
+- Anto Loriso — CTO
+- Martin Julià — 3D & AI Developer
+
+## Contact
+
+Website: https://maigia.tech
+Email: contact via https://maigia.tech (contact form)
+Instagram: https://www.instagram.com/aiasomnis
+LinkedIn: https://www.linkedin.com/company/girasomnis/
+YouTube: https://www.youtube.com/@PacoGramajegirasomnis
+
+## Related companies
+
+- Girasomnis: https://www.girasomnis.com — Creative studio, 20+ years in immersive audiovisual experiences
+- Immerso: https://immerso.live — Software development, AI solutions, real-time 3D avatars
+
+## Keywords
+
+AI agency Spain, agencia inteligencia artificial España, avatar IA, conversational AI avatar, instalaciones interactivas IA, interactive AI installation, producción audiovisual IA, AI audiovisual production, experiencias inmersivas, immersive experiences, videomapping IA, AI video mapping, eventos IA, AI events, MAIGIA, Girasomnis, Immerso
