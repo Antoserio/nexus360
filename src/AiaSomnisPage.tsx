@@ -1445,7 +1445,7 @@ export default function AiaSomnisPage() {
       </div>
 
       {/* ══════════ PARTICLE TEXT TRANSITION ══════════ */}
-      <section className="relative overflow-hidden" style={{ height: '40vh', background: C.bg }}>
+      <section className="relative overflow-hidden hidden sm:block" style={{ height: '40vh', background: C.bg }}>
         {/* top fade from hero */}
         <div className="absolute inset-x-0 top-0 h-20 pointer-events-none z-10"
           style={{ background: `linear-gradient(to bottom, ${C.bg}, transparent)` }} />
