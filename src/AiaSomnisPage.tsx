@@ -788,6 +788,9 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
             style={{ height: 'clamp(90px, 13vw, 180px)', width: 'auto', objectFit: 'contain',
               filter: 'drop-shadow(0 0 40px rgba(0,184,255,0.75)) drop-shadow(0 0 20px rgba(0,184,255,0.4))' }}
           />
+          <h1 style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>
+            MAIGIA — Agencia de Inteligencia Artificial para Experiencias Extraordinarias
+          </h1>
           <p style={{
             color: C.blue,
             fontSize: 'clamp(0.56rem, 0.75vw, 0.72rem)',
