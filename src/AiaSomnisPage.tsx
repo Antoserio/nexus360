@@ -1141,9 +1141,11 @@ export default function AiaSomnisPage() {
           }} />
         <div className="relative z-10 flex items-center justify-between w-full">
           {/* Logo */}
-          <img src="/MAIGIA-LOGO-V1.png" alt="MAIGIA"
-            style={{ height: 42, width: 'auto', objectFit: 'contain',
-              filter: 'drop-shadow(0 0 12px rgba(0,184,255,0.4))' }} />
+          <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/MAIGIA-LOGO-V1.png" alt="MAIGIA"
+              style={{ height: 42, width: 'auto', objectFit: 'contain',
+                filter: 'drop-shadow(0 0 12px rgba(0,184,255,0.4))' }} />
+          </a>
 
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-8">
