@@ -637,7 +637,7 @@ function TiltScanCard({
         onMouseMove={onMove}
         onMouseEnter={onEnter}
         onMouseLeave={onLeave}
-        onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
+        onClick={() => document.getElementById(`servicio-${s.id}`)?.scrollIntoView({ behavior: 'smooth' })}
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -1476,7 +1476,7 @@ export default function AiaSomnisPage() {
               const textRight = i % 2 !== 0
 
               return (
-                <div key={s.id} ref={el => { sectionRefs.current[i] = el }}
+                <div key={s.id} id={`servicio-${s.id}`} ref={el => { sectionRefs.current[i] = el }}
                   className="relative"
                   style={{ height: '100svh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
