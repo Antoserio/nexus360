@@ -1148,17 +1148,18 @@ export default function AiaSomnisPage() {
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-8">
             {[
-              { label: 'Servicios',  href: '#servicios' },
-              { label: 'Proyectos', href: '#proyectos' },
-              { label: 'Equipo',    href: '#equipo' },
-            ].map(({ label, href }) => (
-              <a key={label} href={href}
+              { label: 'Servicios',  id: 'servicios' },
+              { label: 'Proyectos', id: 'proyectos' },
+              { label: 'Equipo',    id: 'equipo' },
+            ].map(({ label, id }) => (
+              <a key={label} href={`#${id}`}
+                onClick={e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }}
                 className="transition-all duration-300"
                 style={{
                   color: C.gray, textDecoration: 'none',
                   fontFamily: "'Syne', sans-serif",
                   fontSize: '14px', fontWeight: 600,
-                  letterSpacing: '0.04em',
+                  letterSpacing: '0.04em', cursor: 'pointer',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = C.white)}
                 onMouseLeave={e => (e.currentTarget.style.color = C.gray)}>
