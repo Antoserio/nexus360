@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
+import { GlowCursor, CursorParticles } from './components/GlowCursor'
 
 const C = {
   bg: '#05070D', blue: '#00B8FF', white: '#F4F7FB', border: '#223044',
@@ -43,6 +44,8 @@ export default function ProyectosPage() {
 
   return (
     <div style={{ background: C.bg, minHeight: '100vh' }}>
+      <GlowCursor />
+      <CursorParticles />
       <header style={{
         position: 'fixed', top: 0, insetInline: 0, zIndex: 20,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
