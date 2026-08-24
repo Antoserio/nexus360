@@ -1021,6 +1021,7 @@ export default function AiaSomnisPage() {
   const [soundOn, setSoundOn] = useState(false)
   const [logoEntranceDone, setLogoEntranceDone] = useState(false)
   const [trackIdx, setTrackIdx] = useState(0)
+  const [isDesktop, setIsDesktop] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
   const heroRef = useRef<HTMLElement>(null)
@@ -1072,6 +1073,16 @@ export default function AiaSomnisPage() {
     const onScroll = () => setScrolledPastHero(window.scrollY > window.innerHeight * 0.6)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // El robot 3D (Spline) de escritorio pesa ~2MB — en movil ni se ve (hidden lg:block)
+  // asi que evitamos montarlo del todo en vez de solo ocultarlo con CSS
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    setIsDesktop(mq.matches)
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
   }, [])
 
   useEffect(() => {
@@ -1446,9 +1457,11 @@ export default function AiaSomnisPage() {
       </div>
 
       {/* ══════════ HERO — desktop only (sticky robot) ══════════ */}
-      <div className="hidden lg:block">
-        <StickyRobotSection ready={!loading} />
-      </div>
+      {isDesktop && (
+        <div className="hidden lg:block">
+          <StickyRobotSection ready={!loading} />
+        </div>
+      )}
 
       {/* ══════════ PARTICLE TEXT TRANSITION ══════════ */}
       <section className="relative overflow-hidden hidden sm:block" style={{ height: '40vh', background: C.bg }}>

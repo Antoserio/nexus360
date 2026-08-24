@@ -2,7 +2,20 @@ import { useEffect, useRef, useState } from 'react'
 
 export function CuboFramesSection() {
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
   const [textOpacity, setTextOpacity] = useState(0)
+  const [canPlay, setCanPlay] = useState(false)
+
+  // Solo carga el video (38MB) cuando el usuario se acerca a la seccion
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setCanPlay(true); obs.disconnect() }
+    }, { rootMargin: '600px' })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   useEffect(() => {
     const wrapper = wrapperRef.current
@@ -31,14 +44,22 @@ export function CuboFramesSection() {
     <div ref={wrapperRef} style={{ height: '300vh', position: 'relative' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
         <video
-          src="/flower-arc.mp4"
+          ref={videoRef}
+          src={canPlay ? '/flower-arc.mp4' : undefined}
           poster="/flower-arc.jpg"
           autoPlay
           muted
           loop
           playsInline
-          preload="auto"
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', background: '#05070D' }}
+          preload="none"
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            objectFit: 'cover',
+            // El motivo floral esta en el lado derecho del encuadre — en pantallas
+            // estrechas (movil) un recorte centrado deja fuera casi todas las flores
+            objectPosition: '78% center',
+            background: '#05070D',
+          }}
         />
         <div
           style={{
