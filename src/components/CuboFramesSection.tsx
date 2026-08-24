@@ -1,58 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 
-const FRAME_COUNT = 300
-const FRAMES = Array.from({ length: FRAME_COUNT }, (_, i) =>
-  `/cubo frames/ezgif-frame-${String(i + 1).padStart(3, '0')}.jpg`
-)
-
 export function CuboFramesSection() {
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const imagesRef = useRef<HTMLImageElement[]>([])
-  const frameRef = useRef(0)
-  const targetRef = useRef(0)
-  const rafRef = useRef<number>(0)
   const [textOpacity, setTextOpacity] = useState(0)
 
   useEffect(() => {
-    imagesRef.current = FRAMES.map(src => {
-      const img = new Image()
-      img.src = src
-      return img
-    })
-  }, [])
-
-  useEffect(() => {
     const wrapper = wrapperRef.current
-    const canvas = canvasRef.current
-    if (!wrapper || !canvas) return
-
-    const drawFrame = (index: number) => {
-      const ctx = canvas.getContext('2d')
-      if (!ctx) return
-      const img = imagesRef.current[index]
-      if (!img?.complete || !img.naturalWidth) return
-      const w = canvas.width
-      const h = canvas.height
-      const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight)
-      const sw = img.naturalWidth * scale
-      const sh = img.naturalHeight * scale
-      ctx.clearRect(0, 0, w, h)
-      ctx.drawImage(img, (w - sw) / 2, (h - sh) / 2, sw, sh)
-    }
-
-    const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-      drawFrame(Math.round(frameRef.current))
-    }
+    if (!wrapper) return
 
     const onScroll = () => {
       const rect = wrapper.getBoundingClientRect()
       const scrolled = -rect.top
       const total = rect.height - window.innerHeight
       const progress = Math.max(0, Math.min(1, scrolled / total))
-      targetRef.current = progress * (FRAME_COUNT - 1)
 
       let opacity = 0
       if (progress < 0.2) opacity = progress / 0.2
@@ -61,33 +21,24 @@ export function CuboFramesSection() {
       setTextOpacity(opacity)
     }
 
-    const loop = () => {
-      const diff = targetRef.current - frameRef.current
-      if (Math.abs(diff) > 0.05) {
-        frameRef.current += diff * 0.12
-      }
-      drawFrame(Math.max(0, Math.min(FRAME_COUNT - 1, Math.round(frameRef.current))))
-      rafRef.current = requestAnimationFrame(loop)
-    }
-
-    window.addEventListener('resize', resize)
     window.addEventListener('scroll', onScroll, { passive: true })
-    resize()
-    rafRef.current = requestAnimationFrame(loop)
+    onScroll()
 
-    return () => {
-      window.removeEventListener('resize', resize)
-      window.removeEventListener('scroll', onScroll)
-      cancelAnimationFrame(rafRef.current)
-    }
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
     <div ref={wrapperRef} style={{ height: '300vh', position: 'relative' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
-        <canvas
-          ref={canvasRef}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: '#05070D' }}
+        <video
+          src="/flower-arc.mp4"
+          poster="/flower-arc.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', background: '#05070D' }}
         />
         <div
           style={{
@@ -102,6 +53,7 @@ export function CuboFramesSection() {
             transition: 'opacity 0.1s linear',
             pointerEvents: 'none',
             zIndex: 10,
+            background: 'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(5,7,13,0.55) 0%, transparent 70%)',
           }}
         >
           <h2
