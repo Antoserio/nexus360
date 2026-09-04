@@ -1527,6 +1527,19 @@ export default function AiaSomnisPage() {
 
                       {/* tags — typewriter reveal on scroll */}
                       <TypewriterTags tags={s.tags} accent={s.accent} />
+
+                      {s.id === 'avatares' && (
+                        <a href="/avatares"
+                          className="inline-flex items-center gap-2 self-start mt-1 transition-all duration-300"
+                          style={{
+                            color: s.accent, fontSize: '0.85rem', fontWeight: 700,
+                            textDecoration: 'none', letterSpacing: '0.02em',
+                          }}
+                          onMouseEnter={e => (e.currentTarget.style.gap = '10px')}
+                          onMouseLeave={e => (e.currentTarget.style.gap = '8px')}>
+                          Conoce a nuestros avatares →
+                        </a>
+                      )}
                     </div>
 
                     {/* ── REEL COLUMN ── fills all remaining space, edge-to-edge */}
