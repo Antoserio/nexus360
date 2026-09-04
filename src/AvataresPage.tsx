@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { GlowCursor, CursorParticles } from './components/GlowCursor'
 
 const C = {
@@ -13,22 +13,27 @@ interface Avatar {
   accent: string
   image: string
   imagePosition?: string
+  video?: string
   desc: string
   tags: string[]
+  note?: string
 }
 
 const AVATARS: Avatar[] = [
   {
     num: '01', name: 'Viky', accent: C.blue,
     image: '/avatares/viky.jpg',
+    video: '/avatares/viky-des.mp4',
     desc: 'Nuestro avatar en vivo. Viky ha conversado en tiempo real con cientos de personas sobre el escenario de DES Málaga 2026, manteniendo más de 800 conversaciones reales con asistentes.',
     tags: ['Conversación en vivo', 'Multilingüe', 'Presencia en eventos', 'Captación de leads'],
   },
   {
     num: '02', name: 'Joy', accent: C.cyan,
     image: '/avatares/joy.png',
+    video: '/avatares/joy-hotel.mp4',
     desc: 'Humano digital 3D con presencia realista: expresiones faciales, mirada, parpadeo, gestos y sincronización labial. Pensada para hospitality, turismo, marca y atención premium.',
     tags: ['Hospitality y turismo', 'Atención premium', 'Recepción y showrooms', 'Multilingüe'],
+    note: '📍 Próxima parada: estaremos con Joy en el TIS Sevilla (Tourism Innovation Summit), con un mapa interactivo del recinto diseñado en exclusiva para ellos.',
   },
   {
     num: '03', name: 'Toby', accent: C.gold,
@@ -44,6 +49,49 @@ const AVATARS: Avatar[] = [
     tags: ['Personajes a medida', 'Museos y cultura', 'Marca e institucional', 'Eventos'],
   },
 ]
+
+function AvatarMedia({ a }: { a: Avatar }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [canPlay, setCanPlay] = useState(false)
+
+  useEffect(() => {
+    if (!a.video) return
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setCanPlay(true); obs.disconnect() }
+    }, { rootMargin: '400px' })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [a.video])
+
+  return (
+    <div ref={ref} className="relative overflow-hidden rounded-2xl"
+      style={{
+        aspectRatio: '4 / 5',
+        border: `1px solid ${a.accent}40`,
+        boxShadow: `0 0 50px ${a.accent}25, 0 20px 50px rgba(0,0,0,0.5)`,
+      }}>
+      {a.video ? (
+        <video
+          src={canPlay ? a.video : undefined}
+          poster={a.image}
+          autoPlay muted loop playsInline preload="none"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
+      ) : (
+        <img src={a.image} alt={`Avatar ${a.name}`}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
+      )}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: `linear-gradient(180deg, transparent 55%, rgba(5,7,13,0.75) 100%)` }} />
+      <span className="absolute bottom-4 left-5 font-black" style={{ fontSize: 42, color: `${a.accent}55`, letterSpacing: '-0.03em' }}>
+        {a.num}
+      </span>
+    </div>
+  )
+}
 
 export default function AvataresPage() {
   const [contactOpen, setContactOpen] = useState(false)
@@ -126,23 +174,9 @@ export default function AvataresPage() {
               style={{ padding: '56px 0', borderBottom: i < AVATARS.length - 1 ? `1px solid ${C.border}` : 'none' }}>
               <div className={`flex flex-col md:flex-row items-center gap-10 md:gap-16 ${imageRight ? 'md:flex-row-reverse' : ''}`}>
 
-                {/* Imagen */}
+                {/* Imagen / vídeo */}
                 <div className="w-full md:w-[38%] shrink-0">
-                  <div className="relative overflow-hidden rounded-2xl"
-                    style={{
-                      aspectRatio: '4 / 5',
-                      border: `1px solid ${a.accent}40`,
-                      boxShadow: `0 0 50px ${a.accent}25, 0 20px 50px rgba(0,0,0,0.5)`,
-                    }}>
-                    <img src={a.image} alt={`Avatar ${a.name}`}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
-                    <div className="absolute inset-0 pointer-events-none"
-                      style={{ background: `linear-gradient(180deg, transparent 55%, rgba(5,7,13,0.75) 100%)` }} />
-                    <span className="absolute bottom-4 left-5 font-black" style={{ fontSize: 42, color: `${a.accent}55`, letterSpacing: '-0.03em' }}>
-                      {a.num}
-                    </span>
-                  </div>
+                  <AvatarMedia a={a} />
                 </div>
 
                 {/* Texto */}
@@ -168,6 +202,13 @@ export default function AvataresPage() {
                       </span>
                     ))}
                   </div>
+
+                  {a.note && (
+                    <div className="rounded-xl px-4 py-3 text-sm leading-relaxed"
+                      style={{ background: `${a.accent}0F`, border: `1px solid ${a.accent}30`, color: C.white }}>
+                      {a.note}
+                    </div>
+                  )}
 
                   {/* CTA card — sin conversación en directo, solo contacto */}
                   <div className="mt-2 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
