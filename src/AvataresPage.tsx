@@ -50,9 +50,27 @@ const AVATARS: Avatar[] = [
   },
 ]
 
+function SoundIcon({ muted }: { muted: boolean }) {
+  return muted ? (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <line x1="23" y1="9" x2="17" y2="15" />
+      <line x1="17" y1="9" x2="23" y2="15" />
+    </svg>
+  ) : (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+    </svg>
+  )
+}
+
 function AvatarMedia({ a }: { a: Avatar }) {
   const ref = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
   const [canPlay, setCanPlay] = useState(false)
+  const [muted, setMuted] = useState(true)
 
   useEffect(() => {
     if (!a.video) return
@@ -65,6 +83,14 @@ function AvatarMedia({ a }: { a: Avatar }) {
     return () => obs.disconnect()
   }, [a.video])
 
+  const toggleSound = () => {
+    const v = videoRef.current
+    if (!v) return
+    v.muted = !v.muted
+    if (!v.muted) v.play().catch(() => {})
+    setMuted(v.muted)
+  }
+
   return (
     <div ref={ref} className="relative overflow-hidden rounded-2xl"
       style={{
@@ -74,6 +100,7 @@ function AvatarMedia({ a }: { a: Avatar }) {
       }}>
       {a.video ? (
         <video
+          ref={videoRef}
           src={canPlay ? a.video : undefined}
           poster={a.image}
           autoPlay muted loop playsInline preload="none"
@@ -89,6 +116,18 @@ function AvatarMedia({ a }: { a: Avatar }) {
       <span className="absolute bottom-4 left-5 font-black" style={{ fontSize: 42, color: `${a.accent}55`, letterSpacing: '-0.03em' }}>
         {a.num}
       </span>
+      {a.video && canPlay && (
+        <button onClick={toggleSound}
+          aria-label={muted ? 'Activar sonido' : 'Silenciar'}
+          className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center"
+          style={{
+            background: 'rgba(5,7,13,0.6)', backdropFilter: 'blur(6px)',
+            border: `1px solid ${muted ? C.border : a.accent}`, color: muted ? C.white : a.accent,
+            cursor: 'pointer',
+          }}>
+          <SoundIcon muted={muted} />
+        </button>
+      )}
     </div>
   )
 }
