@@ -106,10 +106,10 @@ const TRAIL_IMAGES: string[][] = [
 // Projects for FxSlider — real Pexels backgrounds
 const PROJECTS: SliderItem[] = [
   {
-    num: '01', year: '2024', accent: '#00B8FF',
+    num: '01', year: '2026', accent: '#00B8FF',
     title: 'Avatar Viky · Girasomnis', category: 'Avatares IA',
-    // Futuristic AI robot face
-    bg: `url('https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
+    // Foto real: Viky en el escenario del DES Malaga 2026
+    bg: `url('/viky-des-stage.jpg') center/cover no-repeat`,
   },
   {
     num: '02', year: '2024', accent: '#22D3FF',
