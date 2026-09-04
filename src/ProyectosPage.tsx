@@ -26,7 +26,7 @@ const PROJECTS: SliderItem[] = [
   {
     num: '04', year: '2026', accent: '#F6B93B',
     title: 'Mia · Avatar para Fluge Audiovisuales', category: 'Avatares IA',
-    bg: `url('/mia-fluge.jpg') center/cover no-repeat`,
+    bg: `url('/mia-fluge.jpg') center 15%/cover no-repeat`,
   },
   {
     num: '05', year: '2023', accent: '#1B3DFF',
