@@ -124,10 +124,10 @@ const PROJECTS: SliderItem[] = [
     bg: `url('https://images.pexels.com/photos/2387418/pexels-photo-2387418.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
   {
-    num: '04', year: '2024', accent: '#F6B93B',
-    title: 'FLUGE — Avatar Demo', category: 'Avatar Interactivo',
-    // Holographic / digital human
-    bg: `url('https://images.pexels.com/photos/3862021/pexels-photo-3862021.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
+    num: '04', year: '2026', accent: '#F6B93B',
+    title: 'Mia · Avatar para Fluge Audiovisuales', category: 'Avatares IA',
+    // Foto real: Mia, avatar de Fluge Audiovisuales
+    bg: `url('/mia-fluge.jpg') center/cover no-repeat`,
   },
   {
     num: '05', year: '2023', accent: '#1B3DFF',
