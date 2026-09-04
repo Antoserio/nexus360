@@ -107,9 +107,9 @@ const TRAIL_IMAGES: string[][] = [
 const PROJECTS: SliderItem[] = [
   {
     num: '01', year: '2026', accent: '#00B8FF',
-    title: 'Avatar Viky · Girasomnis', category: 'Avatares IA',
-    // Foto real: Viky en el escenario del DES Malaga 2026
-    bg: `url('/viky-des-stage.jpg') center/cover no-repeat`,
+    title: 'Avatar Viky · MAIGIA', category: 'Avatares IA',
+    // Viky Fluge: avatar 3D wireframe, imagen real del dossier
+    bg: `url('/viky-fluge.jpg') center/cover no-repeat`,
   },
   {
     num: '02', year: '2024', accent: '#22D3FF',

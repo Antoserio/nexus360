@@ -9,9 +9,9 @@ const C = {
 // TODO: proyectos reales — de momento mismo listado que la home, se actualizará
 const PROJECTS: SliderItem[] = [
   {
-    num: '01', year: '2024', accent: '#00B8FF',
-    title: 'Avatar Viky · Girasomnis', category: 'Avatares IA',
-    bg: `url('https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
+    num: '01', year: '2026', accent: '#00B8FF',
+    title: 'Avatar Viky · MAIGIA', category: 'Avatares IA',
+    bg: `url('/viky-fluge.jpg') center/cover no-repeat`,
   },
   {
     num: '02', year: '2024', accent: '#22D3FF',
