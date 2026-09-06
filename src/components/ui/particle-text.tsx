@@ -5,6 +5,9 @@ interface Particle {
   baseX: number; baseY: number
   vx: number; vy: number
   color: string
+  sizeMul: number
+  twinklePhase: number
+  twinkleSpeed: number
 }
 
 interface ParticleTextProps {
@@ -76,6 +79,9 @@ export const ParticleText = memo(function ParticleText({
               baseY: y,
               vx: 0, vy: 0,
               color: colors[Math.floor(Math.random() * colors.length)],
+              sizeMul: 0.5 + Math.random() * 1.1,
+              twinklePhase: Math.random() * Math.PI * 2,
+              twinkleSpeed: 0.015 + Math.random() * 0.025,
             })
           }
         }
@@ -133,11 +139,21 @@ export const ParticleText = memo(function ParticleText({
         p.x += p.vx
         p.y += p.vy
 
+        // twinkle: gentle opacity breathing so it reads as stardust, not a flat grid
+        p.twinklePhase += p.twinkleSpeed
+        const twinkle = 0.55 + 0.45 * Math.sin(p.twinklePhase)
+        const r = particleSize * p.sizeMul
+
+        ctx!.globalAlpha = twinkle
+        ctx!.shadowBlur = r * 4
+        ctx!.shadowColor = p.color
         ctx!.fillStyle = p.color
         ctx!.beginPath()
-        ctx!.arc(p.x, p.y, particleSize, 0, Math.PI * 2)
+        ctx!.arc(p.x, p.y, r, 0, Math.PI * 2)
         ctx!.fill()
       }
+      ctx!.globalAlpha = 1
+      ctx!.shadowBlur = 0
     }
 
     const initId = requestAnimationFrame(() => {

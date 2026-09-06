@@ -1506,11 +1506,11 @@ export default function AiaSomnisPage() {
           text="MAIGIA"
           fontSize={130}
           fontWeight={200}
-          colors={['#00B8FF', '#22D3FF', '#1B3DFF', '#0099FF', '#4DA6FF', '#00B8FF', '#22D3FF', '#00B8FF', '#FFD42A']}
-          particleSize={2}
+          colors={['#F4F7FB', '#F4F7FB', '#CFE6FF', '#8FD4FF', '#00B8FF', '#F4F7FB', '#FFE58A', '#FFD42A']}
+          particleSize={0.9}
           mouseRadius={100}
           returnSpeed={0.07}
-          density={5}
+          density={2.5}
           className="cursor-none"
         />
       </section>
@@ -1998,7 +1998,7 @@ export default function AiaSomnisPage() {
               </div>
             ) : (
               <>
-                <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 40, objectFit: 'contain', marginBottom: 20 }} />
+                <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 64, objectFit: 'contain', marginBottom: 20 }} />
                 <h2 className="text-2xl mb-1" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>Cuéntanos tu proyecto</h2>
                 <p className="text-sm mb-6" style={{ color: C.gray }}>Responderemos en menos de 24h.</p>
 
