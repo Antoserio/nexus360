@@ -52,7 +52,7 @@ export default function ProyectosPage() {
         padding: '20px 28px',
       }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/MAIGIA-LOGO-V1.png" alt="MAIGIA" style={{ height: 32, width: 'auto' }} />
+          <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 50, width: 'auto' }} />
         </a>
         <a href="/" style={{
           color: C.white, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em',

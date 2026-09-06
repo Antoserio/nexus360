@@ -67,6 +67,7 @@ const SERVICES: {
     desc: 'Creamos imágenes, animaciones y mundos visuales con IA, combinando dirección artística, 3D, motion graphics y producción audiovisual profesional.',
     tags: ['Campañas publicitarias', 'Pantallas LED', 'Videomapping IA', 'Animaciones generativas', 'Conciertos y espectáculos'],
     accent: '#FFD42A', glow: 'rgba(255,212,42,0.22)',
+    categoryHref: '/maigiaav/', categoryLabel: 'Ver producción audiovisual',
     reel: '/Produccion Audiovisual_1.mp4',
   },
   {
@@ -583,10 +584,10 @@ function LoadingScreen({ onDone }: { onDone: () => void }) {
       </div>
 
       {/* Logo */}
-      <motion.img src="/MAIGIA-LOGO-V1.png" alt="AIA SOMNIS"
+      <motion.img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis"
         initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
-        style={{ height: 60, marginBottom: 48, position: 'relative', zIndex: 1 }} />
+        style={{ height: 80, marginBottom: 48, position: 'relative', zIndex: 1 }} />
 
       {/* Counter */}
       <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
@@ -1166,8 +1167,8 @@ export default function AiaSomnisPage() {
         <div className="relative z-10 flex items-center justify-between w-full">
           {/* Logo */}
           <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/MAIGIA-LOGO-V1.png" alt="MAIGIA"
-              style={{ height: 42, width: 'auto', objectFit: 'contain',
+            <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis"
+              style={{ height: 54, width: 'auto', objectFit: 'contain',
                 filter: 'drop-shadow(0 0 12px rgba(0,184,255,0.4))' }} />
           </a>
 
@@ -1364,8 +1365,8 @@ export default function AiaSomnisPage() {
 
               {/* Logo with glitch entrance + idle breathing */}
               <motion.img
-                src="/MAIGIA-LOGO-V1.png"
-                alt="AIA-SOMNIS"
+                src="/maigia-logo-girasomnis.png"
+                alt="MAIGIA by Girasomnis"
                 initial={{ opacity: 0, scale: 0.78, filter: 'blur(14px)' }}
                 animate={
                   !heroVisible
@@ -1402,7 +1403,7 @@ export default function AiaSomnisPage() {
                   if (!logoEntranceDone && heroVisible) setLogoEntranceDone(true)
                 }}
                 style={{
-                  height: 'clamp(50px, 8vw, 100px)',
+                  height: 'clamp(64px, 10vw, 120px)',
                   width: 'auto',
                   objectFit: 'contain',
                   position: 'relative',
@@ -1901,7 +1902,7 @@ export default function AiaSomnisPage() {
       <footer className="py-10 px-6" style={{ borderTop: `1px solid ${C.border}`, background: C.bg }}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <img src="/MAIGIA-LOGO-V1.png" alt="MAIGIA" style={{ height: 24, width: 'auto', objectFit: 'contain', opacity: 0.6 }} />
+            <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 34, width: 'auto', objectFit: 'contain', opacity: 0.6 }} />
             <span className="text-xs" style={{ color: C.border }}>MAIGIA 2026</span>
           </div>
           <div className="flex gap-4">
@@ -1967,7 +1968,7 @@ export default function AiaSomnisPage() {
               </div>
             ) : (
               <>
-                <img src="/MAIGIA-LOGO-V1.png" alt="AIA-SOMNIS" style={{ height: 28, objectFit: 'contain', marginBottom: 20 }} />
+                <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 40, objectFit: 'contain', marginBottom: 20 }} />
                 <h2 className="font-black text-2xl mb-1" style={{ color: C.white }}>Cuéntanos tu proyecto</h2>
                 <p className="text-sm mb-6" style={{ color: C.gray }}>Responderemos en menos de 24h.</p>
 

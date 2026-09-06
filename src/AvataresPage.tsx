@@ -229,7 +229,7 @@ export default function AvataresPage() {
       <header className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10"
         style={{ height: 64, background: 'rgba(5,7,13,0.85)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${C.border}` }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/MAIGIA-LOGO-V1.png" alt="MAIGIA" style={{ height: 34, width: 'auto', objectFit: 'contain' }} />
+          <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 52, width: 'auto', objectFit: 'contain' }} />
         </a>
         <div className="flex items-center gap-4 md:gap-6">
           <a href="/" style={{ color: C.gray, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
@@ -408,7 +408,7 @@ export default function AvataresPage() {
               </div>
             ) : (
               <>
-                <img src="/MAIGIA-LOGO-V1.png" alt="MAIGIA" style={{ height: 28, objectFit: 'contain', marginBottom: 20 }} />
+                <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 40, objectFit: 'contain', marginBottom: 20 }} />
                 <h2 className="font-black text-2xl mb-1" style={{ color: C.white }}>Cuéntanos tu proyecto</h2>
                 <p className="text-sm mb-6" style={{ color: C.gray }}>Responderemos en menos de 24h.</p>
 
