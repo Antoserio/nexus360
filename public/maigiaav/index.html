@@ -144,6 +144,17 @@
 #mg-contact-overlay .mg-sent{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:32px 0}
 #mg-contact-overlay .mg-sent .mg-check{width:64px;height:64px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:rgba(123,47,255,.15);border:1px solid #7B2FFF;font-size:28px;color:#F4F7FB}
 #mg-contact-overlay .mg-sent button{padding:8px 24px;border-radius:999px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#7B2FFF,#1B3DFF);color:#fff;border:none;cursor:pointer}
+@media (max-width: 640px) {
+  .hero-inner.shell, .hero-inner.shell > *, .hero-copy, .hero-copy > *, .hero-index,
+  .section-heading, .section-heading > *, .shell, .shell > * {
+    min-width: 0 !important;
+  }
+  img, video { max-width: 100%; height: auto; }
+}
+@media (max-width: 480px) {
+  .display-title { font-size: clamp(1.8rem, 10vw, 2.6rem) !important; overflow-wrap: break-word !important; }
+}
+
 </style>
 <div id="mg-contact-overlay">
   <div class="mg-backdrop" data-mg-close="1"></div>
