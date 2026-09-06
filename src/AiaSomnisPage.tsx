@@ -794,27 +794,37 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
           <h1 style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>
             MAIGIA — Agencia de Inteligencia Artificial para Experiencias Extraordinarias
           </h1>
-          <p style={{
+          <span style={{
             color: C.blue,
-            fontSize: 'clamp(0.56rem, 0.75vw, 0.72rem)',
-            fontWeight: 600,
-            fontFamily: "'Orbitron', monospace",
-            letterSpacing: '0.2em',
+            fontSize: '0.7rem',
+            fontWeight: 700,
+            fontFamily: "'Syne', sans-serif",
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+          }}>
+            Creación con IA
+          </span>
+          <p style={{
+            color: C.white,
+            fontSize: 'clamp(1.15rem, 2.6vw, 2.1rem)',
+            fontWeight: 750,
+            fontFamily: "'Syne', sans-serif",
+            letterSpacing: '-0.04em',
             textTransform: 'uppercase',
             textAlign: 'center',
-            lineHeight: 1.7,
-            textShadow: `0 0 20px rgba(0,184,255,0.7), 0 0 40px rgba(0,184,255,0.3)`,
+            lineHeight: 1.05,
+            textShadow: `0 0 30px rgba(0,184,255,0.5)`,
             margin: 0,
           }}>
             Artificial Intelligence for<br />Events, Brands &amp; Culture.
           </p>
           <p style={{
             color: C.gray,
-            fontSize: 'clamp(0.7rem, 0.95vw, 0.85rem)',
+            fontSize: 'clamp(0.8rem, 1.05vw, 0.95rem)',
             fontWeight: 500,
             textAlign: 'center',
-            lineHeight: 1.6,
-            maxWidth: 340,
+            lineHeight: 1.65,
+            maxWidth: 360,
             margin: 0,
           }}>
             Avatares, agentes y experiencias inteligentes que hablan, ven, reaccionan y conectan el mundo físico con el digital.
@@ -1168,7 +1178,7 @@ export default function AiaSomnisPage() {
           {/* Logo */}
           <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
             <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis"
-              style={{ height: 54, width: 'auto', objectFit: 'contain',
+              style={{ height: 92, width: 'auto', objectFit: 'contain',
                 filter: 'drop-shadow(0 0 12px rgba(0,184,255,0.4))' }} />
           </a>
 

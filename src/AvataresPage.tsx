@@ -229,7 +229,7 @@ export default function AvataresPage() {
       <header className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10"
         style={{ height: 64, background: 'rgba(5,7,13,0.85)', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${C.border}` }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 52, width: 'auto', objectFit: 'contain' }} />
+          <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 92, width: 'auto', objectFit: 'contain' }} />
         </a>
         <div className="flex items-center gap-4 md:gap-6">
           <a href="/" style={{ color: C.gray, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
@@ -256,7 +256,10 @@ export default function AvataresPage() {
           style={{ background: 'rgba(0,184,255,0.10)', border: `1px solid rgba(0,184,255,0.35)`, color: C.blue }}>
           Avatares IA
         </span>
-        <h1 className="relative font-black leading-tight" style={{ fontSize: 'clamp(2rem,5vw,3.8rem)', maxWidth: 780 }}>
+        <h1 className="relative" style={{
+          fontFamily: "'Syne', sans-serif", fontWeight: 750, textTransform: 'uppercase',
+          letterSpacing: '-0.03em', lineHeight: 1.05, fontSize: 'clamp(2.1rem,5vw,3.8rem)', maxWidth: 780,
+        }}>
           Presencia digital que <span style={{ color: C.blue }}>habla, mira y conecta</span>
         </h1>
         <p className="relative mt-5" style={{ color: C.gray, fontSize: 'clamp(0.95rem,1.3vw,1.15rem)', maxWidth: 620 }}>
@@ -299,10 +302,25 @@ export default function AvataresPage() {
                 {/* Texto */}
                 <div className="w-full md:w-[62%] flex flex-col gap-5">
                   <div>
-                    <span className="block text-xs uppercase tracking-widest font-bold mb-2" style={{ color: a.accent }}>
-                      Avatar {a.num}
-                    </span>
-                    <h2 className="font-black" style={{ fontSize: 'clamp(1.7rem,2.6vw,2.4rem)', color: C.white }}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span style={{
+                        width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                        border: `1px solid ${a.accent}90`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 11, fontWeight: 700, fontFamily: "'Syne', sans-serif", color: a.accent,
+                      }}>
+                        {a.num}
+                      </span>
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, fontFamily: "'Syne', sans-serif",
+                        letterSpacing: '0.15em', textTransform: 'uppercase', color: C.white,
+                      }}>
+                        Avatar
+                      </span>
+                    </div>
+                    <h2 style={{
+                      fontFamily: "'Syne', sans-serif", fontWeight: 750, textTransform: 'uppercase',
+                      letterSpacing: '-0.03em', fontSize: 'clamp(1.9rem,3vw,2.8rem)', color: C.white, lineHeight: 1.03,
+                    }}>
                       {a.name}
                     </h2>
                   </div>
