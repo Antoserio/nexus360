@@ -402,8 +402,8 @@ function HudCard({
             <motion.h3
               animate={{ color: lit ? C.white : '#D0E4F4' }}
               transition={{ duration: 0.28 }}
-              className="font-black leading-snug"
-              style={{ fontSize: 'clamp(16px, 1.6vw, 22px)' }}>
+              className="leading-snug"
+              style={{ fontSize: 'clamp(16px, 1.6vw, 22px)', fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.02em' }}>
               {s.title}
             </motion.h3>
           </div>
@@ -694,7 +694,8 @@ function TiltScanCard({
 
         {/* ── Title ── */}
         <span style={{
-          color: '#fff', fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap',
+          color: '#fff', fontSize: 18, fontWeight: 650, whiteSpace: 'nowrap',
+          fontFamily: "'Syne', sans-serif", letterSpacing: '-0.02em',
           textShadow: `0 0 24px ${s.accent}60, 0 2px 8px rgba(0,0,0,0.9)`,
           position: 'relative', zIndex: 6,
         }}>
@@ -841,7 +842,10 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
           x: textX,
           zIndex: 2,
         }}>
-          <h2 style={{ fontSize: 'clamp(3rem, 7vw, 6rem)', fontWeight: 900, color: C.white, lineHeight: 1.05, margin: 0 }}>
+          <h2 style={{
+            fontSize: 'clamp(3rem, 7vw, 6rem)', fontWeight: 650, color: C.white, lineHeight: 1.05, margin: 0,
+            fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
+          }}>
             <span style={{ display: 'block' }}>¿Qué</span>
             <span style={{ display: 'block' }}>hacemos?</span>
           </h2>
@@ -853,7 +857,7 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
         {/* Right — 4 service cards (máximo protagonismo) */}
         <div style={{
           position: 'absolute',
-          right: '5vw',
+          right: '8vw',
           top: '50%',
           display: 'flex',
           flexDirection: 'column',
@@ -973,7 +977,10 @@ function AboutSection() {
           className="grid md:grid-cols-2 gap-16 items-center">
           <div>
             <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.blue }}>Sobre nosotros</span>
-            <h2 className="font-black leading-tight mb-8" style={{ fontSize: 'clamp(2rem,4.5vw,3.5rem)', color: C.white }}>
+            <h2 className="leading-tight mb-8" style={{
+              fontSize: 'clamp(2rem,4.5vw,3.5rem)', color: C.white, fontWeight: 650,
+              fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
+            }}>
               Más de 20 años<br /><span style={{ color: C.gold }}>evolucionando</span>
             </h2>
             <div className="space-y-5 text-base leading-relaxed" style={{ color: C.gray }}>
@@ -1538,8 +1545,11 @@ export default function AiaSomnisPage() {
                       <div>
                         <span className="block font-black leading-none mb-1"
                           style={{ fontSize: 'clamp(2.5rem,5vw,6rem)', color: `${s.accent}30`, letterSpacing: '-0.04em', lineHeight: 1 }}>{s.num}</span>
-                        <h2 className="font-black leading-tight mb-2"
-                          style={{ fontSize: 'clamp(1.5rem,2.8vw,2.5rem)', color: C.white, marginTop: '-0.5rem' }}>{s.title}</h2>
+                        <h2 className="leading-tight mb-2"
+                          style={{
+                            fontSize: 'clamp(1.5rem,2.8vw,2.5rem)', color: C.white, marginTop: '-0.5rem',
+                            fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.03em',
+                          }}>{s.title}</h2>
                         <p style={{ color: `${s.accent}CC`, fontSize: '0.9rem' }}>{s.subtitle}</p>
                       </div>
 
@@ -1722,7 +1732,10 @@ export default function AiaSomnisPage() {
         <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.9 }}
           className="relative z-10 flex flex-col items-center text-center gap-6 px-6 py-24">
           <span className="text-xs uppercase tracking-[0.3em]" style={{ color: C.cyan, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>Creatividad · Tecnología · IA</span>
-          <h2 className="font-black leading-tight" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)', color: C.white, maxWidth: 800 }}>
+          <h2 className="leading-tight" style={{
+            fontSize: 'clamp(2.5rem,6vw,5rem)', color: C.white, maxWidth: 800,
+            fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
+          }}>
             Experiencias que{' '}
             <span style={{ backgroundImage: `linear-gradient(90deg, ${C.blue} 0%, ${C.cyan} 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               conectan
@@ -1751,7 +1764,10 @@ export default function AiaSomnisPage() {
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="text-center mb-16">
             <span className="text-xs uppercase tracking-[0.3em] mb-4 block" style={{ color: C.blue }}>El equipo</span>
-            <h2 className="font-black" style={{ fontSize: 'clamp(2rem,4vw,3rem)', color: C.white }}>Las personas detrás</h2>
+            <h2 style={{
+              fontSize: 'clamp(2rem,4vw,3rem)', color: C.white,
+              fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
+            }}>Las personas detrás</h2>
           </motion.div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {TEAM.map((member, i) => (
@@ -1770,6 +1786,7 @@ export default function AiaSomnisPage() {
                       <img
                         src={member.photo}
                         alt={member.name}
+                        loading="lazy"
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                         style={member.imgStyle}
                       />
@@ -1820,7 +1837,10 @@ export default function AiaSomnisPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}>
               <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.gold }}>Hablemos</span>
-              <h2 className="font-black leading-none mb-6" style={{ fontSize: 'clamp(2.5rem,5vw,4.5rem)', color: C.white }}>
+              <h2 className="leading-none mb-6" style={{
+                fontSize: 'clamp(2.5rem,5vw,4.5rem)', color: C.white,
+                fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
+              }}>
                 ¿Tienes un{' '}
                 <span style={{
                   backgroundImage: `linear-gradient(90deg, ${C.deep} 0%, ${C.blue} 45%, ${C.cyan} 100%)`,
@@ -1968,7 +1988,7 @@ export default function AiaSomnisPage() {
                   style={{ background: 'rgba(123,47,255,0.15)', border: '1px solid #7B2FFF' }}>
                   <span style={{ fontSize: 28 }}>✓</span>
                 </div>
-                <h3 className="font-black text-xl" style={{ color: C.white }}>¡Mensaje enviado!</h3>
+                <h3 className="text-xl" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>¡Mensaje enviado!</h3>
                 <p style={{ color: C.gray }}>Te responderemos lo antes posible.</p>
                 <button onClick={() => { setContactOpen(false); setFormSent(false) }}
                   className="mt-2 px-6 py-2 rounded-full text-sm font-bold"
@@ -1979,7 +1999,7 @@ export default function AiaSomnisPage() {
             ) : (
               <>
                 <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 40, objectFit: 'contain', marginBottom: 20 }} />
-                <h2 className="font-black text-2xl mb-1" style={{ color: C.white }}>Cuéntanos tu proyecto</h2>
+                <h2 className="text-2xl mb-1" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>Cuéntanos tu proyecto</h2>
                 <p className="text-sm mb-6" style={{ color: C.gray }}>Responderemos en menos de 24h.</p>
 
                 <form

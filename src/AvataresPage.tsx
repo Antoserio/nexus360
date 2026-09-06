@@ -185,7 +185,7 @@ function AvatarMedia({ a }: { a: Avatar }) {
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
       ) : (
-        <img src={a.image} alt={`Avatar ${a.name}`}
+        <img src={a.image} alt={`Avatar ${a.name}`} loading="lazy"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
       )}
@@ -318,8 +318,8 @@ export default function AvataresPage() {
                       </span>
                     </div>
                     <h2 style={{
-                      fontFamily: "'Syne', sans-serif", fontWeight: 750, textTransform: 'uppercase',
-                      letterSpacing: '-0.03em', fontSize: 'clamp(1.9rem,3vw,2.8rem)', color: C.white, lineHeight: 1.03,
+                      fontFamily: "'Syne', sans-serif", fontWeight: 650,
+                      letterSpacing: '-0.04em', fontSize: 'clamp(1.9rem,3vw,2.8rem)', color: C.white, lineHeight: 1.05,
                     }}>
                       {a.name}
                     </h2>
@@ -379,7 +379,10 @@ export default function AvataresPage() {
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse 55% 55% at 50% 50%, rgba(123,47,255,0.12) 0%, transparent 70%)',
         }} />
-        <h2 className="relative font-black leading-tight mb-4" style={{ fontSize: 'clamp(1.7rem,3.2vw,2.8rem)', maxWidth: 640 }}>
+        <h2 className="relative leading-tight mb-4" style={{
+          fontSize: 'clamp(1.7rem,3.2vw,2.8rem)', maxWidth: 640,
+          fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.04em',
+        }}>
           Una presencia digital que la gente recuerda
         </h2>
         <p className="relative mb-8" style={{ color: C.gray, maxWidth: 520 }}>
@@ -416,7 +419,7 @@ export default function AvataresPage() {
                   style={{ background: 'rgba(123,47,255,0.15)', border: '1px solid #7B2FFF' }}>
                   <span style={{ fontSize: 28 }}>✓</span>
                 </div>
-                <h3 className="font-black text-xl" style={{ color: C.white }}>¡Mensaje enviado!</h3>
+                <h3 className="text-xl" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>¡Mensaje enviado!</h3>
                 <p style={{ color: C.gray }}>Te responderemos lo antes posible.</p>
                 <button onClick={() => { setContactOpen(false); setFormSent(false) }}
                   className="mt-2 px-6 py-2 rounded-full text-sm font-bold"
@@ -427,7 +430,7 @@ export default function AvataresPage() {
             ) : (
               <>
                 <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 40, objectFit: 'contain', marginBottom: 20 }} />
-                <h2 className="font-black text-2xl mb-1" style={{ color: C.white }}>Cuéntanos tu proyecto</h2>
+                <h2 className="text-2xl mb-1" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>Cuéntanos tu proyecto</h2>
                 <p className="text-sm mb-6" style={{ color: C.gray }}>Responderemos en menos de 24h.</p>
 
                 <form

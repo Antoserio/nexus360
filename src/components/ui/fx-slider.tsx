@@ -174,8 +174,11 @@ export function FxSlider({ items, headerText = 'Proyectos', duration = 0.55 }: F
           <motion.div key={current} custom={dir} variants={titleVariants} initial="enter" animate="center" exit="exit"
             transition={{ ...t, duration: t.duration * 0.75 }} className="text-center">
             <p className="text-xs uppercase tracking-[0.35em] mb-3" style={{ color: active.accent }}>{active.year}</p>
-            <h2 className="font-black leading-none"
-              style={{ fontSize: 'clamp(1.5rem, 5vw, 3.5rem)', color: C.white, textShadow: '0 2px 40px rgba(0,0,0,0.9)', letterSpacing: '-0.02em' }}>
+            <h2 className="leading-none"
+              style={{
+                fontSize: 'clamp(1.5rem, 5vw, 3.5rem)', color: C.white, textShadow: '0 2px 40px rgba(0,0,0,0.9)',
+                fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.04em',
+              }}>
               {active.title}
             </h2>
             {/* Category badge — visible on mobile (lists hidden) */}

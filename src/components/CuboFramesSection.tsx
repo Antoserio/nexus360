@@ -80,11 +80,12 @@ export function CuboFramesSection() {
           <h2
             style={{
               fontSize: 'clamp(1.8rem, 5vw, 4rem)',
-              fontWeight: 900,
+              fontWeight: 650,
+              fontFamily: "'Syne', sans-serif",
               color: '#F4F7FB',
               lineHeight: 1.15,
               textShadow: '0 0 40px rgba(255,212,42,0.6), 0 0 80px rgba(255,212,42,0.3)',
-              letterSpacing: '-0.02em',
+              letterSpacing: '-0.04em',
               margin: 0,
             }}
           >
