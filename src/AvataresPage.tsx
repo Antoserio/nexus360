@@ -14,6 +14,7 @@ interface Avatar {
   image: string
   imagePosition?: string
   video?: string
+  youtube?: { cas: string; eng: string }
   desc: string
   tags: string[]
   note?: string
@@ -21,14 +22,21 @@ interface Avatar {
 
 const AVATARS: Avatar[] = [
   {
-    num: '01', name: 'Viky', accent: C.blue,
+    num: '01', name: 'Viky · Girasomnis', accent: C.blue,
     image: '/avatares/viky.jpg',
-    video: '/avatares/viky-des.mp4',
-    desc: 'Nuestro avatar en vivo. Viky ha conversado en tiempo real con cientos de personas sobre el escenario de DES Málaga 2026, manteniendo más de 800 conversaciones reales con asistentes.',
+    youtube: { cas: 'W0EKcrfuCL8', eng: 'qmQq8Bkq_TY' },
+    desc: 'Avatar conversacional interactivo para eventos, marcas y espacios corporativos. Reel de presentación con contenido LED de alta gama, disponible en español e inglés.',
     tags: ['Conversación en vivo', 'Multilingüe', 'Presencia en eventos', 'Captación de leads'],
   },
   {
-    num: '02', name: 'Joy', accent: C.cyan,
+    num: '02', name: 'Viky · DES', accent: C.blue,
+    image: '/avatares/viky.jpg',
+    video: '/avatares/viky-des.mp4',
+    desc: 'Viky ha conversado en tiempo real con cientos de personas sobre el escenario de DES Málaga 2026, manteniendo más de 800 conversaciones reales con asistentes.',
+    tags: ['Conversación en vivo', 'Multilingüe', 'Presencia en eventos', 'Captación de leads'],
+  },
+  {
+    num: '03', name: 'Joy', accent: C.cyan,
     image: '/avatares/joy.png',
     video: '/avatares/joy-hotel.mp4',
     desc: 'Humano digital 3D con presencia realista: expresiones faciales, mirada, parpadeo, gestos y sincronización labial. Pensada para hospitality, turismo, marca y atención premium.',
@@ -36,14 +44,14 @@ const AVATARS: Avatar[] = [
     note: '📍 Próxima parada: estaremos con Joy en el TIS Sevilla (Tourism Innovation Summit), con un mapa interactivo del recinto diseñado en exclusiva para ellos.',
   },
   {
-    num: '03', name: 'Toby', accent: C.gold,
+    num: '04', name: 'Toby', accent: C.gold,
     image: '/avatares/toby.png',
     imagePosition: 'center 30%',
     desc: 'Personaje robótico generado proceduralmente, con ojos y núcleo luminosos y animaciones propias. Latencia casi cero y capaz de hablar en más de 50 idiomas en tiempo real.',
     tags: ['Industria y tecnología', 'Educación', '+50 idiomas', 'Latencia casi cero'],
   },
   {
-    num: '04', name: 'Velázquez', accent: C.purple,
+    num: '05', name: 'Velázquez', accent: C.purple,
     image: '/avatares/velazquez.png',
     desc: 'Personaje de marca a medida: embajador corporativo o histórico. Personalidad, vestuario, colores, entorno y tono se diseñan a medida de cada cliente.',
     tags: ['Personajes a medida', 'Museos y cultura', 'Marca e institucional', 'Eventos'],
@@ -63,6 +71,74 @@ function SoundIcon({ muted }: { muted: boolean }) {
       <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
       <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
     </svg>
+  )
+}
+
+function PlayIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  )
+}
+
+function YoutubeMedia({ a }: { a: Avatar & { youtube: { cas: string; eng: string } } }) {
+  const [lang, setLang] = useState<'cas' | 'eng'>('cas')
+  const [playing, setPlaying] = useState(false)
+  const videoId = a.youtube[lang]
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl"
+      style={{
+        aspectRatio: '4 / 5',
+        border: `1px solid ${a.accent}40`,
+        boxShadow: `0 0 50px ${a.accent}25, 0 20px 50px rgba(0,0,0,0.5)`,
+        background: '#000',
+      }}>
+      {playing ? (
+        <iframe
+          key={videoId}
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1`}
+          title={`Vídeo de ${a.name}`}
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 w-full h-full border-0" />
+      ) : (
+        <button onClick={() => setPlaying(true)}
+          className="absolute inset-0 w-full h-full"
+          style={{ border: 'none', cursor: 'pointer', padding: 0, background: 'none' }}
+          aria-label={`Reproducir vídeo de ${a.name}`}>
+          <img src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`} alt=""
+            className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: 'center 15%' }} />
+          <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, transparent 55%, rgba(5,7,13,0.75) 100%)` }} />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="w-16 h-16 rounded-full flex items-center justify-center"
+              style={{ background: `${a.accent}CC`, color: '#05070D', boxShadow: `0 0 30px ${a.accent}80` }}>
+              <PlayIcon />
+            </span>
+          </div>
+        </button>
+      )}
+
+      <span className="absolute bottom-4 left-5 font-black pointer-events-none" style={{ fontSize: 42, color: `${a.accent}55`, letterSpacing: '-0.03em' }}>
+        {a.num}
+      </span>
+
+      <div className="absolute top-3 right-3 flex rounded-full overflow-hidden"
+        style={{ border: `1px solid ${C.border}`, background: 'rgba(5,7,13,0.6)', backdropFilter: 'blur(6px)' }}>
+        {(['cas', 'eng'] as const).map(l => (
+          <button key={l} onClick={() => { setLang(l); setPlaying(false) }}
+            style={{
+              padding: '6px 12px', fontSize: 11, fontWeight: 800, letterSpacing: '0.04em',
+              border: 'none', cursor: 'pointer',
+              background: lang === l ? a.accent : 'transparent',
+              color: lang === l ? '#05070D' : C.white,
+            }}>
+            {l.toUpperCase()}
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -90,6 +166,8 @@ function AvatarMedia({ a }: { a: Avatar }) {
     if (!v.muted) v.play().catch(() => {})
     setMuted(v.muted)
   }
+
+  if (a.youtube) return <YoutubeMedia a={a as Avatar & { youtube: { cas: string; eng: string } }} />
 
   return (
     <div ref={ref} className="relative overflow-hidden rounded-2xl"
@@ -182,7 +260,7 @@ export default function AvataresPage() {
           Presencia digital que <span style={{ color: C.blue }}>habla, mira y conecta</span>
         </h1>
         <p className="relative mt-5" style={{ color: C.gray, fontSize: 'clamp(0.95rem,1.3vw,1.15rem)', maxWidth: 620 }}>
-          Cuatro avatares listos para llevar a tu evento, stand o espacio. Cuéntanos tu proyecto y te mostramos cuál encaja mejor — y si quieres, lo pruebas en directo.
+          Cinco avatares listos para llevar a tu evento, stand o espacio. Cuéntanos tu proyecto y te mostramos cuál encaja mejor — y si quieres, lo pruebas en directo.
         </p>
         <div className="relative flex flex-wrap items-center justify-center gap-4 mt-8">
           <button onClick={() => openContact()}

@@ -36,6 +36,7 @@ const SERVICES: {
   num: string; id: string; title: string; cardDesc: string; subtitle: string;
   desc: string; tags: string[]; accent: string; glow: string; Icon: LucideIcon
   reel: string | null   // drop any .mp4 in /public and put its path here e.g. '/reel-01.mp4'
+  categoryHref?: string; categoryLabel?: string   // boton grande hacia la pagina dedicada de la categoria
 }[] = [
   {
     num: '01', id: 'avatares', Icon: ScanRingIcon as typeof Cpu,
@@ -46,6 +47,7 @@ const SERVICES: {
     tags: ['Ferias y exposiciones', 'Centros comerciales', 'Eventos corporativos', 'Presentador virtual', 'Multilingüe', 'Conectado a marca'],
     accent: '#00B8FF', glow: 'rgba(0,184,255,0.3)',
     reel: '/Avatares IA.mp4',
+    categoryHref: '/avatares', categoryLabel: 'Conoce a nuestros avatares',
   },
   {
     num: '02', id: 'instalaciones', Icon: Cpu,
@@ -783,9 +785,9 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
           transition: logoVisible ? 'opacity 0.9s ease 0.2s' : 'opacity 0.35s ease',
         }}>
           <img
-            src="/MAIGIA-LOGO-V1.png"
-            alt="MAIGIA"
-            style={{ height: 'clamp(90px, 13vw, 180px)', width: 'auto', objectFit: 'contain',
+            src="/maigia-logo-girasomnis.png"
+            alt="MAIGIA by Girasomnis"
+            style={{ height: 'clamp(100px, 15vw, 200px)', width: 'auto', objectFit: 'contain',
               filter: 'drop-shadow(0 0 40px rgba(0,184,255,0.75)) drop-shadow(0 0 20px rgba(0,184,255,0.4))' }}
           />
           <h1 style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>
@@ -803,7 +805,18 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
             textShadow: `0 0 20px rgba(0,184,255,0.7), 0 0 40px rgba(0,184,255,0.3)`,
             margin: 0,
           }}>
-            AI Agency for<br />Extraordinary Experiences
+            Artificial Intelligence for<br />Events, Brands &amp; Culture.
+          </p>
+          <p style={{
+            color: C.gray,
+            fontSize: 'clamp(0.7rem, 0.95vw, 0.85rem)',
+            fontWeight: 500,
+            textAlign: 'center',
+            lineHeight: 1.6,
+            maxWidth: 340,
+            margin: 0,
+          }}>
+            Avatares, agentes y experiencias inteligentes que hablan, ven, reaccionan y conectan el mundo físico con el digital.
           </p>
         </div>
 
@@ -1528,17 +1541,32 @@ export default function AiaSomnisPage() {
                       {/* tags — typewriter reveal on scroll */}
                       <TypewriterTags tags={s.tags} accent={s.accent} />
 
-                      {s.id === 'avatares' && (
-                        <a href="/avatares"
-                          className="inline-flex items-center gap-2 self-start mt-1 transition-all duration-300"
+                      {s.categoryHref && (
+                        <motion.a href={s.categoryHref}
+                          className="inline-flex items-center gap-2.5 self-start mt-2"
                           style={{
-                            color: s.accent, fontSize: '0.85rem', fontWeight: 700,
-                            textDecoration: 'none', letterSpacing: '0.02em',
+                            color: '#05070D', background: s.accent,
+                            fontSize: '0.95rem', fontWeight: 800, letterSpacing: '0.02em',
+                            textDecoration: 'none', borderRadius: 999,
+                            padding: '14px 26px',
                           }}
-                          onMouseEnter={e => (e.currentTarget.style.gap = '10px')}
-                          onMouseLeave={e => (e.currentTarget.style.gap = '8px')}>
-                          Conoce a nuestros avatares →
-                        </a>
+                          animate={{
+                            boxShadow: [
+                              `0 0 0px ${s.accent}00`,
+                              `0 0 26px ${s.accent}99`,
+                              `0 0 0px ${s.accent}00`,
+                            ],
+                          }}
+                          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.97 }}>
+                          {s.categoryLabel}
+                          <motion.span
+                            animate={{ x: [0, 5, 0] }}
+                            transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}>
+                            →
+                          </motion.span>
+                        </motion.a>
                       )}
                     </div>
 
