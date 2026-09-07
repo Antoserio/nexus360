@@ -47,15 +47,20 @@ export function CursorParticles() {
         p.vy -= 0.03  // leve flotación hacia arriba
         const t = p.life / p.maxLife
         const alpha = Math.max(0, (1 - t) * 0.85)
+        // Sin shadowBlur (caro por-particula-por-frame) — un halo dibujado
+        // aparte, mas grande y transparente, da un brillo parecido mucho mas barato.
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.r * (1 - t * 0.4) * 2.4, 0, Math.PI * 2)
+        ctx.fillStyle = p.color
+        ctx.globalAlpha = alpha * 0.3
+        ctx.fill()
+
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.r * (1 - t * 0.4), 0, Math.PI * 2)
         ctx.fillStyle = p.color
         ctx.globalAlpha = alpha
-        ctx.shadowBlur = 8
-        ctx.shadowColor = p.color
         ctx.fill()
         ctx.globalAlpha = 1
-        ctx.shadowBlur = 0
         if (p.life >= p.maxLife) particles.splice(i, 1)
       }
 

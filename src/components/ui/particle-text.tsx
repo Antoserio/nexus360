@@ -38,6 +38,7 @@ export const ParticleText = memo(function ParticleText({
   const particles  = useRef<Particle[]>([])
   const raf        = useRef(0)
   const size       = useRef({ w: 0, h: 0 })
+  const visible    = useRef(true)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -105,7 +106,12 @@ export const ParticleText = memo(function ParticleText({
     }
 
     // ── animation loop ─────────────────────────────────────────────────────
+    // Nunca se pausaba al hacer scroll fuera de la seccion: seguia dibujando
+    // miles de particulas, cada una con shadowBlur (el operador de canvas mas
+    // caro que hay), en cada frame, todo el tiempo que el usuario estuviera
+    // en la home. Ahora se detiene del todo cuando la seccion no es visible.
     function draw() {
+      if (!visible.current) { raf.current = 0; return }
       raf.current = requestAnimationFrame(draw)
       const { w, h } = size.current
       if (w < 2 || h < 2 || particles.current.length === 0) return
@@ -144,16 +150,22 @@ export const ParticleText = memo(function ParticleText({
         const twinkle = 0.55 + 0.45 * Math.sin(p.twinklePhase)
         const r = particleSize * p.sizeMul
 
+        // Sin shadowBlur: con miles de particulas, ese blur por-particula-por-
+        // frame era el coste dominante de toda la seccion. Un halo mas grande
+        // y mas transparente da un brillo parecido por una fraccion del coste.
+        ctx!.globalAlpha = twinkle * 0.35
+        ctx!.fillStyle = p.color
+        ctx!.beginPath()
+        ctx!.arc(p.x, p.y, r * 2.2, 0, Math.PI * 2)
+        ctx!.fill()
+
         ctx!.globalAlpha = twinkle
-        ctx!.shadowBlur = r * 4
-        ctx!.shadowColor = p.color
         ctx!.fillStyle = p.color
         ctx!.beginPath()
         ctx!.arc(p.x, p.y, r, 0, Math.PI * 2)
         ctx!.fill()
       }
       ctx!.globalAlpha = 1
-      ctx!.shadowBlur = 0
     }
 
     const initId = requestAnimationFrame(() => {
@@ -163,6 +175,18 @@ export const ParticleText = memo(function ParticleText({
 
     const ro = new ResizeObserver(resize)
     ro.observe(canvas!.parentElement ?? canvas!)
+
+    // Solo anima mientras la seccion esta realmente cerca del viewport —
+    // con esto deja de gastar CPU/GPU en cuanto el usuario baja hacia
+    // Servicios/Proyectos y ya no vuelve a esta seccion.
+    const vis = new IntersectionObserver(([e]) => {
+      const wasVisible = visible.current
+      visible.current = e.isIntersecting
+      if (e.isIntersecting && !wasVisible && raf.current === 0) {
+        raf.current = requestAnimationFrame(draw)
+      }
+    }, { rootMargin: '200px' })
+    vis.observe(canvas)
 
     // ── Pointer events (mouse + touch) ────────────────────────────────────
     // For touch: only track if the user deliberately presses the canvas,
@@ -194,6 +218,7 @@ export const ParticleText = memo(function ParticleText({
       cancelAnimationFrame(initId)
       cancelAnimationFrame(raf.current)
       ro.disconnect()
+      vis.disconnect()
       canvas.removeEventListener('pointerdown',  onPointerDown)
       canvas.removeEventListener('pointermove',  onPointerMove)
       canvas.removeEventListener('pointerup',    onPointerUp)
