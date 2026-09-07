@@ -748,6 +748,20 @@ function StickyRobotSection({ ready, lang }: { ready: boolean; lang: Lang }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress: p } = useScroll({ target: wrapperRef, offset: ['start start', 'end end'] })
   const [logoVisible, setLogoVisible] = useState(false)
+  const [robotInView, setRobotInView] = useState(false)
+
+  // El robot 3D (Spline) pesa ~2MB — sin este observer, el <Suspense> de abajo
+  // dispara el import() en cuanto isDesktop pasa a true (justo tras el primer
+  // paint), aunque el usuario nunca llegue a bajar hasta esta seccion.
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setRobotInView(true); obs.disconnect() }
+    }, { rootMargin: '800px' })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   // Logo aparece cuando ready=true, desaparece cuando las cards empiezan a llegar
   useEffect(() => { if (ready) setLogoVisible(true) }, [ready])
@@ -795,17 +809,21 @@ function StickyRobotSection({ ready, lang }: { ready: boolean; lang: Lang }) {
           height: 'clamp(320px, 55vw, 700px)',
           zIndex: 1,
         }}>
-          <Suspense fallback={
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div className="w-12 h-12 rounded-full border-2 border-transparent animate-spin"
-                style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
-            </div>
-          }>
-            <Spline
-              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-              style={{ width: '100%', height: '100%' }}
-            />
-          </Suspense>
+          {robotInView ? (
+            <Suspense fallback={
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="w-12 h-12 rounded-full border-2 border-transparent animate-spin"
+                  style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
+              </div>
+            }>
+              <Spline
+                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                style={{ width: '100%', height: '100%' }}
+              />
+            </Suspense>
+          ) : (
+            <div style={{ width: '100%', height: '100%' }} />
+          )}
         </motion.div>
 
         {/* Logo MAIGIA + tagline — aparece al cargar, se desvanece antes de que lleguen las cards */}
@@ -1386,7 +1404,7 @@ export default function AiaSomnisPage() {
             position: 'relative',
             pointerEvents: 'auto',
           }}>
-            {splineInView && splineReady ? (
+            {!isDesktop && splineInView && splineReady ? (
               <Suspense fallback={
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
