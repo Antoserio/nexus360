@@ -2041,6 +2041,22 @@ export default function AiaSomnisPage() {
             </a>
           </span>
         </div>
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
+          style={{ marginTop: 28, paddingTop: 24, borderTop: `1px solid ${C.border}` }}>
+          {[
+            { href: '/aviso-legal', label: { es: 'Aviso legal', en: 'Legal notice' } },
+            { href: '/politica-privacidad', label: { es: 'Política de privacidad', en: 'Privacy policy' } },
+            { href: '/politica-cookies', label: { es: 'Política de cookies', en: 'Cookie policy' } },
+          ].map(link => (
+            <a key={link.href} href={link.href}
+              className="text-xs transition-colors duration-300"
+              style={{ color: C.border, textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.color = C.gray)}
+              onMouseLeave={e => (e.currentTarget.style.color = C.border)}>
+              {link.label[lang]}
+            </a>
+          ))}
+        </div>
       </footer>
 
       {/* ══════════ CONTACT MODAL ══════════ */}
