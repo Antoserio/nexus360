@@ -350,6 +350,14 @@
     }
   });
 
+  document.body.addEventListener('click', function (e) {
+    var brand = e.target.closest('a.av-brand-mark');
+    if (brand) {
+      e.preventDefault();
+      window.location.href = '/';
+    }
+  });
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var data = new URLSearchParams(new FormData(form)).toString();
