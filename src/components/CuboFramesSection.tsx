@@ -7,13 +7,15 @@ export function CuboFramesSection({ lang }: { lang: Lang }) {
   const [textOpacity, setTextOpacity] = useState(0)
   const [canPlay, setCanPlay] = useState(false)
 
-  // Solo carga el video (38MB) cuando el usuario se acerca a la seccion
+  // Solo carga el video cuando el usuario se acerca a la seccion — rootMargin
+  // generoso (600px) disparaba la carga casi al llegar a la pagina, porque
+  // esta seccion no esta tan lejos del top como parece por su altura (900vh)
   useEffect(() => {
     const el = wrapperRef.current
     if (!el) return
     const obs = new IntersectionObserver(([e]) => {
       if (e.isIntersecting) { setCanPlay(true); obs.disconnect() }
-    }, { rootMargin: '600px' })
+    }, { rootMargin: '150px' })
     obs.observe(el)
     return () => obs.disconnect()
   }, [])
