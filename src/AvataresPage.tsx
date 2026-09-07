@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { GlowCursor, CursorParticles } from './components/GlowCursor'
+import { useLang, type Lang } from '@/lib/lang'
+import { LangToggle } from '@/components/LangToggle'
 
 const C = {
   bg: '#05070D', blue: '#00B8FF', cyan: '#22D3FF',
   deep: '#1B3DFF', gold: '#FFD42A', goldSoft: '#F6B93B', purple: '#7B2FFF',
   white: '#F4F7FB', gray: '#AAB3C2', border: '#223044',
 }
+
+type T = { es: string; en: string }
 
 interface Avatar {
   num: string
@@ -15,9 +19,9 @@ interface Avatar {
   imagePosition?: string
   video?: string
   youtube?: { cas: string; eng: string }
-  desc: string
-  tags: string[]
-  note?: string
+  desc: T
+  tags: T[]
+  note?: T
 }
 
 const AVATARS: Avatar[] = [
@@ -25,36 +29,79 @@ const AVATARS: Avatar[] = [
     num: '01', name: 'Viky · Girasomnis', accent: C.blue,
     image: '/avatares/viky.jpg',
     youtube: { cas: 'W0EKcrfuCL8', eng: 'qmQq8Bkq_TY' },
-    desc: 'Avatar conversacional interactivo para eventos, marcas y espacios corporativos. Reel de presentación con contenido LED de alta gama, disponible en español e inglés.',
-    tags: ['Conversación en vivo', 'Multilingüe', 'Presencia en eventos', 'Captación de leads'],
+    desc: {
+      es: 'Avatar conversacional interactivo para eventos, marcas y espacios corporativos. Reel de presentación con contenido LED de alta gama, disponible en español e inglés.',
+      en: 'Interactive conversational avatar for events, brands and corporate spaces. Presentation reel with high-end LED content, available in Spanish and English.',
+    },
+    tags: [
+      { es: 'Conversación en vivo', en: 'Live conversation' },
+      { es: 'Multilingüe', en: 'Multilingual' },
+      { es: 'Presencia en eventos', en: 'Event presence' },
+      { es: 'Captación de leads', en: 'Lead capture' },
+    ],
   },
   {
     num: '02', name: 'Viky · DES', accent: C.blue,
     image: '/avatares/viky.jpg',
     video: '/avatares/viky-des.mp4',
-    desc: 'Viky ha conversado en tiempo real con cientos de personas sobre el escenario de DES Málaga 2026, manteniendo más de 800 conversaciones reales con asistentes.',
-    tags: ['Conversación en vivo', 'Multilingüe', 'Presencia en eventos', 'Captación de leads'],
+    desc: {
+      es: 'Viky ha conversado en tiempo real con cientos de personas sobre el escenario de DES Málaga 2026, manteniendo más de 800 conversaciones reales con asistentes.',
+      en: 'Viky has held real-time conversations with hundreds of people on stage at DES Málaga 2026, holding more than 800 real conversations with attendees.',
+    },
+    tags: [
+      { es: 'Conversación en vivo', en: 'Live conversation' },
+      { es: 'Multilingüe', en: 'Multilingual' },
+      { es: 'Presencia en eventos', en: 'Event presence' },
+      { es: 'Captación de leads', en: 'Lead capture' },
+    ],
   },
   {
     num: '03', name: 'Joy', accent: C.cyan,
     image: '/avatares/joy.png',
     video: '/avatares/joy-hotel.mp4',
-    desc: 'Humano digital 3D con presencia realista: expresiones faciales, mirada, parpadeo, gestos y sincronización labial. Pensada para hospitality, turismo, marca y atención premium.',
-    tags: ['Hospitality y turismo', 'Atención premium', 'Recepción y showrooms', 'Multilingüe'],
-    note: '📍 Próxima parada: estaremos con Joy en el TIS Sevilla (Tourism Innovation Summit), con un mapa interactivo del recinto diseñado en exclusiva para ellos.',
+    desc: {
+      es: 'Humano digital 3D con presencia realista: expresiones faciales, mirada, parpadeo, gestos y sincronización labial. Pensada para hospitality, turismo, marca y atención premium.',
+      en: 'A 3D digital human with a realistic presence: facial expressions, gaze, blinking, gestures and lip sync. Designed for hospitality, tourism, branding and premium guest care.',
+    },
+    tags: [
+      { es: 'Hospitality y turismo', en: 'Hospitality & tourism' },
+      { es: 'Atención premium', en: 'Premium guest care' },
+      { es: 'Recepción y showrooms', en: 'Reception & showrooms' },
+      { es: 'Multilingüe', en: 'Multilingual' },
+    ],
+    note: {
+      es: '📍 Próxima parada: estaremos con Joy en el TIS Sevilla (Tourism Innovation Summit), con un mapa interactivo del recinto diseñado en exclusiva para ellos.',
+      en: '📍 Next stop: we\'ll be with Joy at TIS Sevilla (Tourism Innovation Summit), with an interactive venue map designed exclusively for them.',
+    },
   },
   {
     num: '04', name: 'Toby', accent: C.gold,
     image: '/avatares/toby.png',
     imagePosition: 'center 30%',
-    desc: 'Personaje robótico generado proceduralmente, con ojos y núcleo luminosos y animaciones propias. Latencia casi cero y capaz de hablar en más de 50 idiomas en tiempo real.',
-    tags: ['Industria y tecnología', 'Educación', '+50 idiomas', 'Latencia casi cero'],
+    desc: {
+      es: 'Personaje robótico generado proceduralmente, con ojos y núcleo luminosos y animaciones propias. Latencia casi cero y capaz de hablar en más de 50 idiomas en tiempo real.',
+      en: 'A procedurally generated robotic character, with glowing eyes and core and its own animations. Near-zero latency and able to speak in more than 50 languages in real time.',
+    },
+    tags: [
+      { es: 'Industria y tecnología', en: 'Industry & technology' },
+      { es: 'Educación', en: 'Education' },
+      { es: '+50 idiomas', en: '50+ languages' },
+      { es: 'Latencia casi cero', en: 'Near-zero latency' },
+    ],
   },
   {
     num: '05', name: 'Velázquez', accent: C.purple,
     image: '/avatares/velazquez.png',
-    desc: 'Personaje de marca a medida: embajador corporativo o histórico. Personalidad, vestuario, colores, entorno y tono se diseñan a medida de cada cliente.',
-    tags: ['Personajes a medida', 'Museos y cultura', 'Marca e institucional', 'Eventos'],
+    desc: {
+      es: 'Personaje de marca a medida: embajador corporativo o histórico. Personalidad, vestuario, colores, entorno y tono se diseñan a medida de cada cliente.',
+      en: 'A custom brand character: corporate or historical ambassador. Personality, wardrobe, colours, setting and tone are all designed to each client\'s needs.',
+    },
+    tags: [
+      { es: 'Personajes a medida', en: 'Custom characters' },
+      { es: 'Museos y cultura', en: 'Museums & culture' },
+      { es: 'Marca e institucional', en: 'Brand & institutional' },
+      { es: 'Eventos', en: 'Events' },
+    ],
   },
 ]
 
@@ -82,10 +129,10 @@ function PlayIcon() {
   )
 }
 
-function YoutubeMedia({ a }: { a: Avatar & { youtube: { cas: string; eng: string } } }) {
-  const [lang, setLang] = useState<'cas' | 'eng'>('cas')
+function YoutubeMedia({ a, lang }: { a: Avatar & { youtube: { cas: string; eng: string } }; lang: Lang }) {
+  const [videoLang, setVideoLang] = useState<'cas' | 'eng'>('cas')
   const [playing, setPlaying] = useState(false)
-  const videoId = a.youtube[lang]
+  const videoId = a.youtube[videoLang]
 
   return (
     <div className="relative overflow-hidden rounded-2xl"
@@ -99,7 +146,7 @@ function YoutubeMedia({ a }: { a: Avatar & { youtube: { cas: string; eng: string
         <iframe
           key={videoId}
           src={`https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=1`}
-          title={`Vídeo de ${a.name}`}
+          title={lang === 'es' ? `Vídeo de ${a.name}` : `${a.name} video`}
           allow="autoplay; encrypted-media; picture-in-picture"
           allowFullScreen
           className="absolute inset-0 w-full h-full border-0" />
@@ -107,7 +154,7 @@ function YoutubeMedia({ a }: { a: Avatar & { youtube: { cas: string; eng: string
         <button onClick={() => setPlaying(true)}
           className="absolute inset-0 w-full h-full"
           style={{ border: 'none', cursor: 'pointer', padding: 0, background: 'none' }}
-          aria-label={`Reproducir vídeo de ${a.name}`}>
+          aria-label={lang === 'es' ? `Reproducir vídeo de ${a.name}` : `Play ${a.name} video`}>
           <img src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`} alt=""
             className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: 'center 15%' }} />
           <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, transparent 55%, rgba(5,7,13,0.75) 100%)` }} />
@@ -127,12 +174,12 @@ function YoutubeMedia({ a }: { a: Avatar & { youtube: { cas: string; eng: string
       <div className="absolute top-3 right-3 flex rounded-full overflow-hidden"
         style={{ border: `1px solid ${C.border}`, background: 'rgba(5,7,13,0.6)', backdropFilter: 'blur(6px)' }}>
         {(['cas', 'eng'] as const).map(l => (
-          <button key={l} onClick={() => { setLang(l); setPlaying(false) }}
+          <button key={l} onClick={() => { setVideoLang(l); setPlaying(false) }}
             style={{
               padding: '6px 12px', fontSize: 11, fontWeight: 800, letterSpacing: '0.04em',
               border: 'none', cursor: 'pointer',
-              background: lang === l ? a.accent : 'transparent',
-              color: lang === l ? '#05070D' : C.white,
+              background: videoLang === l ? a.accent : 'transparent',
+              color: videoLang === l ? '#05070D' : C.white,
             }}>
             {l.toUpperCase()}
           </button>
@@ -142,7 +189,7 @@ function YoutubeMedia({ a }: { a: Avatar & { youtube: { cas: string; eng: string
   )
 }
 
-function AvatarMedia({ a }: { a: Avatar }) {
+function AvatarMedia({ a, lang }: { a: Avatar; lang: Lang }) {
   const ref = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [canPlay, setCanPlay] = useState(false)
@@ -167,7 +214,7 @@ function AvatarMedia({ a }: { a: Avatar }) {
     setMuted(v.muted)
   }
 
-  if (a.youtube) return <YoutubeMedia a={a as Avatar & { youtube: { cas: string; eng: string } }} />
+  if (a.youtube) return <YoutubeMedia a={a as Avatar & { youtube: { cas: string; eng: string } }} lang={lang} />
 
   return (
     <div ref={ref} className="relative overflow-hidden rounded-2xl"
@@ -185,7 +232,7 @@ function AvatarMedia({ a }: { a: Avatar }) {
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
       ) : (
-        <img src={a.image} alt={`Avatar ${a.name}`} loading="lazy"
+        <img src={a.image} alt={lang === 'es' ? `Avatar ${a.name}` : `${a.name} avatar`} loading="lazy"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
       )}
@@ -196,7 +243,7 @@ function AvatarMedia({ a }: { a: Avatar }) {
       </span>
       {a.video && canPlay && (
         <button onClick={toggleSound}
-          aria-label={muted ? 'Activar sonido' : 'Silenciar'}
+          aria-label={muted ? (lang === 'es' ? 'Activar sonido' : 'Unmute') : (lang === 'es' ? 'Silenciar' : 'Mute')}
           className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center"
           style={{
             background: 'rgba(5,7,13,0.6)', backdropFilter: 'blur(6px)',
@@ -211,6 +258,7 @@ function AvatarMedia({ a }: { a: Avatar }) {
 }
 
 export default function AvataresPage() {
+  const [lang, setLang] = useLang()
   const [contactOpen, setContactOpen] = useState(false)
   const [formSent, setFormSent] = useState(false)
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null)
@@ -233,15 +281,16 @@ export default function AvataresPage() {
         </a>
         <div className="flex items-center gap-4 md:gap-6">
           <a href="/" style={{ color: C.gray, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>
-            ← Volver
+            {lang === 'es' ? '← Volver' : '← Back'}
           </a>
+          <LangToggle lang={lang} setLang={setLang} />
           <button onClick={() => openContact()}
             style={{
               background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white,
               boxShadow: '0 0 18px rgba(0,184,255,0.3)', border: 'none', cursor: 'pointer',
               padding: '9px 20px', borderRadius: 999, fontSize: 13, fontWeight: 700, letterSpacing: '0.03em',
             }}>
-            Contactar
+            {lang === 'es' ? 'Contactar' : 'Contact'}
           </button>
         </div>
       </header>
@@ -254,16 +303,20 @@ export default function AvataresPage() {
         }} />
         <span className="relative inline-block mb-5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
           style={{ background: 'rgba(0,184,255,0.10)', border: `1px solid rgba(0,184,255,0.35)`, color: C.blue }}>
-          Avatares IA
+          {lang === 'es' ? 'Avatares IA' : 'AI Avatars'}
         </span>
         <h1 className="relative" style={{
           fontFamily: "'Syne', sans-serif", fontWeight: 750, textTransform: 'uppercase',
           letterSpacing: '-0.03em', lineHeight: 1.05, fontSize: 'clamp(2.1rem,5vw,3.8rem)', maxWidth: 780,
         }}>
-          Presencia digital que <span style={{ color: C.blue }}>habla, mira y conecta</span>
+          {lang === 'es'
+            ? <>Presencia digital que <span style={{ color: C.blue }}>habla, mira y conecta</span></>
+            : <>A digital presence that <span style={{ color: C.blue }}>speaks, watches and connects</span></>}
         </h1>
         <p className="relative mt-5" style={{ color: C.gray, fontSize: 'clamp(0.95rem,1.3vw,1.15rem)', maxWidth: 620 }}>
-          Cinco avatares listos para llevar a tu evento, stand o espacio. Cuéntanos tu proyecto y te mostramos cuál encaja mejor — y si quieres, lo pruebas en directo.
+          {lang === 'es'
+            ? 'Cinco avatares listos para llevar a tu evento, stand o espacio. Cuéntanos tu proyecto y te mostramos cuál encaja mejor — y si quieres, lo pruebas en directo.'
+            : 'Five avatars ready to bring to your event, stand or space. Tell us about your project and we\'ll show you which one fits best — and if you like, you can try it live.'}
         </p>
         <div className="relative flex flex-wrap items-center justify-center gap-4 mt-8">
           <button onClick={() => openContact()}
@@ -272,7 +325,7 @@ export default function AvataresPage() {
               boxShadow: '0 0 24px rgba(0,184,255,0.4)', border: 'none', cursor: 'pointer',
               padding: '13px 30px', borderRadius: 999, fontSize: 14, fontWeight: 700, letterSpacing: '0.03em',
             }}>
-            Contáctanos
+            {lang === 'es' ? 'Contáctanos' : 'Contact us'}
           </button>
           <a href="#avatares-lista"
             onClick={e => { e.preventDefault(); document.getElementById('avatares-lista')?.scrollIntoView({ behavior: 'smooth' }) }}
@@ -280,7 +333,7 @@ export default function AvataresPage() {
               color: C.white, textDecoration: 'none', fontSize: 14, fontWeight: 600,
               border: `1px solid ${C.border}`, borderRadius: 999, padding: '13px 26px', cursor: 'pointer',
             }}>
-            Ver avatares ↓
+            {lang === 'es' ? 'Ver avatares ↓' : 'See avatars ↓'}
           </a>
         </div>
       </section>
@@ -296,7 +349,7 @@ export default function AvataresPage() {
 
                 {/* Imagen / vídeo */}
                 <div className="w-full md:w-[38%] shrink-0">
-                  <AvatarMedia a={a} />
+                  <AvatarMedia a={a} lang={lang} />
                 </div>
 
                 {/* Texto */}
@@ -314,7 +367,7 @@ export default function AvataresPage() {
                         fontSize: 11, fontWeight: 700, fontFamily: "'Syne', sans-serif",
                         letterSpacing: '0.15em', textTransform: 'uppercase', color: C.white,
                       }}>
-                        Avatar
+                        {lang === 'es' ? 'Avatar' : 'Avatar'}
                       </span>
                     </div>
                     <h2 style={{
@@ -326,14 +379,14 @@ export default function AvataresPage() {
                   </div>
 
                   <p className="leading-relaxed" style={{ color: C.gray, fontSize: '1rem', maxWidth: 560 }}>
-                    {a.desc}
+                    {a.desc[lang]}
                   </p>
 
                   <div className="flex flex-wrap gap-2">
                     {a.tags.map(tag => (
-                      <span key={tag} className="text-xs px-3 py-1.5 rounded-full"
+                      <span key={tag.es} className="text-xs px-3 py-1.5 rounded-full"
                         style={{ background: `${a.accent}14`, border: `1px solid ${a.accent}35`, color: a.accent }}>
-                        {tag}
+                        {tag[lang]}
                       </span>
                     ))}
                   </div>
@@ -341,7 +394,7 @@ export default function AvataresPage() {
                   {a.note && (
                     <div className="rounded-xl px-4 py-3 text-sm leading-relaxed"
                       style={{ background: `${a.accent}0F`, border: `1px solid ${a.accent}30`, color: C.white }}>
-                      {a.note}
+                      {a.note[lang]}
                     </div>
                   )}
 
@@ -351,10 +404,10 @@ export default function AvataresPage() {
                     <div>
                       <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest mb-1" style={{ color: a.accent }}>
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: a.accent }} />
-                        ¿Te lo imaginas en tu evento?
+                        {lang === 'es' ? '¿Te lo imaginas en tu evento?' : 'Can you picture it at your event?'}
                       </span>
                       <p style={{ color: C.gray, fontSize: '0.85rem' }}>
-                        Cuéntanos tu caso y, si quieres, te lo mostramos en directo.
+                        {lang === 'es' ? 'Cuéntanos tu caso y, si quieres, te lo mostramos en directo.' : 'Tell us about your case and, if you like, we\'ll show it to you live.'}
                       </p>
                     </div>
                     <button onClick={() => openContact(a.name)}
@@ -364,7 +417,7 @@ export default function AvataresPage() {
                         padding: '11px 22px', borderRadius: 999, fontSize: 13, fontWeight: 800, letterSpacing: '0.02em',
                         whiteSpace: 'nowrap',
                       }}>
-                      Solicitar info
+                      {lang === 'es' ? 'Solicitar info' : 'Request info'}
                     </button>
                   </div>
                 </div>
@@ -383,10 +436,12 @@ export default function AvataresPage() {
           fontSize: 'clamp(1.7rem,3.2vw,2.8rem)', maxWidth: 640,
           fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.04em',
         }}>
-          Una presencia digital que la gente recuerda
+          {lang === 'es' ? 'Una presencia digital que la gente recuerda' : 'A digital presence people remember'}
         </h2>
         <p className="relative mb-8" style={{ color: C.gray, maxWidth: 520 }}>
-          Diseñamos un anfitrión digital con un objetivo, una personalidad y un comportamiento pensado para tu espacio. Hablemos de tu proyecto.
+          {lang === 'es'
+            ? 'Diseñamos un anfitrión digital con un objetivo, una personalidad y un comportamiento pensado para tu espacio. Hablemos de tu proyecto.'
+            : 'We design a digital host with a purpose, a personality and a behaviour built for your space. Let\'s talk about your project.'}
         </p>
         <button onClick={() => openContact()}
           className="relative"
@@ -395,7 +450,7 @@ export default function AvataresPage() {
             boxShadow: '0 0 28px rgba(0,184,255,0.45)', border: 'none', cursor: 'pointer',
             padding: '14px 32px', borderRadius: 999, fontSize: 15, fontWeight: 700, letterSpacing: '0.03em',
           }}>
-          Contactar ahora
+          {lang === 'es' ? 'Contactar ahora' : 'Contact now'}
         </button>
       </section>
 
@@ -419,19 +474,19 @@ export default function AvataresPage() {
                   style={{ background: 'rgba(123,47,255,0.15)', border: '1px solid #7B2FFF' }}>
                   <span style={{ fontSize: 28 }}>✓</span>
                 </div>
-                <h3 className="text-xl" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>¡Mensaje enviado!</h3>
-                <p style={{ color: C.gray }}>Te responderemos lo antes posible.</p>
+                <h3 className="text-xl" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>{lang === 'es' ? '¡Mensaje enviado!' : 'Message sent!'}</h3>
+                <p style={{ color: C.gray }}>{lang === 'es' ? 'Te responderemos lo antes posible.' : 'We\'ll get back to you as soon as possible.'}</p>
                 <button onClick={() => { setContactOpen(false); setFormSent(false) }}
                   className="mt-2 px-6 py-2 rounded-full text-sm font-bold"
                   style={{ background: 'linear-gradient(135deg,#7B2FFF,#1B3DFF)', color: C.white, border: 'none', cursor: 'pointer' }}>
-                  Cerrar
+                  {lang === 'es' ? 'Cerrar' : 'Close'}
                 </button>
               </div>
             ) : (
               <>
                 <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 64, objectFit: 'contain', marginBottom: 20 }} />
-                <h2 className="text-2xl mb-1" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>Cuéntanos tu proyecto</h2>
-                <p className="text-sm mb-6" style={{ color: C.gray }}>Responderemos en menos de 24h.</p>
+                <h2 className="text-2xl mb-1" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>{lang === 'es' ? 'Cuéntanos tu proyecto' : 'Tell us about your project'}</h2>
+                <p className="text-sm mb-6" style={{ color: C.gray }}>{lang === 'es' ? 'Responderemos en menos de 24h.' : 'We\'ll reply within 24h.'}</p>
 
                 <form
                   name="contacto-aiasomnis"
@@ -458,8 +513,8 @@ export default function AvataresPage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Nombre</label>
-                      <input name="nombre" required placeholder="Tu nombre"
+                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Nombre' : 'Name'}</label>
+                      <input name="nombre" required placeholder={lang === 'es' ? 'Tu nombre' : 'Your name'}
                         className="rounded-xl px-4 py-3 text-sm outline-none"
                         style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }} />
                     </div>
@@ -472,24 +527,24 @@ export default function AvataresPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Tipo de proyecto</label>
+                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Tipo de proyecto' : 'Project type'}</label>
                     <select name="tipo" defaultValue="Avatar IA"
                       style={{ background: '#0D1829', border: `1px solid ${C.border}`, color: C.white }}
                       className="rounded-xl px-4 py-3 text-sm outline-none">
-                      <option value="">Selecciona una opción</option>
-                      <option>Avatar IA</option>
-                      <option>Instalación interactiva</option>
-                      <option>Producción audiovisual con IA</option>
-                      <option>Solución digital / Web</option>
-                      <option>Otro</option>
+                      <option value="">{lang === 'es' ? 'Selecciona una opción' : 'Select an option'}</option>
+                      <option>{lang === 'es' ? 'Avatar IA' : 'AI Avatar'}</option>
+                      <option>{lang === 'es' ? 'Instalación interactiva' : 'Interactive installation'}</option>
+                      <option>{lang === 'es' ? 'Producción audiovisual con IA' : 'AI audiovisual production'}</option>
+                      <option>{lang === 'es' ? 'Solución digital / Web' : 'Digital solution / Website'}</option>
+                      <option>{lang === 'es' ? 'Otro' : 'Other'}</option>
                     </select>
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Cuéntanos tu idea</label>
+                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Cuéntanos tu idea' : 'Tell us your idea'}</label>
                     <textarea name="mensaje" required rows={4}
-                      defaultValue={selectedAvatar ? `Me interesa el avatar ${selectedAvatar} para mi evento/espacio. ` : ''}
-                      placeholder="Describe tu proyecto, evento, marca o lo que necesitas..."
+                      defaultValue={selectedAvatar ? (lang === 'es' ? `Me interesa el avatar ${selectedAvatar} para mi evento/espacio. ` : `I'm interested in the ${selectedAvatar} avatar for my event/space. `) : ''}
+                      placeholder={lang === 'es' ? 'Describe tu proyecto, evento, marca o lo que necesitas...' : 'Describe your project, event, brand or what you need...'}
                       className="rounded-xl px-4 py-3 text-sm outline-none resize-none"
                       style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }} />
                   </div>
@@ -500,7 +555,7 @@ export default function AvataresPage() {
                       border: 'none', cursor: 'pointer', padding: '13px', borderRadius: 999,
                       fontSize: 14, fontWeight: 700, letterSpacing: '0.03em', marginTop: 4,
                     }}>
-                    Enviar mensaje
+                    {lang === 'es' ? 'Enviar mensaje' : 'Send message'}
                   </button>
                 </form>
               </>

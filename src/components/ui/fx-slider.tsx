@@ -19,6 +19,7 @@ export interface SliderItem {
 interface FxSliderProps {
   items: SliderItem[]
   headerText?: string
+  categoryLabel?: string
   duration?: number
   parallaxAmount?: number
 }
@@ -60,7 +61,7 @@ function GlitchFlash({ show }: { show: boolean }) {
   )
 }
 
-export function FxSlider({ items, headerText = 'Proyectos', duration = 0.55 }: FxSliderProps) {
+export function FxSlider({ items, headerText = 'Proyectos', categoryLabel = 'Categoría', duration = 0.55 }: FxSliderProps) {
   const [current, setCurrent] = useState(0)
   const [dir, setDir] = useState<'down' | 'up'>('down')
   const [locked, setLocked] = useState(false)
@@ -151,7 +152,7 @@ export function FxSlider({ items, headerText = 'Proyectos', duration = 0.55 }: F
       <div className="hidden lg:flex absolute right-0 inset-y-0 flex-col justify-center items-end z-10"
         style={{ padding: '0 2.5rem', width: 260 }}>
         <div className="mb-5 text-right">
-          <span className="text-xs uppercase tracking-[0.3em]" style={{ color: C.blue }}>Categoría</span>
+          <span className="text-xs uppercase tracking-[0.3em]" style={{ color: C.blue }}>{categoryLabel}</span>
         </div>
         <div className="flex flex-col gap-0.5 items-end">
           {items.map((item, i) => (

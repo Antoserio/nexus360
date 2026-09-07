@@ -156,60 +156,100 @@
 }
 
 </style>
-<div id="mg-contact-overlay">
-  <div class="mg-backdrop" data-mg-close="1"></div>
-  <div class="mg-modal">
-    <button class="mg-close" type="button" data-mg-close="1">&#10005;</button>
-    <div class="mg-form-view">
-      <img class="mg-logo" src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" />
-      <h2>Cuéntanos tu proyecto</h2>
-      <p class="mg-sub">Responderemos en menos de 24h.</p>
-      <form name="contacto-aiasomnis" id="mg-contact-form">
-        <input type="hidden" name="form-name" value="contacto-aiasomnis" />
-        <div class="mg-row">
-          <div>
-            <label>Nombre</label>
-            <input name="nombre" required placeholder="Tu nombre" />
-          </div>
-          <div>
-            <label>Email</label>
-            <input name="email" type="email" required placeholder="tu@email.com" />
-          </div>
-        </div>
-        <div>
-          <label>Tipo de proyecto</label>
-          <select name="tipo">
-            <option value="">Selecciona una opción</option>
-            <option>Producción audiovisual con IA</option>
-            <option>Avatar IA</option>
-            <option>Instalación interactiva</option>
-            <option>Solución digital / Web</option>
-            <option>Otro</option>
-          </select>
-        </div>
-        <div>
-          <label>Cuéntanos tu idea</label>
-          <textarea name="mensaje" required rows="4" placeholder="Describe tu proyecto, evento, marca o lo que necesitas..."></textarea>
-        </div>
-        <button type="submit">Enviar mensaje</button>
-      </form>
-    </div>
-    <div class="mg-sent" style="display:none">
-      <div class="mg-check">&#10003;</div>
-      <h2>¡Mensaje enviado!</h2>
-      <p class="mg-sub" style="margin:0">Te responderemos lo antes posible.</p>
-      <button type="button" data-mg-close="1">Cerrar</button>
-    </div>
-  </div>
-</div>
+
 <script>
 (function () {
-  function init() {
+  var MG_PAIRS = [["Saltar al contenido", "Skip to content"], ["Navegación principal", "Main navigation"], ["Proyectos", "Projects"], ["Espacios", "Spaces"], ["Proceso", "Process"], ["Hablemos", "Let's talk"], ["Producción AV", "AV Production"], ["CREACIÓN CON IA", "AI-POWERED CREATION"], ["PRODUCCIÓN", "PRODUCTION"], ["Imágenes que mueven ideas.", "Images that move ideas."], ["Creamos spots, videoclips, personajes y visuales para eventos con IA generativa, dirección creativa y acabado cinematográfico.", "We create spots, music videos, characters and event visuals with generative AI, creative direction and a cinematic finish."], ["Ver proyectos", "See projects"], ["DIRECCIÓN CREATIVA", "CREATIVE DIRECTION"], ["IA GENERATIVA", "GENERATIVE AI"], ["POSTPRODUCCIÓN", "POST-PRODUCTION"], ["VISUALES PARA EVENTOS", "EVENT VISUALS"], ["Disciplinas", "Disciplines"], ["PROYECTOS SELECCIONADOS", "SELECTED PROJECTS"], ["Historias diseñadas para ser vistas.", "Stories designed to be seen."], ["De la primera imagen al máster final. Concepto, generación, continuidad, montaje, sonido y postproducción bajo una misma dirección.", "From the first image to the final master. Concept, generation, continuity, editing, sound and post-production under one direction."], ["Reproducir MAIGIA REEL", "Play MAIGIA REEL"], ["SHOWREEL · IA + CRAFT", "SHOWREEL · AI + CRAFT"], ["Una selección de mundos, personajes y narrativas creadas entre dirección humana y producción generativa.", "A selection of worlds, characters and narratives created between human direction and generative production."], ["Reproducir SPOT TIS 2026", "Play SPOT TIS 2026"], ["Un viaje audiovisual donde patrimonio, innovación y mirada de futuro comparten el mismo plano.", "An audiovisual journey where heritage, innovation and a forward-looking vision share the same frame."], ["Reproducir VIDEOCLIP", "Play VIDEOCLIP"], ["Identidad, performance y materia digital para imaginar una presencia que solo podía existir en pantalla.", "Identity, performance and digital matter to imagine a presence that could only exist on screen."], ["ESPACIOS QUE COMUNICAN", "SPACES THAT COMMUNICATE"], ["Del frame al espacio real.", "From frame to real space."], ["Diseñamos la arquitectura y el contenido como una sola experiencia: superficies, recorridos y visuales que cambian la forma de vivir una marca o un evento.", "We design architecture and content as a single experience: surfaces, journeys and visuals that change the way a brand or event is experienced."], ["DISEÑO DE STANDS", "STAND DESIGN"], ["Stands como lienzos en movimiento.", "Stands as canvases in motion."], ["Exploramos cómo una identidad visual puede ocupar pantallas, volúmenes y recorridos. Cada concepto parte del espacio y se adapta al flujo del público, la escala y el objetivo de la marca.", "We explore how a visual identity can occupy screens, volumes and pathways. Each concept starts from the space and adapts to audience flow, scale and brand objectives."], ["Usa las teclas de flecha o los botones anterior y siguiente para recorrer las imágenes.", "Use the arrow keys or the previous and next buttons to browse the images."], ["Conceptos de diseño de stands", "Stand design concepts"], ["Imagen anterior de Conceptos de diseño de stands", "Previous image of Stand design concepts"], ["Imagen siguiente de Conceptos de diseño de stands", "Next image of Stand design concepts"], ["Visualización conceptual", "Concept visualization"], ["Identidad suspendida", "Suspended identity"], ["Tecnología en exposición", "Technology on display"], ["Arquitectura de luz", "Architecture of light"], ["Recorrido inmersivo", "Immersive journey"], ["Hospitality expandida", "Expanded hospitality"], ["Producto en primer plano", "Product in the spotlight"], ["Contraste luminoso", "Luminous contrast"], ["DISEÑO DE ESCENARIOS", "STAGE DESIGN"], ["Escenarios LED a escala arquitectónica.", "LED stages at architectural scale."], ["Creamos universos visuales para pantallas panorámicas, curvas y modulares. Cada composición se diseña para el formato, la distancia de visión, el ritmo del show y la presencia de intérpretes o ponentes.", "We create visual universes for panoramic, curved and modular screens. Each composition is designed for the format, viewing distance, show pace and the presence of performers or speakers."], ["Conceptos de diseño de escenarios LED", "LED stage design concepts"], ["Imagen anterior de Conceptos de diseño de escenarios LED", "Previous image of LED stage design concepts"], ["Imagen siguiente de Conceptos de diseño de escenarios LED", "Next image of LED stage design concepts"], ["Coreografía cósmica", "Cosmic choreography"], ["Keynote envolvente", "Immersive keynote"], ["Gala de luz", "Gala of light"], ["Música en órbita", "Music in orbit"], ["Paisaje continuo", "Continuous landscape"], ["Instalación exterior", "Outdoor installation"], ["Acceso al futuro", "Gateway to the future"], ["CAPACIDADES", "CAPABILITIES"], ["Una producción. Muchos lenguajes.", "One production. Many languages."], ["Elegimos y combinamos técnicas para construir la solución exacta: desde una pieza breve hasta un sistema visual que ocupa todo un espacio.", "We choose and combine techniques to build the exact solution: from a short piece to a visual system that fills an entire space."], ["Piezas de marca con una idea clara, lenguaje cinematográfico y producción diseñada para cada canal.", "Brand pieces with a clear idea, cinematic language and production designed for each channel."], ["Videoclips & visual worlds", "Music videos & visual worlds"], ["Universos visuales, personajes y performances que amplifican la identidad sonora de cada artista.", "Visual universes, characters and performances that amplify each artist's sonic identity."], ["Visuales para eventos", "Event visuals"], ["Contenido generativo pensado para escenarios, pantallas fuera de formato e instalaciones inmersivas.", "Generative content designed for stages, out-of-format screens and immersive installations."], ["Personajes digitales", "Digital characters"], ["Presencias coherentes capaces de habitar una película, una campaña o una experiencia en tiempo real.", "Coherent presences able to inhabit a film, a campaign or a real-time experience."], ["Producción híbrida", "Hybrid production"], ["Rodaje, 3D, IA, VFX y postproducción combinados según lo que necesita la historia, no la herramienta.", "Live shoots, 3D, AI, VFX and post-production combined according to what the story needs, not the tool."], ["CÓMO TRABAJAMOS", "HOW WE WORK"], ["Del concepto al último frame.", "From concept to the last frame."], ["Concepto", "Concept"], ["Definimos la idea, el tono y el papel que debe cumplir cada imagen.", "We define the idea, the tone and the role each image must play."], ["Construimos el lenguaje visual antes de escalar la producción.", "We build the visual language before scaling production."], ["Generación", "Generation"], ["Producimos planos, personajes y entornos con control creativo.", "We produce shots, characters and environments with creative control."], ["Continuidad", "Continuity"], ["Unificamos movimiento, identidad, luz y narrativa de principio a fin.", "We unify movement, identity, light and narrative from start to finish."], ["Postproducción", "Post-production"], ["Montaje, composición, VFX, sonido, color y entrega final.", "Editing, compositing, VFX, sound, color and final delivery."], ["TU PRÓXIMO PROYECTO", "YOUR NEXT PROJECT"], ["¿Tienes una idea difícil de rodar?", "Got an idea that's hard to shoot?"], ["Cuéntanos qué quieres hacer, dónde debe vivir y qué tiene que hacer sentir. Nosotros encontraremos la forma de convertirlo en imagen.", "Tell us what you want to create, where it needs to live and what it should make people feel. We'll find the way to turn it into images."], ["Empezar una conversación", "Start a conversation"], ["MAIGIA — Inicio", "MAIGIA — Home"], ["MAIGIA — Volver al inicio", "MAIGIA — Back to home"], ["Cuéntanos tu proyecto", "Tell us about your project"], ["Responderemos en menos de 24h.", "We'll reply within 24h."], ["Nombre", "Name"], ["Tipo de proyecto", "Project type"], ["Selecciona una opción", "Select an option"], ["Producción audiovisual con IA", "AI audiovisual production"], ["Avatar IA", "AI Avatar"], ["Instalación interactiva", "Interactive installation"], ["Solución digital / Web", "Digital solution / Website"], ["Otro", "Other"], ["Cuéntanos tu idea", "Tell us your idea"], ["Enviar mensaje", "Send message"], ["¡Mensaje enviado!", "Message sent!"], ["Te responderemos lo antes posible.", "We'll get back to you as soon as possible."], ["Cerrar", "Close"], ["1 de 7", "1 of 7"], ["2 de 7", "2 of 7"], ["3 de 7", "3 of 7"], ["4 de 7", "4 of 7"], ["5 de 7", "5 of 7"], ["6 de 7", "6 of 7"], ["7 de 7", "7 of 7"]];
+  var MG_ATTR_PAIRS = [["Tu nombre", "Your name"], ["Describe tu proyecto, evento, marca o lo que necesitas...", "Describe your project, event, brand or what you need..."]];
+  var MG_KEY = 'maigia-lang';
+
+  function otherValue(pairs, current, lang) {
+    for (var i = 0; i < pairs.length; i++) {
+      var p = pairs[i];
+      if (p[0] === current) return lang === 'es' ? p[0] : p[1];
+      if (p[1] === current) return lang === 'es' ? p[0] : p[1];
+    }
+    return null;
+  }
+
+  // This static export hydrates with a client-only React app. On this
+  // particular build, hydration sometimes bails (mismatch) and does a full
+  // client re-render, which clears out any plain DOM nodes that aren't part
+  // of its own tree (like a statically-authored toggle button would be).
+  // Building the toggle via JS and re-creating it on every apply call makes
+  // it self-healing against that wipe, regardless of when it happens.
+  function ensureToggle() {
+    var el = document.getElementById('mg-lang-toggle');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'mg-lang-toggle';
+    el.style.cssText = 'position:fixed;top:12px;right:clamp(1.5rem,4vw,4rem);z-index:999998;'
+      + 'display:flex;border-radius:999px;overflow:hidden;border:1px solid #223044;'
+      + 'background:rgba(5,7,13,.6);backdrop-filter:blur(6px);'
+      + "font-family:system-ui,-apple-system,'Segoe UI',sans-serif;";
+    var btnCss = 'padding:6px 12px;font-size:11px;font-weight:800;letter-spacing:.04em;border:none;cursor:pointer;';
+    el.innerHTML = '<button type="button" data-mg-lang="es" style="' + btnCss + '">ES</button>'
+      + '<button type="button" data-mg-lang="en" style="' + btnCss + '">EN</button>';
+    el.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-mg-lang]');
+      if (!btn) return;
+      var newLang = btn.getAttribute('data-mg-lang');
+      window.localStorage.setItem(MG_KEY, newLang);
+      applyLang(newLang);
+    });
+    document.body.appendChild(el);
+    return el;
+  }
+
+  var MG_MODAL_HTML = '<div class="mg-backdrop" data-mg-close="1"></div>'
+    + '<div class="mg-modal">'
+    + '<button class="mg-close" type="button" data-mg-close="1">&#10005;</button>'
+    + '<div class="mg-form-view">'
+    + '<img class="mg-logo" src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" />'
+    + '<h2>Cuéntanos tu proyecto</h2>'
+    + '<p class="mg-sub">Responderemos en menos de 24h.</p>'
+    + '<form name="contacto-aiasomnis" id="mg-contact-form">'
+    + '<input type="hidden" name="form-name" value="contacto-aiasomnis" />'
+    + '<div class="mg-row">'
+    + '<div><label>Nombre</label><input name="nombre" required placeholder="Tu nombre" /></div>'
+    + '<div><label>Email</label><input name="email" type="email" required placeholder="tu@email.com" /></div>'
+    + '</div>'
+    + '<div><label>Tipo de proyecto</label>'
+    + '<select name="tipo">'
+    + '<option value="">Selecciona una opción</option>'
+    + '<option>Producción audiovisual con IA</option>'
+    + '<option>Avatar IA</option>'
+    + '<option>Instalación interactiva</option>'
+    + '<option>Solución digital / Web</option>'
+    + '<option>Otro</option>'
+    + '</select></div>'
+    + '<div><label>Cuéntanos tu idea</label>'
+    + '<textarea name="mensaje" required rows="4" placeholder="Describe tu proyecto, evento, marca o lo que necesitas..."></textarea></div>'
+    + '<button type="submit">Enviar mensaje</button>'
+    + '</form>'
+    + '</div>'
+    + '<div class="mg-sent" style="display:none">'
+    + '<div class="mg-check">&#10003;</div>'
+    + '<h2>¡Mensaje enviado!</h2>'
+    + '<p class="mg-sub" style="margin:0">Te responderemos lo antes posible.</p>'
+    + '<button type="button" data-mg-close="1">Cerrar</button>'
+    + '</div>';
+
+  // Same wipe risk as the toggle: rebuilt via JS and recreated on the same
+  // polling cycle so the contact modal keeps working even if a hydration
+  // failure clears it out mid-session.
+  function ensureContactModal() {
     var overlay = document.getElementById('mg-contact-overlay');
-    if (!overlay) return;
+    if (overlay) return overlay;
+
+    overlay = document.createElement('div');
+    overlay.id = 'mg-contact-overlay';
+    overlay.innerHTML = MG_MODAL_HTML;
+    document.body.appendChild(overlay);
+
     var formView = overlay.querySelector('.mg-form-view');
     var sentView = overlay.querySelector('.mg-sent');
-    var form = document.getElementById('mg-contact-form');
+    var form = overlay.querySelector('#mg-contact-form');
 
     function openModal() {
       formView.style.display = '';
@@ -219,20 +259,10 @@
     function closeModal() {
       overlay.classList.remove('mg-open');
     }
+    overlay.__mgOpen = openModal;
 
     overlay.addEventListener('click', function (e) {
       if (e.target && e.target.getAttribute('data-mg-close')) closeModal();
-    });
-
-    var targets = document.querySelectorAll('a.header-cta[href^="mailto:"], a.contact-link[href^="mailto:"]');
-
-    var brandLinks = document.querySelectorAll('a.av-brand-mark');
-    brandLinks.forEach(function (a) { a.setAttribute('href', '/'); });
-    targets.forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        e.preventDefault();
-        openModal();
-      });
     });
 
     form.addEventListener('submit', function (e) {
@@ -247,6 +277,84 @@
         sentView.style.display = '';
       });
     });
+
+    return overlay;
+  }
+
+  function applyLang(lang) {
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        var p = node.parentElement;
+        if (!p || p.tagName === 'SCRIPT' || p.tagName === 'STYLE') return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var node;
+    while ((node = walker.nextNode())) {
+      var next = otherValue(MG_PAIRS, node.nodeValue, lang);
+      if (next !== null && next !== node.nodeValue) node.nodeValue = next;
+    }
+
+    var attrEls = document.querySelectorAll('[aria-label], [placeholder]');
+    attrEls.forEach(function (el) {
+      ['aria-label', 'placeholder'].forEach(function (attr) {
+        var v = el.getAttribute(attr);
+        if (!v) return;
+        var next = otherValue(MG_PAIRS, v, lang) || otherValue(MG_ATTR_PAIRS, v, lang);
+        if (next !== null && next !== v) el.setAttribute(attr, next);
+      });
+    });
+
+    ensureContactModal();
+    var toggle = ensureToggle();
+    toggle.querySelectorAll('[data-mg-lang]').forEach(function (btn) {
+      var active = btn.getAttribute('data-mg-lang') === lang;
+      btn.style.background = active ? '#00b8ff' : 'transparent';
+      btn.style.color = active ? '#05070d' : '#f4f7fb';
+    });
+  }
+
+  function getLang() {
+    return window.localStorage.getItem(MG_KEY) === 'en' ? 'en' : 'es';
+  }
+
+  function init() {
+    applyLang(getLang());
+
+    // Event delegation on document.body: the header/main/footer links this
+    // targets can themselves get replaced by a hydration-failure rebuild, so
+    // listeners attached directly to them would be lost. document.body's own
+    // identity is stable even when its children are replaced, so delegating
+    // here keeps working regardless of how many times those links get
+    // recreated.
+    document.body.addEventListener('click', function (e) {
+      var link = e.target.closest('a.header-cta[href^="mailto:"], a.contact-link[href^="mailto:"]');
+      if (link) {
+        e.preventDefault();
+        var overlay = ensureContactModal();
+        if (overlay.__mgOpen) overlay.__mgOpen();
+        return;
+      }
+      var brand = e.target.closest('a.av-brand-mark');
+      if (brand) {
+        e.preventDefault();
+        window.location.href = '/';
+      }
+    });
+
+    // This build's hydration is flaky on a plain static export (unrelated to
+    // this toggle) and can wipe/rebuild parts of <body> more than once, at
+    // unpredictable times, as its separate lazily-loaded islands
+    // (FilmShowcase, SpatialCarousels) each attempt to hydrate. A short
+    // polling window re-applies (and re-creates the toggle if wiped) until
+    // things settle, without depending on any single DOM node reference
+    // that a full-body rebuild could leave stale.
+    var ticks = 0;
+    var timer = setInterval(function () {
+      applyLang(getLang());
+      ticks++;
+      if (ticks > 25) clearInterval(timer);
+    }, 400);
   }
 
   if (document.readyState === 'loading') {

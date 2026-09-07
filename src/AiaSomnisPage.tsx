@@ -7,6 +7,10 @@ import { ParticleText } from '@/components/ui/particle-text'
 import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
 import { Mail, MapPin, ChevronDown, Cpu, Play, Share2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { useLang, type Lang } from '@/lib/lang'
+import { LangToggle } from '@/components/LangToggle'
+
+type T = { es: string; en: string }
 
 // Heavy components loaded only when needed
 const Spline = lazy(() => import('@splinetool/react-spline'))
@@ -33,60 +37,87 @@ const ScanRingIcon = ({ size = 22, style }: { size?: number; style?: React.CSSPr
 
 // ── 4 Services ────────────────────────────────────────────────────────────────
 const SERVICES: {
-  num: string; id: string; title: string; cardDesc: string; subtitle: string;
-  desc: string; tags: string[]; accent: string; glow: string; Icon: LucideIcon
+  num: string; id: string; title: T; cardDesc: T; subtitle: T;
+  desc: T; tags: T[]; accent: string; glow: string; Icon: LucideIcon
   reel: string | null   // drop any .mp4 in /public and put its path here e.g. '/reel-01.mp4'
-  categoryHref?: string; categoryLabel?: string   // boton grande hacia la pagina dedicada de la categoria
+  categoryHref?: string; categoryLabel?: T   // boton grande hacia la pagina dedicada de la categoria
 }[] = [
   {
     num: '01', id: 'avatares', Icon: ScanRingIcon as typeof Cpu,
-    title: 'Avatares IA',
-    cardDesc: 'Avatares conversacionales para eventos, ferias y espacios físicos.',
-    subtitle: 'para eventos, ferias y espacios físicos',
-    desc: 'Creamos avatares conversacionales personalizados que pueden atender al público, presentar contenidos, responder preguntas, hablar en varios idiomas y captar leads en tiempo real.',
-    tags: ['Ferias y exposiciones', 'Centros comerciales', 'Eventos corporativos', 'Presentador virtual', 'Multilingüe', 'Conectado a marca'],
+    title: { es: 'Avatares IA', en: 'AI Avatars' },
+    cardDesc: { es: 'Avatares conversacionales para eventos, ferias y espacios físicos.', en: 'Conversational avatars for events, trade fairs and physical spaces.' },
+    subtitle: { es: 'para eventos, ferias y espacios físicos', en: 'for events, trade fairs and physical spaces' },
+    desc: { es: 'Creamos avatares conversacionales personalizados que pueden atender al público, presentar contenidos, responder preguntas, hablar en varios idiomas y captar leads en tiempo real.', en: 'We create custom conversational avatars that greet the public, present content, answer questions, speak multiple languages and capture leads in real time.' },
+    tags: [
+      { es: 'Ferias y exposiciones', en: 'Trade fairs & exhibitions' },
+      { es: 'Centros comerciales', en: 'Shopping centres' },
+      { es: 'Eventos corporativos', en: 'Corporate events' },
+      { es: 'Presentador virtual', en: 'Virtual presenter' },
+      { es: 'Multilingüe', en: 'Multilingual' },
+      { es: 'Conectado a marca', en: 'Brand-connected' },
+    ],
     accent: '#00B8FF', glow: 'rgba(0,184,255,0.3)',
     reel: '/Avatares IA.mp4',
-    categoryHref: '/avatares', categoryLabel: 'Conoce a nuestros avatares',
+    categoryHref: '/avatares', categoryLabel: { es: 'Conoce a nuestros avatares', en: 'Meet our avatars' },
   },
   {
     num: '02', id: 'instalaciones', Icon: Cpu,
-    title: 'Instalaciones interactivas',
-    cardDesc: 'Experiencias con IA, cámaras y pantallas en tiempo real.',
-    subtitle: 'con Inteligencia Artificial',
-    desc: 'Diseñamos experiencias donde el público interactúa con cámaras, pantallas, sensores y sistemas generativos, creando contenido visual en tiempo real.',
-    tags: ['Cámara + IA', 'Visuales reactivos', 'Photocalls inteligentes', 'Tótems interactivos', 'Holográfico', '360° inmersivo'],
+    title: { es: 'Instalaciones interactivas', en: 'Interactive installations' },
+    cardDesc: { es: 'Experiencias con IA, cámaras y pantallas en tiempo real.', en: 'Real-time experiences with AI, cameras and screens.' },
+    subtitle: { es: 'con Inteligencia Artificial', en: 'with Artificial Intelligence' },
+    desc: { es: 'Diseñamos experiencias donde el público interactúa con cámaras, pantallas, sensores y sistemas generativos, creando contenido visual en tiempo real.', en: 'We design experiences where the audience interacts with cameras, screens, sensors and generative systems, creating visual content in real time.' },
+    tags: [
+      { es: 'Cámara + IA', en: 'Camera + AI' },
+      { es: 'Visuales reactivos', en: 'Reactive visuals' },
+      { es: 'Photocalls inteligentes', en: 'Smart photocalls' },
+      { es: 'Tótems interactivos', en: 'Interactive totems' },
+      { es: 'Holográfico', en: 'Holographic' },
+      { es: '360° inmersivo', en: '360° immersive' },
+    ],
     accent: '#22D3FF', glow: 'rgba(34,211,255,0.28)',
+    categoryHref: '/maigiaapps/', categoryLabel: { es: 'Ver instalaciones interactivas', en: 'See interactive installations' },
     reel: null,
   },
   {
     num: '03', id: 'visuales', Icon: Play,
-    title: 'Producción audiovisual con IA',
-    cardDesc: 'Contenido publicitario, visuales generativos y videomapping.',
-    subtitle: 'y producción audiovisual con IA',
-    desc: 'Creamos imágenes, animaciones y mundos visuales con IA, combinando dirección artística, 3D, motion graphics y producción audiovisual profesional.',
-    tags: ['Campañas publicitarias', 'Pantallas LED', 'Videomapping IA', 'Animaciones generativas', 'Conciertos y espectáculos'],
+    title: { es: 'Producción audiovisual con IA', en: 'AI audiovisual production' },
+    cardDesc: { es: 'Contenido publicitario, visuales generativos y videomapping.', en: 'Advertising content, generative visuals and video mapping.' },
+    subtitle: { es: 'y producción audiovisual con IA', en: 'and AI audiovisual production' },
+    desc: { es: 'Creamos imágenes, animaciones y mundos visuales con IA, combinando dirección artística, 3D, motion graphics y producción audiovisual profesional.', en: 'We create images, animations and visual worlds with AI, combining art direction, 3D, motion graphics and professional audiovisual production.' },
+    tags: [
+      { es: 'Campañas publicitarias', en: 'Advertising campaigns' },
+      { es: 'Pantallas LED', en: 'LED screens' },
+      { es: 'Videomapping IA', en: 'AI video mapping' },
+      { es: 'Animaciones generativas', en: 'Generative animation' },
+      { es: 'Conciertos y espectáculos', en: 'Concerts & shows' },
+    ],
     accent: '#FFD42A', glow: 'rgba(255,212,42,0.22)',
-    categoryHref: '/maigiaav/', categoryLabel: 'Ver producción audiovisual',
+    categoryHref: '/maigiaav/', categoryLabel: { es: 'Ver producción audiovisual', en: 'See audiovisual production' },
     reel: '/Produccion Audiovisual_1.mp4',
   },
   {
     num: '04', id: 'digital', Icon: Share2,
-    title: 'Soluciones digitales con IA',
-    cardDesc: 'Webs, automatizaciones y agentes inteligentes para empresas.',
-    subtitle: 'y automatizaciones',
-    desc: 'Creamos soluciones digitales con IA para automatizar procesos, captar leads, mejorar la atención al cliente y crear experiencias web más inteligentes.',
-    tags: ['Webs con IA', 'Asistentes virtuales', 'Automatización de procesos', 'CRM integration', 'Experiencias 3D web'],
+    title: { es: 'Soluciones digitales con IA', en: 'AI digital solutions' },
+    cardDesc: { es: 'Webs, automatizaciones y agentes inteligentes para empresas.', en: 'Websites, automations and smart agents for businesses.' },
+    subtitle: { es: 'y automatizaciones', en: 'and automation' },
+    desc: { es: 'Creamos soluciones digitales con IA para automatizar procesos, captar leads, mejorar la atención al cliente y crear experiencias web más inteligentes.', en: 'We build AI-powered digital solutions to automate processes, capture leads, improve customer care and create smarter web experiences.' },
+    tags: [
+      { es: 'Webs con IA', en: 'AI-powered websites' },
+      { es: 'Asistentes virtuales', en: 'Virtual assistants' },
+      { es: 'Automatización de procesos', en: 'Process automation' },
+      { es: 'CRM integration', en: 'CRM integration' },
+      { es: 'Experiencias 3D web', en: '3D web experiences' },
+    ],
     accent: '#F6B93B', glow: 'rgba(246,185,59,0.22)',
     reel: '/Soluciones Digitales.mp4',
   },
 ]
 
-const TEAM = [
-  { name: 'Paco Gramaje',      role: 'Business Developer', initials: 'PG', photo: '/team/paco.jpg',   imgStyle: { objectPosition: 'center 12%' } },
-  { name: 'Leonardo Bautista', role: 'Director Creativo', initials: 'LB', photo: '/team/LEO.png',    imgStyle: { objectPosition: 'center 10%' } },
-  { name: 'Anto Loriso',       role: 'CTO',               initials: 'AL', photo: '/team/anto.jpg',   imgStyle: { objectPosition: 'center 20%' } },
-  { name: 'Martin Julià',      role: '3D & IA Developer', initials: 'MJ', photo: '/team/MARTIN.png', imgStyle: { objectPosition: 'center 10%' } },
+const TEAM: { name: string; role: T; initials: string; photo: string; imgStyle: React.CSSProperties }[] = [
+  { name: 'Paco Gramaje',      role: { es: 'Business Developer', en: 'Business Developer' }, initials: 'PG', photo: '/team/paco.jpg',   imgStyle: { objectPosition: 'center 12%' } },
+  { name: 'Leonardo Bautista', role: { es: 'Director Creativo', en: 'Creative Director' },   initials: 'LB', photo: '/team/LEO.png',    imgStyle: { objectPosition: 'center 10%' } },
+  { name: 'Anto Loriso',       role: { es: 'CTO', en: 'CTO' },                                initials: 'AL', photo: '/team/anto.jpg',   imgStyle: { objectPosition: 'center 20%' } },
+  { name: 'Martin Julià',      role: { es: '3D & IA Developer', en: '3D & AI Developer' },    initials: 'MJ', photo: '/team/MARTIN.png', imgStyle: { objectPosition: 'center 10%' } },
 ]
 
 
@@ -107,38 +138,42 @@ const TRAIL_IMAGES: string[][] = [
 ]
 
 // Projects for FxSlider — real Pexels backgrounds
-const PROJECTS: SliderItem[] = [
+function getProjects(lang: Lang): SliderItem[] {
+  return [
   {
     num: '01', year: '2026', accent: '#00B8FF',
-    title: 'Avatar Viky · MAIGIA', category: 'Avatares IA',
+    title: 'Avatar Viky · MAIGIA', category: lang === 'es' ? 'Avatares IA' : 'AI Avatars',
     // Viky Fluge: avatar 3D wireframe, imagen real del dossier
     bg: `url('/viky-fluge.jpg') center/cover no-repeat`,
   },
   {
     num: '02', year: '2024', accent: '#22D3FF',
-    title: 'Canet Rock IA', category: 'Visuales Generativos',
+    title: 'Canet Rock IA', category: lang === 'es' ? 'Visuales Generativos' : 'Generative Visuals',
     // Concert stage with dramatic lights
     bg: `url('https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
   {
     num: '03', year: '2024', accent: '#FFD42A',
-    title: 'Quiniela Planeta', category: 'Instalación Interactiva',
+    title: 'Quiniela Planeta', category: lang === 'es' ? 'Instalación Interactiva' : 'Interactive Installation',
     // Neon / immersive light installation
     bg: `url('https://images.pexels.com/photos/2387418/pexels-photo-2387418.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
   {
     num: '04', year: '2026', accent: '#F6B93B',
-    title: 'Mia · Avatar para Fluge Audiovisuales', category: 'Avatares IA',
+    title: lang === 'es' ? 'Mia · Avatar para Fluge Audiovisuales' : 'Mia · Avatar for Fluge Audiovisuales',
+    category: lang === 'es' ? 'Avatares IA' : 'AI Avatars',
     // Foto real: Mia, avatar de Fluge Audiovisuales
     bg: `url('/mia-fluge.jpg') center 18%/cover no-repeat`,
   },
   {
     num: '05', year: '2023', accent: '#1B3DFF',
-    title: 'Interactivos Táctiles', category: 'Instalación Interactiva',
+    title: lang === 'es' ? 'Interactivos Táctiles' : 'Interactive Touch Displays',
+    category: lang === 'es' ? 'Instalación Interactiva' : 'Interactive Installation',
     // Dramatic light art / projection mapping
     bg: `url('https://images.pexels.com/photos/3756165/pexels-photo-3756165.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
   },
-]
+  ]
+}
 
 
 // ── Interactive Dot Grid ──────────────────────────────────────────────────────
@@ -269,9 +304,10 @@ const BRACKET_RADIUS = [
 ] as const
 
 function HudCard({
-  s, delay, corner, active, visible, onClick,
+  s, delay, corner, active, visible, onClick, lang,
 }: {
   s: typeof SERVICES[0]
+  lang: Lang
   delay: number
   corner: 0 | 1 | 2 | 3
   active: boolean
@@ -404,7 +440,7 @@ function HudCard({
               transition={{ duration: 0.28 }}
               className="leading-snug"
               style={{ fontSize: 'clamp(16px, 1.6vw, 22px)', fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.02em' }}>
-              {s.title}
+              {s.title[lang]}
             </motion.h3>
           </div>
         </div>
@@ -412,7 +448,7 @@ function HudCard({
         {/* Description */}
         <p className={`leading-relaxed ${isRight ? 'text-right' : ''}`}
           style={{ fontSize: 'clamp(12px, 1vw, 14px)', color: '#8AABB8', lineHeight: 1.65 }}>
-          {s.cardDesc}
+          {s.cardDesc[lang]}
         </p>
 
         {/* Bottom glow line */}
@@ -608,9 +644,10 @@ function LoadingScreen({ onDone }: { onDone: () => void }) {
 
 // ── Tilt 3D + Scan Line card ─────────────────────────────────────────────────
 function TiltScanCard({
-  s, index, opacity, x,
+  s, index, opacity, x, lang,
 }: {
   s: typeof SERVICES[0]
+  lang: Lang
   index: number
   opacity: MotionValue<number>
   x: MotionValue<string>
@@ -699,7 +736,7 @@ function TiltScanCard({
           textShadow: `0 0 24px ${s.accent}60, 0 2px 8px rgba(0,0,0,0.9)`,
           position: 'relative', zIndex: 6,
         }}>
-          {s.title}
+          {s.title[lang]}
         </span>
       </div>
     </motion.div>
@@ -707,7 +744,7 @@ function TiltScanCard({
 }
 
 // ── Sticky Robot Section (desktop hero) ───────────────────────────────────────
-function StickyRobotSection({ ready }: { ready: boolean }) {
+function StickyRobotSection({ ready, lang }: { ready: boolean; lang: Lang }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress: p } = useScroll({ target: wrapperRef, offset: ['start start', 'end end'] })
   const [logoVisible, setLogoVisible] = useState(false)
@@ -846,11 +883,14 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
             fontSize: 'clamp(3rem, 7vw, 6rem)', fontWeight: 650, color: C.white, lineHeight: 1.05, margin: 0,
             fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
           }}>
-            <span style={{ display: 'block' }}>¿Qué</span>
-            <span style={{ display: 'block' }}>hacemos?</span>
+            {lang === 'es' ? (
+              <><span style={{ display: 'block' }}>¿Qué</span><span style={{ display: 'block' }}>hacemos?</span></>
+            ) : (
+              <><span style={{ display: 'block' }}>What</span><span style={{ display: 'block' }}>we do?</span></>
+            )}
           </h2>
           <p style={{ color: C.blue, letterSpacing: '0.18em', fontSize: '0.9rem', marginTop: 16, textTransform: 'uppercase' }}>
-            Creatividad · Tecnología · IA
+            {lang === 'es' ? 'Creatividad · Tecnología · IA' : 'Creativity · Technology · AI'}
           </p>
         </motion.div>
 
@@ -866,7 +906,7 @@ function StickyRobotSection({ ready }: { ready: boolean }) {
           transform: 'translateY(-50%)',
         }}>
           {SERVICES.map((s, i) => (
-            <TiltScanCard key={s.id} s={s} index={i} opacity={cardOpacities[i]} x={cardXs[i]} />
+            <TiltScanCard key={s.id} s={s} index={i} opacity={cardOpacities[i]} x={cardXs[i]} lang={lang} />
           ))}
         </div>
       </div>
@@ -965,7 +1005,7 @@ function AboutTiltCard({ children, accent, delay = 0, compact = false }: {
 }
 
 // ── About Section (self-contained so it can use the hook) ─────────────────────
-function AboutSection() {
+function AboutSection({ lang }: { lang: Lang }) {
   const { canvasRef, sectionRef } = useInteractiveDotGrid()
   return (
     <section ref={sectionRef} className="relative py-32 px-6 overflow-hidden" style={{ background: C.bg }}>
@@ -976,23 +1016,35 @@ function AboutSection() {
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
           className="grid md:grid-cols-2 gap-16 items-center">
           <div>
-            <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.blue }}>Sobre nosotros</span>
+            <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.blue }}>{lang === 'es' ? 'Sobre nosotros' : 'About us'}</span>
             <h2 className="leading-tight mb-8" style={{
               fontSize: 'clamp(2rem,4.5vw,3.5rem)', color: C.white, fontWeight: 650,
               fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
             }}>
-              Más de 20 años<br /><span style={{ color: C.gold }}>evolucionando</span>
+              {lang === 'es'
+                ? <>Más de 20 años<br /><span style={{ color: C.gold }}>evolucionando</span></>
+                : <>Over 20 years<br /><span style={{ color: C.gold }}>evolving</span></>}
             </h2>
             <div className="space-y-5 text-base leading-relaxed" style={{ color: C.gray }}>
-              <p>Esta nueva línea nace como una evolución natural de{' '}<span style={{ color: C.white, fontWeight: 600 }}>Girasomnis</span>, un estudio creativo con más de 20 años de experiencia en espectáculos audiovisuales, experiencias inmersivas, video mapping, contenido escénico e innovación visual.</p>
-              <p>Ahora aplicamos la inteligencia artificial a ese mismo universo creativo para desarrollar <span style={{ color: C.cyan }}>avatares interactivos</span>, <span style={{ color: C.cyan }}>instalaciones inteligentes</span>, producción audiovisual con IA y soluciones digitales para empresas.</p>
-              <p>Esta división surge de la unión entre Girasomnis e{' '}<span style={{ color: C.white, fontWeight: 600 }}>Immerso</span>, especializada en desarrollo de software, aplicaciones web, soluciones IA y avatares 3D en tiempo real.</p>
+              {lang === 'es' ? (
+                <>
+                  <p>Esta nueva línea nace como una evolución natural de{' '}<span style={{ color: C.white, fontWeight: 600 }}>Girasomnis</span>, un estudio creativo con más de 20 años de experiencia en espectáculos audiovisuales, experiencias inmersivas, video mapping, contenido escénico e innovación visual.</p>
+                  <p>Ahora aplicamos la inteligencia artificial a ese mismo universo creativo para desarrollar <span style={{ color: C.cyan }}>avatares interactivos</span>, <span style={{ color: C.cyan }}>instalaciones inteligentes</span>, producción audiovisual con IA y soluciones digitales para empresas.</p>
+                  <p>Esta división surge de la unión entre Girasomnis e{' '}<span style={{ color: C.white, fontWeight: 600 }}>Immerso</span>, especializada en desarrollo de software, aplicaciones web, soluciones IA y avatares 3D en tiempo real.</p>
+                </>
+              ) : (
+                <>
+                  <p>This new line was born as a natural evolution of{' '}<span style={{ color: C.white, fontWeight: 600 }}>Girasomnis</span>, a creative studio with over 20 years of experience in audiovisual shows, immersive experiences, video mapping, stage content and visual innovation.</p>
+                  <p>We now apply artificial intelligence to that same creative universe to develop <span style={{ color: C.cyan }}>interactive avatars</span>, <span style={{ color: C.cyan }}>smart installations</span>, AI audiovisual production and digital solutions for businesses.</p>
+                  <p>This division comes from the union of Girasomnis and{' '}<span style={{ color: C.white, fontWeight: 600 }}>Immerso</span>, specialised in software development, web applications, AI solutions and real-time 3D avatars.</p>
+                </>
+              )}
             </div>
           </div>
           <div className="flex flex-col gap-6">
             <div className="flex gap-6">
               {([
-                { brand: 'Girasomnis', sub: 'Arte & Creatividad', accent: C.blue,  grad: `${C.blue}, ${C.deep}` },
+                { brand: 'Girasomnis', sub: lang === 'es' ? 'Arte & Creatividad' : 'Art & Creativity', accent: C.blue,  grad: `${C.blue}, ${C.deep}` },
                 { brand: 'Immerso',    sub: 'Tech & Software',    accent: C.gold,  grad: `${C.gold}, ${C.goldSoft}` },
               ] as const).map(({ brand, sub, accent, grad }, i) => (
                 <AboutTiltCard key={brand} accent={accent} delay={i * 0.1}>
@@ -1007,9 +1059,9 @@ function AboutSection() {
             </div>
             <div className="grid grid-cols-3 gap-4">
               {([
-                { n: '20+', l: 'años de experiencia', accent: C.blue },
-                { n: '4',   l: 'líneas de servicio',  accent: C.cyan },
-                { n: '3',   l: 'oficinas',             accent: C.gold },
+                { n: '20+', l: lang === 'es' ? 'años de experiencia' : 'years of experience', accent: C.blue },
+                { n: '4',   l: lang === 'es' ? 'líneas de servicio' : 'service lines',  accent: C.cyan },
+                { n: '3',   l: lang === 'es' ? 'oficinas' : 'offices',             accent: C.gold },
               ] as const).map(({ n, l, accent }, i) => (
                 <AboutTiltCard key={l} accent={accent} delay={i * 0.08} compact>
                   <div className="font-black text-2xl mb-1" style={{ color: accent }}>{n}</div>
@@ -1040,6 +1092,7 @@ function AboutSection() {
 }
 
 export default function AiaSomnisPage() {
+  const [lang, setLang] = useLang()
   const [loading, setLoading] = useState(true)
   const [heroVisible, setHeroVisible] = useState(false)
   const [activeService, setActiveService] = useState(0)
@@ -1192,11 +1245,11 @@ export default function AiaSomnisPage() {
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-8">
             {[
-              { label: 'Servicios',  id: 'servicios' },
-              { label: 'Proyectos', id: 'proyectos' },
-              { label: 'Equipo',    id: 'equipo' },
+              { label: { es: 'Servicios', en: 'Services' }, id: 'servicios' },
+              { label: { es: 'Proyectos', en: 'Projects' }, id: 'proyectos' },
+              { label: { es: 'Equipo',    en: 'Team' },     id: 'equipo' },
             ].map(({ label, id }) => (
-              <a key={label} href={`#${id}`}
+              <a key={id} href={`#${id}`}
                 onClick={e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }}
                 className="transition-all duration-300"
                 style={{
@@ -1207,9 +1260,10 @@ export default function AiaSomnisPage() {
                 }}
                 onMouseEnter={e => (e.currentTarget.style.color = C.white)}
                 onMouseLeave={e => (e.currentTarget.style.color = C.gray)}>
-                {label}
+                {label[lang]}
               </a>
             ))}
+            <LangToggle lang={lang} setLang={setLang} dim={C.gray} />
             <a href="#contacto"
               onClick={e => { e.preventDefault(); setContactOpen(true) }}
               className="transition-all duration-300"
@@ -1222,16 +1276,19 @@ export default function AiaSomnisPage() {
               }}
               onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 0 30px rgba(0,184,255,0.6)`)}
               onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 18px rgba(0,184,255,0.3)`)}>
-              Contacto
+              {lang === 'es' ? 'Contacto' : 'Contact'}
             </a>
           </div>
 
-          {/* Mobile: contact button */}
-          <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }}
-            className="md:hidden px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase"
-            style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white }}>
-            Contacto
-          </a>
+          {/* Mobile: lang toggle + contact button */}
+          <div className="md:hidden flex items-center gap-3">
+            <LangToggle lang={lang} setLang={setLang} dim={C.gray} />
+            <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }}
+              className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase"
+              style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white }}>
+              {lang === 'es' ? 'Contacto' : 'Contact'}
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -1298,6 +1355,7 @@ export default function AiaSomnisPage() {
           <HudCard
             key={corner}
             s={SERVICES[CORNER_SERVICE[corner]]}
+            lang={lang}
             delay={300 + corner * 100}
             corner={corner}
             active={heroQuadrant === corner}
@@ -1314,7 +1372,7 @@ export default function AiaSomnisPage() {
             <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold tracking-widest uppercase"
               style={{ background: 'rgba(0,184,255,0.10)', border: `1px solid rgba(0,184,255,0.35)`, color: C.blue, fontSize: 'clamp(12px, 2.8vw, 17px)' }}>
               <span className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse" style={{ background: C.blue }} />
-              Artificial Intelligence Agency
+              {lang === 'es' ? 'Agencia de Inteligencia Artificial' : 'Artificial Intelligence Agency'}
             </span>
           </div>
 
@@ -1430,7 +1488,9 @@ export default function AiaSomnisPage() {
             </div>
 
             <p className="text-base max-w-sm mx-auto font-medium" style={{ ...fadeUp(1400), color: C.gray }}>
-              Para <span style={{ color: C.white }}>eventos, marcas y cultura.</span>
+              {lang === 'es'
+                ? <>Para <span style={{ color: C.white }}>eventos, marcas y cultura.</span></>
+                : <>For <span style={{ color: C.white }}>events, brands and culture.</span></>}
             </p>
           </div>
 
@@ -1490,7 +1550,7 @@ export default function AiaSomnisPage() {
       {/* ══════════ HERO — desktop only (sticky robot) ══════════ */}
       {isDesktop && (
         <div className="hidden lg:block">
-          <StickyRobotSection ready={!loading} />
+          <StickyRobotSection ready={!loading} lang={lang} />
         </div>
       )}
 
@@ -1549,18 +1609,18 @@ export default function AiaSomnisPage() {
                           style={{
                             fontSize: 'clamp(1.5rem,2.8vw,2.5rem)', color: C.white, marginTop: '-0.5rem',
                             fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.03em',
-                          }}>{s.title}</h2>
-                        <p style={{ color: `${s.accent}CC`, fontSize: '0.9rem' }}>{s.subtitle}</p>
+                          }}>{s.title[lang]}</h2>
+                        <p style={{ color: `${s.accent}CC`, fontSize: '0.9rem' }}>{s.subtitle[lang]}</p>
                       </div>
 
                       {/* description */}
                       <p className="leading-relaxed"
                         style={{ color: C.gray, fontSize: 'clamp(0.88rem,1vw,1rem)' }}>
-                        {s.desc}
+                        {s.desc[lang]}
                       </p>
 
                       {/* tags — typewriter reveal on scroll */}
-                      <TypewriterTags tags={s.tags} accent={s.accent} />
+                      <TypewriterTags tags={s.tags.map(t => t[lang])} accent={s.accent} />
 
                       {s.categoryHref && (
                         <motion.a href={s.categoryHref}
@@ -1581,7 +1641,7 @@ export default function AiaSomnisPage() {
                           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.97 }}>
-                          {s.categoryLabel}
+                          {s.categoryLabel?.[lang]}
                           <motion.span
                             animate={{ x: [0, 5, 0] }}
                             transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}>
@@ -1656,7 +1716,7 @@ export default function AiaSomnisPage() {
                                   <div className="w-2.5 h-2.5 rounded-full" style={{ background: s.accent, boxShadow: `0 0 12px ${s.accent}` }} />
                                 </div>
                                 <span className="text-xs uppercase tracking-[0.35em] text-center" style={{ color: `${s.accent}80` }}>
-                                  Mueve el cursor
+                                  {lang === 'es' ? 'Mueve el cursor' : 'Move your cursor'}
                                 </span>
                               </motion.div>
 
@@ -1693,7 +1753,7 @@ export default function AiaSomnisPage() {
         >
           {[...Array(2)].map((_, rep) => (
             <div key={rep} className="flex gap-12 items-center">
-              {['Avatar Viky', 'Canet Rock IA', 'Quiniela Planeta', 'FLUGE', 'Interactivos Táctiles'].map((name) => (
+              {['Avatar Viky', 'Canet Rock IA', 'Quiniela Planeta', 'FLUGE', lang === 'es' ? 'Interactivos Táctiles' : 'Interactive Touch Displays'].map((name) => (
                 <span key={name} className="flex items-center gap-12">
                   <span className="font-black uppercase tracking-widest text-sm" style={{ color: C.white }}>{name}</span>
                   <span className="text-lg font-black" style={{ color: C.blue }}>·</span>
@@ -1706,11 +1766,11 @@ export default function AiaSomnisPage() {
 
       {/* ══════════ PROYECTOS — FxSlider ══════════ */}
       <section id="proyectos">
-        <FxSlider items={PROJECTS} headerText="Proyectos seleccionados" duration={0.64} parallaxAmount={5} />
+        <FxSlider items={getProjects(lang)} headerText={lang === 'es' ? 'Proyectos seleccionados' : 'Selected projects'} categoryLabel={lang === 'es' ? 'Categoría' : 'Category'} duration={0.64} parallaxAmount={5} />
       </section>
 
       {/* ══════════ CUBO FRAMES ══════════ */}
-      <CuboFramesSection />
+      <CuboFramesSection lang={lang} />
 
       {/* ══════════ AURORA — Experiencias que conectan ══════════ */}
       <section className="relative overflow-hidden" style={{ minHeight: '70vh', background: C.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1731,18 +1791,20 @@ export default function AiaSomnisPage() {
         {/* Content */}
         <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.9 }}
           className="relative z-10 flex flex-col items-center text-center gap-6 px-6 py-24">
-          <span className="text-xs uppercase tracking-[0.3em]" style={{ color: C.cyan, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>Creatividad · Tecnología · IA</span>
+          <span className="text-xs uppercase tracking-[0.3em]" style={{ color: C.cyan, fontFamily: "'Syne',sans-serif", fontWeight: 600 }}>{lang === 'es' ? 'Creatividad · Tecnología · IA' : 'Creativity · Technology · AI'}</span>
           <h2 className="leading-tight" style={{
             fontSize: 'clamp(2.5rem,6vw,5rem)', color: C.white, maxWidth: 800,
             fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
           }}>
-            Experiencias que{' '}
+            {lang === 'es' ? 'Experiencias que' : 'Experiences that'}{' '}
             <span style={{ backgroundImage: `linear-gradient(90deg, ${C.blue} 0%, ${C.cyan} 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              conectan
+              {lang === 'es' ? 'conectan' : 'connect'}
             </span>
           </h2>
           <p className="max-w-xl text-base md:text-lg leading-relaxed" style={{ color: '#B8CCE0' }}>
-            La fusión entre la experiencia artística de Girasomnis y la capacidad tecnológica de Immerso.
+            {lang === 'es'
+              ? 'La fusión entre la experiencia artística de Girasomnis y la capacidad tecnológica de Immerso.'
+              : 'The fusion of Girasomnis’ artistic expertise and Immerso’s technological capability.'}
           </p>
           {/* Divider line */}
           <div style={{ width: 80, height: 1, background: `linear-gradient(90deg, transparent, ${C.blue}, transparent)`, marginTop: 8 }} />
@@ -1753,7 +1815,7 @@ export default function AiaSomnisPage() {
       </section>
 
       {/* ══════════ ABOUT US — Dot Grid ══════════ */}
-      <AboutSection />
+      <AboutSection lang={lang} />
 
 
       {/* ══════════ TEAM ══════════ */}
@@ -1763,11 +1825,11 @@ export default function AiaSomnisPage() {
           style={{ background: `linear-gradient(to bottom, ${C.bg}, ${C.bg2})` }} />
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="text-center mb-16">
-            <span className="text-xs uppercase tracking-[0.3em] mb-4 block" style={{ color: C.blue }}>El equipo</span>
+            <span className="text-xs uppercase tracking-[0.3em] mb-4 block" style={{ color: C.blue }}>{lang === 'es' ? 'El equipo' : 'The team'}</span>
             <h2 style={{
               fontSize: 'clamp(2rem,4vw,3rem)', color: C.white,
               fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
-            }}>Las personas detrás</h2>
+            }}>{lang === 'es' ? 'Las personas detrás' : 'The people behind it'}</h2>
           </motion.div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {TEAM.map((member, i) => (
@@ -1801,7 +1863,7 @@ export default function AiaSomnisPage() {
                         style={{ background: `linear-gradient(135deg, ${C.bg2}, #0D1829)`, border: `1px solid ${C.border}` }}>
                         <span className="font-black text-2xl" style={{ color: C.blue }}>{member.initials}</span>
                       </div>
-                      <span className="text-xs" style={{ color: C.border }}>Próximamente</span>
+                      <span className="text-xs" style={{ color: C.border }}>{lang === 'es' ? 'Próximamente' : 'Coming soon'}</span>
                     </div>
                   )}
                   {/* Bottom gradient to blend into card body */}
@@ -1811,7 +1873,7 @@ export default function AiaSomnisPage() {
                 {/* Name / role */}
                 <div className="px-4 py-4">
                   <h3 className="font-bold text-sm mb-1" style={{ color: C.white }}>{member.name}</h3>
-                  <span className="text-xs uppercase tracking-wide" style={{ color: C.gray }}>{member.role}</span>
+                  <span className="text-xs uppercase tracking-wide" style={{ color: C.gray }}>{member.role[lang]}</span>
                 </div>
               </motion.div>
             ))}
@@ -1836,19 +1898,21 @@ export default function AiaSomnisPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}>
-              <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.gold }}>Hablemos</span>
+              <span className="text-xs uppercase tracking-[0.3em] mb-6 block" style={{ color: C.gold }}>{lang === 'es' ? 'Hablemos' : "Let's talk"}</span>
               <h2 className="leading-none mb-6" style={{
                 fontSize: 'clamp(2.5rem,5vw,4.5rem)', color: C.white,
                 fontWeight: 650, fontFamily: "'Syne', sans-serif", letterSpacing: '-0.05em',
               }}>
-                ¿Tienes un{' '}
+                {lang === 'es' ? <>¿Tienes un{' '}</> : <>Have a{' '}</>}
                 <span style={{
                   backgroundImage: `linear-gradient(90deg, ${C.deep} 0%, ${C.blue} 45%, ${C.cyan} 100%)`,
                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                }}>proyecto?</span>
+                }}>{lang === 'es' ? 'proyecto?' : 'project?'}</span>
               </h2>
               <p className="text-base md:text-lg mb-10 max-w-md" style={{ color: '#B8CCE0', lineHeight: 1.7 }}>
-                Cuéntanos tu idea. Transformamos creatividad, tecnología e inteligencia artificial en experiencias que impactan.
+                {lang === 'es'
+                  ? 'Cuéntanos tu idea. Transformamos creatividad, tecnología e inteligencia artificial en experiencias que impactan.'
+                  : 'Tell us your idea. We turn creativity, technology and artificial intelligence into experiences that make an impact.'}
               </p>
               <a href="mailto:info@girasomnis.com"
                 className="inline-flex items-center gap-3 px-9 py-4 rounded-full font-bold text-base transition-all duration-300 mb-10"
@@ -1988,19 +2052,19 @@ export default function AiaSomnisPage() {
                   style={{ background: 'rgba(123,47,255,0.15)', border: '1px solid #7B2FFF' }}>
                   <span style={{ fontSize: 28 }}>✓</span>
                 </div>
-                <h3 className="text-xl" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>¡Mensaje enviado!</h3>
-                <p style={{ color: C.gray }}>Te responderemos lo antes posible.</p>
+                <h3 className="text-xl" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>{lang === 'es' ? '¡Mensaje enviado!' : 'Message sent!'}</h3>
+                <p style={{ color: C.gray }}>{lang === 'es' ? 'Te responderemos lo antes posible.' : "We'll get back to you as soon as possible."}</p>
                 <button onClick={() => { setContactOpen(false); setFormSent(false) }}
                   className="mt-2 px-6 py-2 rounded-full text-sm font-bold"
                   style={{ background: 'linear-gradient(135deg,#7B2FFF,#1B3DFF)', color: C.white }}>
-                  Cerrar
+                  {lang === 'es' ? 'Cerrar' : 'Close'}
                 </button>
               </div>
             ) : (
               <>
                 <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 64, objectFit: 'contain', marginBottom: 20 }} />
-                <h2 className="text-2xl mb-1" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>Cuéntanos tu proyecto</h2>
-                <p className="text-sm mb-6" style={{ color: C.gray }}>Responderemos en menos de 24h.</p>
+                <h2 className="text-2xl mb-1" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>{lang === 'es' ? 'Cuéntanos tu proyecto' : 'Tell us about your project'}</h2>
+                <p className="text-sm mb-6" style={{ color: C.gray }}>{lang === 'es' ? 'Responderemos en menos de 24h.' : "We'll reply within 24h."}</p>
 
                 <form
                   name="contacto-aiasomnis"
@@ -2027,8 +2091,8 @@ export default function AiaSomnisPage() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Nombre</label>
-                      <input name="nombre" required placeholder="Tu nombre"
+                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Nombre' : 'Name'}</label>
+                      <input name="nombre" required placeholder={lang === 'es' ? 'Tu nombre' : 'Your name'}
                         className="rounded-xl px-4 py-3 text-sm outline-none transition-all"
                         style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
                         onFocus={e => e.currentTarget.style.borderColor = C.blue}
@@ -2036,7 +2100,7 @@ export default function AiaSomnisPage() {
                     </div>
                     <div className="flex flex-col gap-1">
                       <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Email</label>
-                      <input name="email" type="email" required placeholder="tu@email.com"
+                      <input name="email" type="email" required placeholder={lang === 'es' ? 'tu@email.com' : 'you@email.com'}
                         className="rounded-xl px-4 py-3 text-sm outline-none transition-all"
                         style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
                         onFocus={e => e.currentTarget.style.borderColor = C.blue}
@@ -2045,21 +2109,21 @@ export default function AiaSomnisPage() {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Tipo de proyecto</label>
+                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Tipo de proyecto' : 'Project type'}</label>
                     <select name="tipo" style={{ background: '#0D1829', border: `1px solid ${C.border}`, color: C.white }}
                       className="rounded-xl px-4 py-3 text-sm outline-none">
-                      <option value="">Selecciona una opción</option>
-                      <option>Avatar IA</option>
-                      <option>Instalación interactiva</option>
-                      <option>Producción audiovisual con IA</option>
-                      <option>Solución digital / Web</option>
-                      <option>Otro</option>
+                      <option value="">{lang === 'es' ? 'Selecciona una opción' : 'Select an option'}</option>
+                      <option>{lang === 'es' ? 'Avatar IA' : 'AI Avatar'}</option>
+                      <option>{lang === 'es' ? 'Instalación interactiva' : 'Interactive installation'}</option>
+                      <option>{lang === 'es' ? 'Producción audiovisual con IA' : 'AI audiovisual production'}</option>
+                      <option>{lang === 'es' ? 'Solución digital / Web' : 'Digital solution / Website'}</option>
+                      <option>{lang === 'es' ? 'Otro' : 'Other'}</option>
                     </select>
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Cuéntanos tu idea</label>
-                    <textarea name="mensaje" required rows={4} placeholder="Describe tu proyecto, evento, marca o lo que necesitas..."
+                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Cuéntanos tu idea' : 'Tell us your idea'}</label>
+                    <textarea name="mensaje" required rows={4} placeholder={lang === 'es' ? 'Describe tu proyecto, evento, marca o lo que necesitas...' : 'Describe your project, event, brand or what you need...'}
                       className="rounded-xl px-4 py-3 text-sm outline-none transition-all resize-none"
                       style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
                       onFocus={e => e.currentTarget.style.borderColor = C.blue}
@@ -2069,7 +2133,7 @@ export default function AiaSomnisPage() {
                   <button type="submit"
                     className="w-full py-3.5 rounded-xl font-bold text-sm tracking-wide mt-1"
                     style={{ background: `linear-gradient(135deg, ${C.deep} 0%, ${C.blue} 60%, ${C.cyan} 100%)`, color: C.white, boxShadow: `0 0 32px ${C.blue}66` }}>
-                    Enviar proyecto →
+                    {lang === 'es' ? 'Enviar proyecto →' : 'Send project →'}
                   </button>
                 </form>
               </>

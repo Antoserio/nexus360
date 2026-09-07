@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import type { Lang } from '@/lib/lang'
 
-export function CuboFramesSection() {
+export function CuboFramesSection({ lang }: { lang: Lang }) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const [textOpacity, setTextOpacity] = useState(0)
@@ -89,7 +90,7 @@ export function CuboFramesSection() {
               margin: 0,
             }}
           >
-            Creatividad sin límites.<br />Tecnología que transforma.
+            {lang === 'es' ? <>Creatividad sin límites.<br />Tecnología que transforma.</> : <>Creativity without limits.<br />Technology that transforms.</>}
           </h2>
         </div>
       </div>
