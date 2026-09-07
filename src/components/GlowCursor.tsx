@@ -89,27 +89,16 @@ export function GlowCursor() {
   const [hidden, setHidden]   = useState(true)
 
   useEffect(() => {
+    let lastColorCheckX = -999, lastColorCheckY = -999
+
+    // Solo actualiza la posicion (barato) — el hit-test de color se hace
+    // como mucho una vez por frame dentro del propio loop de animate(),
+    // no en cada evento mousemove (que puede disparar muy por encima de 60Hz
+    // y con elementFromPoint() cada vez, forzaba un hit-test de layout en
+    // cada uno — la causa principal de que la pagina no se sintiera fluida).
     const onMove = (e: MouseEvent) => {
       pos.current = { x: e.clientX, y: e.clientY }
       setHidden(false)
-
-      // Detect accent color from hovered element
-      const el = document.elementFromPoint(e.clientX, e.clientY)
-      if (el) {
-        // Walk up to find data-accent
-        let node: Element | null = el
-        let found = false
-        while (node && !found) {
-          const accent = node.getAttribute('data-cursor-accent')
-          if (accent) { setColor(accent); found = true }
-          const tag = node.tagName
-          if (tag === 'BUTTON' || tag === 'A' || node.getAttribute('role') === 'button') {
-            setHovered(true)
-          }
-          node = node.parentElement
-        }
-        if (!found) setColor('#00B8FF')
-      }
     }
 
     const onEnter = (e: MouseEvent) => {
@@ -140,10 +129,29 @@ export function GlowCursor() {
       if (ringRef.current) {
         ringRef.current.style.transform = `translate(${ring.current.x - 22}px, ${ring.current.y - 22}px)`
       }
+
+      // Hit-test de color acotado a una vez por frame, y solo si el cursor
+      // se ha movido de verdad desde la ultima comprobacion
+      if (pos.current.x !== lastColorCheckX || pos.current.y !== lastColorCheckY) {
+        lastColorCheckX = pos.current.x
+        lastColorCheckY = pos.current.y
+        const el = document.elementFromPoint(pos.current.x, pos.current.y)
+        if (el) {
+          let node: Element | null = el
+          let found = false
+          while (node && !found) {
+            const accent = node.getAttribute('data-cursor-accent')
+            if (accent) { setColor(accent); found = true }
+            node = node.parentElement
+          }
+          if (!found) setColor('#00B8FF')
+        }
+      }
+
       rafRef.current = requestAnimationFrame(animate)
     }
 
-    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mousemove', onMove, { passive: true })
     document.addEventListener('mouseover', onEnter)
     document.addEventListener('mouseout', onLeave)
     document.addEventListener('mouseleave', onLeaveWindow)

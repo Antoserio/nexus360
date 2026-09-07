@@ -656,16 +656,26 @@ function TiltScanCard({
   const [tilt,   setTilt]   = useState({ rx: 0, ry: 0 })
   const [shine,  setShine]  = useState({ x: 50, y: 50 })
   const [active, setActive] = useState(false)
+  const rafGate  = useRef(false)
   const { Icon } = s
 
+  // RAF gate — sin esto, cada mousemove (que puede disparar muy por encima
+  // de 60Hz) forzaba un getBoundingClientRect() y dos setState, es decir un
+  // re-render completo por evento. Acotado a un update por frame como mucho.
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = cardRef.current; if (!el) return
-    const r  = el.getBoundingClientRect()
-    const dx = ((e.clientX - r.left) / r.width  - 0.5) * 2   // -1→1
-    const dy = ((e.clientY - r.top)  / r.height - 0.5) * 2
-    setTilt({ rx: -dy * 14, ry: dx * 14 })
-    setShine({ x: ((e.clientX - r.left) / r.width)  * 100,
-               y: ((e.clientY - r.top)  / r.height) * 100 })
+    if (rafGate.current) return
+    rafGate.current = true
+    const clientX = e.clientX, clientY = e.clientY
+    requestAnimationFrame(() => {
+      rafGate.current = false
+      const el = cardRef.current; if (!el) return
+      const r  = el.getBoundingClientRect()
+      const dx = ((clientX - r.left) / r.width  - 0.5) * 2   // -1→1
+      const dy = ((clientY - r.top)  / r.height - 0.5) * 2
+      setTilt({ rx: -dy * 14, ry: dx * 14 })
+      setShine({ x: ((clientX - r.left) / r.width)  * 100,
+                 y: ((clientY - r.top)  / r.height) * 100 })
+    })
   }
   const onLeave = () => { setTilt({ rx: 0, ry: 0 }); setActive(false) }
   const onEnter = () => setActive(true)
@@ -964,14 +974,23 @@ function AboutTiltCard({ children, accent, delay = 0, compact = false }: {
   const [tilt,  setTilt]  = useState({ rx: 0, ry: 0 })
   const [shine, setShine] = useState({ x: 50, y: 50 })
   const [active, setActive] = useState(false)
+  const rafGate = useRef(false)
 
+  // Ver comentario en TiltScanCard.onMove — mismo RAF gate para no re-renderizar
+  // en cada evento mousemove.
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = ref.current; if (!el) return
-    const r  = el.getBoundingClientRect()
-    const dx = ((e.clientX - r.left) / r.width  - 0.5) * 2
-    const dy = ((e.clientY - r.top)  / r.height - 0.5) * 2
-    setTilt({ rx: -dy * 12, ry: dx * 12 })
-    setShine({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 })
+    if (rafGate.current) return
+    rafGate.current = true
+    const clientX = e.clientX, clientY = e.clientY
+    requestAnimationFrame(() => {
+      rafGate.current = false
+      const el = ref.current; if (!el) return
+      const r  = el.getBoundingClientRect()
+      const dx = ((clientX - r.left) / r.width  - 0.5) * 2
+      const dy = ((clientY - r.top)  / r.height - 0.5) * 2
+      setTilt({ rx: -dy * 12, ry: dx * 12 })
+      setShine({ x: ((clientX - r.left) / r.width) * 100, y: ((clientY - r.top) / r.height) * 100 })
+    })
   }
 
   return (
