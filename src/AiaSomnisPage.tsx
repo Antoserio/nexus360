@@ -4,7 +4,8 @@ import { CuboFramesSection } from './components/CuboFramesSection'
 import { GlowCursor, CursorParticles } from './components/GlowCursor'
 import { ImageTrail } from '@/components/ui/image-trail'
 import { ParticleText } from '@/components/ui/particle-text'
-import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
+// Panel "Proyectos seleccionados" desactivado a peticion del usuario — ver getProjects() mas abajo
+// import { FxSlider, type SliderItem } from '@/components/ui/fx-slider'
 import { Mail, MapPin, ChevronDown, Cpu, Play, Share2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useLang, type Lang } from '@/lib/lang'
@@ -138,42 +139,46 @@ const TRAIL_IMAGES: string[][] = [
 ]
 
 // Projects for FxSlider — real Pexels backgrounds
-function getProjects(lang: Lang): SliderItem[] {
-  return [
-  {
-    num: '01', year: '2026', accent: '#00B8FF',
-    title: 'Avatar Viky · MAIGIA', category: lang === 'es' ? 'Avatares IA' : 'AI Avatars',
-    // Viky Fluge: avatar 3D wireframe, imagen real del dossier
-    bg: `url('/viky-fluge.jpg') center/cover no-repeat`,
-  },
-  {
-    num: '02', year: '2024', accent: '#22D3FF',
-    title: 'Canet Rock IA', category: lang === 'es' ? 'Visuales Generativos' : 'Generative Visuals',
-    // Concert stage with dramatic lights
-    bg: `url('https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
-  },
-  {
-    num: '03', year: '2024', accent: '#FFD42A',
-    title: 'Quiniela Planeta', category: lang === 'es' ? 'Instalación Interactiva' : 'Interactive Installation',
-    // Neon / immersive light installation
-    bg: `url('https://images.pexels.com/photos/2387418/pexels-photo-2387418.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
-  },
-  {
-    num: '04', year: '2026', accent: '#F6B93B',
-    title: lang === 'es' ? 'Mia · Avatar para Fluge Audiovisuales' : 'Mia · Avatar for Fluge Audiovisuales',
-    category: lang === 'es' ? 'Avatares IA' : 'AI Avatars',
-    // Foto real: Mia, avatar de Fluge Audiovisuales
-    bg: `url('/mia-fluge.jpg') center 18%/cover no-repeat`,
-  },
-  {
-    num: '05', year: '2023', accent: '#1B3DFF',
-    title: lang === 'es' ? 'Interactivos Táctiles' : 'Interactive Touch Displays',
-    category: lang === 'es' ? 'Instalación Interactiva' : 'Interactive Installation',
-    // Dramatic light art / projection mapping
-    bg: `url('https://images.pexels.com/photos/3756165/pexels-photo-3756165.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
-  },
-  ]
-}
+// DESACTIVADO A PETICION DEL USUARIO (09/2026): se quita el panel de
+// "Proyectos seleccionados" de la home por ahora. No borrar — solo
+// descomentar esto + el import de FxSlider arriba + la <section id="proyectos">
+// mas abajo para restaurarlo.
+// function getProjects(lang: Lang): SliderItem[] {
+//   return [
+//   {
+//     num: '01', year: '2026', accent: '#00B8FF',
+//     title: 'Avatar Viky · MAIGIA', category: lang === 'es' ? 'Avatares IA' : 'AI Avatars',
+//     // Viky Fluge: avatar 3D wireframe, imagen real del dossier
+//     bg: `url('/viky-fluge.jpg') center/cover no-repeat`,
+//   },
+//   {
+//     num: '02', year: '2024', accent: '#22D3FF',
+//     title: 'Canet Rock IA', category: lang === 'es' ? 'Visuales Generativos' : 'Generative Visuals',
+//     // Concert stage with dramatic lights
+//     bg: `url('https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
+//   },
+//   {
+//     num: '03', year: '2024', accent: '#FFD42A',
+//     title: 'Quiniela Planeta', category: lang === 'es' ? 'Instalación Interactiva' : 'Interactive Installation',
+//     // Neon / immersive light installation
+//     bg: `url('https://images.pexels.com/photos/2387418/pexels-photo-2387418.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
+//   },
+//   {
+//     num: '04', year: '2026', accent: '#F6B93B',
+//     title: lang === 'es' ? 'Mia · Avatar para Fluge Audiovisuales' : 'Mia · Avatar for Fluge Audiovisuales',
+//     category: lang === 'es' ? 'Avatares IA' : 'AI Avatars',
+//     // Foto real: Mia, avatar de Fluge Audiovisuales
+//     bg: `url('/mia-fluge.jpg') center 18%/cover no-repeat`,
+//   },
+//   {
+//     num: '05', year: '2023', accent: '#1B3DFF',
+//     title: lang === 'es' ? 'Interactivos Táctiles' : 'Interactive Touch Displays',
+//     category: lang === 'es' ? 'Instalación Interactiva' : 'Interactive Installation',
+//     // Dramatic light art / projection mapping
+//     bg: `url('https://images.pexels.com/photos/3756165/pexels-photo-3756165.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop') center/cover no-repeat`,
+//   },
+//   ]
+// }
 
 
 // ── Interactive Dot Grid ──────────────────────────────────────────────────────
@@ -854,22 +859,12 @@ function StickyRobotSection({ ready, lang }: { ready: boolean; lang: Lang }) {
           <img
             src="/maigia-logo-girasomnis.png"
             alt="MAIGIA by Girasomnis"
-            style={{ height: 'clamp(100px, 15vw, 200px)', width: 'auto', objectFit: 'contain',
+            style={{ height: 'clamp(200px, 30vw, 400px)', width: 'auto', objectFit: 'contain',
               filter: 'drop-shadow(0 0 40px rgba(0,184,255,0.75)) drop-shadow(0 0 20px rgba(0,184,255,0.4))' }}
           />
           <h1 style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>
             MAIGIA — Agencia de Inteligencia Artificial para Experiencias Extraordinarias
           </h1>
-          <span style={{
-            color: C.blue,
-            fontSize: '0.7rem',
-            fontWeight: 700,
-            fontFamily: "'Syne', sans-serif",
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-          }}>
-            Creación con IA
-          </span>
           <p style={{
             color: C.white,
             fontSize: 'clamp(1.15rem, 2.6vw, 2.1rem)',
@@ -1286,8 +1281,8 @@ export default function AiaSomnisPage() {
               { label: { es: 'Proyectos', en: 'Projects' }, id: 'proyectos' },
               { label: { es: 'Equipo',    en: 'Team' },     id: 'equipo' },
             ].map(({ label, id }) => (
-              <a key={id} href={`#${id}`}
-                onClick={e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }}
+              <a key={id} href={id === 'proyectos' ? '/proyectos' : `#${id}`}
+                onClick={id === 'proyectos' ? undefined : e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }}
                 className="transition-all duration-300"
                 style={{
                   color: C.gray, textDecoration: 'none',
@@ -1801,10 +1796,11 @@ export default function AiaSomnisPage() {
         </motion.div>
       </div>
 
-      {/* ══════════ PROYECTOS — FxSlider ══════════ */}
+      {/* ══════════ PROYECTOS — FxSlider (desactivado, ver nota junto a getProjects) ══════════
       <section id="proyectos">
         <FxSlider items={getProjects(lang)} headerText={lang === 'es' ? 'Proyectos seleccionados' : 'Selected projects'} categoryLabel={lang === 'es' ? 'Categoría' : 'Category'} duration={0.64} parallaxAmount={5} />
       </section>
+      */}
 
       {/* ══════════ CUBO FRAMES ══════════ */}
       <CuboFramesSection lang={lang} />
