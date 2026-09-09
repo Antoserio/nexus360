@@ -1278,11 +1278,13 @@ export default function AiaSomnisPage() {
           <div className="hidden md:flex items-center gap-8">
             {[
               { label: { es: 'Servicios', en: 'Services' }, id: 'servicios' },
-              { label: { es: 'Proyectos', en: 'Projects' }, id: 'proyectos' },
+              // "Proyectos" oculto del menu a peticion del usuario (09/2026) — la
+              // pagina /proyectos sigue viva, solo se quita el enlace de aqui.
+              // { label: { es: 'Proyectos', en: 'Projects' }, id: 'proyectos' },
               { label: { es: 'Equipo',    en: 'Team' },     id: 'equipo' },
             ].map(({ label, id }) => (
-              <a key={id} href={id === 'proyectos' ? '/proyectos' : `#${id}`}
-                onClick={id === 'proyectos' ? undefined : e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }}
+              <a key={id} href={`#${id}`}
+                onClick={e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }) }}
                 className="transition-all duration-300"
                 style={{
                   color: C.gray, textDecoration: 'none',
