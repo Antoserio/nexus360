@@ -15,6 +15,7 @@ interface Avatar {
   name: string
   accent: string
   image?: string
+  imageFit?: 'cover' | 'contain'
   status?: T
   imagePosition?: string
   video?: string
@@ -111,6 +112,7 @@ const AVATARS: Avatar[] = [
   },
   {
     num: '07', name: 'Helen', accent: C.cyan,
+    image: '/avatares/helen.jpg', imageFit: 'contain', imagePosition: 'center bottom',
     status: { es: 'Demo en preparación', en: 'Demo in preparation' },
     desc: {
       es: 'Versión humana de cuerpo completo: humano digital con apariencia totalmente humana. Presencia natural para recepción, eventos y atención de marca.',
@@ -293,9 +295,15 @@ function AvatarMedia({ a, lang }: { a: Avatar; lang: Lang }) {
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
       ) : a.image ? (
-        <img src={a.image} alt={lang === 'es' ? `Avatar ${a.name}` : `${a.name} avatar`} loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
+        <>
+          {a.imageFit === 'contain' && (
+            <div className="absolute inset-0"
+              style={{ background: `radial-gradient(ellipse 70% 55% at 50% 42%, ${a.accent}30 0%, #071120 75%)` }} />
+          )}
+          <img src={a.image} alt={lang === 'es' ? `Avatar ${a.name}` : `${a.name} avatar`} loading="lazy"
+            className="absolute inset-0 w-full h-full"
+            style={{ objectFit: a.imageFit ?? 'cover', objectPosition: a.imagePosition ?? 'center 15%' }} />
+        </>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center"
           style={{ background: `radial-gradient(ellipse 70% 55% at 50% 42%, ${a.accent}30 0%, #071120 70%)` }}>
@@ -395,9 +403,30 @@ export default function AvataresPage() {
         </div>
       </header>
 
+      {/* ── VÍDEO DEMO (arriba del todo) ── */}
+      <section className="relative px-6 flex flex-col items-center" style={{ paddingTop: 96 }}>
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 50% 60% at 50% 45%, rgba(0,184,255,0.12) 0%, transparent 70%)',
+        }} />
+        <div className="relative w-full overflow-hidden rounded-2xl" style={{
+          maxWidth: 'min(400px, calc((100vh - 200px) * 0.741))', aspectRatio: '848 / 1144', background: '#000',
+          border: `1px solid ${C.cyan}50`, boxShadow: `0 0 60px ${C.cyan}25, 0 24px 60px rgba(0,0,0,0.55)`,
+        }}>
+          <video
+            controls playsInline preload="none"
+            poster="/avatares/helen-demo-poster.jpg"
+            src="/avatares/helen-demo.mp4"
+            aria-label={lang === 'es' ? 'Demo en vídeo de Helen, conserje virtual' : 'Video demo of Helen, virtual concierge'}
+            className="absolute inset-0 w-full h-full object-cover" />
+        </div>
+        <p className="relative" style={{ color: C.gray, fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 16 }}>
+          {lang === 'es' ? 'Helen · demo de conserje virtual' : 'Helen · virtual concierge demo'}
+        </p>
+      </section>
+
       {/* ── HERO ── */}
       <section className="relative flex flex-col items-center justify-center text-center px-6"
-        style={{ minHeight: '68vh', paddingTop: 90 }}>
+        style={{ minHeight: '56vh', paddingTop: 70 }}>
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(0,184,255,0.14) 0%, transparent 70%)',
         }} />
@@ -438,30 +467,36 @@ export default function AvataresPage() {
         </div>
       </section>
 
-      {/* ── LA OPORTUNIDAD ── */}
-      <section className="relative max-w-6xl mx-auto px-6" style={{ padding: '70px 24px 30px' }}>
+      {/* ── LA OPORTUNIDAD (solo títulos) ── */}
+      <section className="relative max-w-6xl mx-auto px-6" style={{ padding: '60px 24px 20px' }}>
         <SectionHead eyebrow={OPPORTUNITY.eyebrow} title={OPPORTUNITY.title} lang={lang} />
-        <p style={{ color: C.gray, fontSize: '1.05rem', lineHeight: 1.7, maxWidth: 680, marginTop: -16, marginBottom: 36 }}>
-          {OPPORTUNITY.text[lang]}
-        </p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {OPPORTUNITY.pillars.map((p, i) => (
-            <div key={i} style={cardStyle}>
-              <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, fontSize: '1.05rem', color: C.white, marginBottom: 10 }}>
-                {p.title[lang]}
-              </h3>
-              <p style={{ color: C.gray, fontSize: '0.9rem', lineHeight: 1.65 }}>{p.text[lang]}</p>
-            </div>
-          ))}
+          {OPPORTUNITY.pillars.map((p, i) => {
+            const col = [C.blue, C.gold, C.purple, C.cyan][i % 4]
+            return (
+              <div key={i} className="flex items-center" style={{
+                minHeight: 110, padding: '22px 24px', borderRadius: 16,
+                border: `1px solid ${col}55`,
+                background: `linear-gradient(135deg, ${col}22 0%, rgba(255,255,255,0.02) 100%)`,
+                boxShadow: `0 0 28px ${col}1A`,
+              }}>
+                <h3 style={{
+                  fontFamily: "'Syne', sans-serif", fontWeight: 700, letterSpacing: '-0.02em',
+                  fontSize: 'clamp(1.1rem,1.6vw,1.35rem)', lineHeight: 1.2, color: col,
+                }}>
+                  {p.title[lang]}
+                </h3>
+              </div>
+            )
+          })}
         </div>
-        <div className="rounded-2xl" style={{
-          marginTop: 20, padding: 28, border: `1px solid ${C.cyan}40`,
-          background: `linear-gradient(135deg, ${C.cyan}12 0%, rgba(255,255,255,0.02) 100%)`,
+        <div className="rounded-2xl flex items-center" style={{
+          marginTop: 16, padding: '20px 24px', border: `1px solid ${C.goldSoft}55`,
+          background: `linear-gradient(135deg, ${C.goldSoft}22 0%, rgba(255,255,255,0.02) 100%)`,
         }}>
-          <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, fontSize: '1.2rem', color: C.white, marginBottom: 10 }}>
+          <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, letterSpacing: '-0.02em', fontSize: 'clamp(1.05rem,1.5vw,1.25rem)', color: C.goldSoft }}>
             {OPPORTUNITY.tis.title[lang]}
           </h3>
-          <p style={{ color: C.gray, fontSize: '0.95rem', lineHeight: 1.7, maxWidth: 820 }}>{OPPORTUNITY.tis.text[lang]}</p>
         </div>
       </section>
 
