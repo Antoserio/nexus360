@@ -16,6 +16,7 @@ interface Avatar {
   accent: string
   image?: string
   imageFit?: 'cover' | 'contain'
+  player?: { src: string; poster: string }
   status?: T
   imagePosition?: string
   video?: string
@@ -65,7 +66,7 @@ const AVATARS: Avatar[] = [
   {
     num: '04', name: 'Joy', accent: C.cyan,
     image: '/avatares/joy.png',
-    video: '/avatares/joy-hotel.mp4',
+    player: { src: '/avatares/joy-tis.mp4', poster: '/avatares/joy-tis-poster.jpg' },
     desc: {
       es: 'Humano digital 3D con presencia realista: expresiones faciales, mirada, parpadeo, gestos y sincronización labial. Ideal para hospitality, turismo, marca y atención premium.',
       en: 'A 3D digital human with a realistic presence: facial expressions, gaze, blinking, gestures and lip sync. Ideal for hospitality, tourism, branding and premium guest care.',
@@ -99,6 +100,7 @@ const AVATARS: Avatar[] = [
   {
     num: '06', name: 'Velázquez', accent: C.purple,
     image: '/avatares/velazquez.png',
+    player: { src: '/avatares/velazquez-tis.mp4', poster: '/avatares/velazquez-tis-poster.jpg' },
     desc: {
       es: 'Personaje de marca a medida: embajador corporativo o personaje histórico. Personalidad, vestuario, colores, entorno y tono se alinean con la identidad del cliente.',
       en: 'A custom brand character: corporate ambassador or historical figure. Personality, wardrobe, colours, setting and tone are aligned with the client\'s identity.',
@@ -112,7 +114,8 @@ const AVATARS: Avatar[] = [
   },
   {
     num: '07', name: 'Helen', accent: C.cyan,
-    image: '/avatares/helen.jpg', imageFit: 'contain', imagePosition: 'center bottom',
+    image: '/avatares/helen.jpg', imagePosition: 'center 20%',
+    video: '/avatares/helen-demo.mp4',
     status: { es: 'Demo en preparación', en: 'Demo in preparation' },
     desc: {
       es: 'Versión humana de cuerpo completo: humano digital con apariencia totalmente humana. Presencia natural para recepción, eventos y atención de marca.',
@@ -128,6 +131,7 @@ const AVATARS: Avatar[] = [
   {
     num: '08', name: 'Mia · Fluge Audiovisuales', accent: C.goldSoft,
     image: '/mia-fluge.jpg', imagePosition: 'center 18%',
+    player: { src: '/avatares/mia-tis.mp4', poster: '/avatares/mia-tis-poster.jpg' },
     desc: {
       es: 'Humana digital creada para Fluge Audiovisuales. Presenta la marca, sus servicios y atiende a clientes en eventos y espacios corporativos.',
       en: 'A digital human created for Fluge Audiovisuales. She presents the brand and its services and looks after clients at events and corporate spaces.',
@@ -252,6 +256,42 @@ function YoutubeMedia({ a, lang }: { a: Avatar & { youtube: { cas: string; eng: 
   )
 }
 
+function PlayerMedia({ a, lang }: { a: Avatar & { player: { src: string; poster: string } }; lang: Lang }) {
+  const [playing, setPlaying] = useState(false)
+  return (
+    <div className="relative overflow-hidden rounded-2xl"
+      style={{
+        aspectRatio: '16 / 9', background: '#000',
+        border: `1px solid ${a.accent}40`,
+        boxShadow: `0 0 50px ${a.accent}25, 0 20px 50px rgba(0,0,0,0.5)`,
+      }}>
+      {playing ? (
+        <video src={a.player.src} poster={a.player.poster} controls autoPlay playsInline
+          className="absolute inset-0 w-full h-full object-contain" />
+      ) : (
+        <button onClick={() => setPlaying(true)}
+          className="absolute inset-0 w-full h-full"
+          style={{ border: 'none', cursor: 'pointer', padding: 0, background: 'none' }}
+          aria-label={lang === 'es' ? `Reproducir vídeo de ${a.name}` : `Play ${a.name} video`}>
+          <img src={a.player.poster} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, transparent 55%, rgba(5,7,13,0.55) 100%)' }} />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="w-16 h-16 rounded-full flex items-center justify-center"
+              style={{ background: `${a.accent}CC`, color: '#05070D', boxShadow: `0 0 30px ${a.accent}80` }}>
+              <PlayIcon />
+            </span>
+          </div>
+        </button>
+      )}
+      {!playing && (
+        <span className="absolute bottom-3 right-4 font-black pointer-events-none" style={{ fontSize: 34, color: `${a.accent}77`, letterSpacing: '-0.03em' }}>
+          {a.num}
+        </span>
+      )}
+    </div>
+  )
+}
+
 function AvatarMedia({ a, lang }: { a: Avatar; lang: Lang }) {
   const ref = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -277,6 +317,7 @@ function AvatarMedia({ a, lang }: { a: Avatar; lang: Lang }) {
     setMuted(v.muted)
   }
 
+  if (a.player) return <PlayerMedia a={a as Avatar & { player: { src: string; poster: string } }} lang={lang} />
   if (a.youtube) return <YoutubeMedia a={a as Avatar & { youtube: { cas: string; eng: string } }} lang={lang} />
 
   return (
@@ -403,24 +444,24 @@ export default function AvataresPage() {
         </div>
       </header>
 
-      {/* ── VÍDEO DEMO (arriba del todo) ── */}
+      {/* ── VÍDEO DE PRESENTACIÓN (arriba del todo, horizontal) ── */}
       <section className="relative px-6 flex flex-col items-center" style={{ paddingTop: 96 }}>
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 50% 60% at 50% 45%, rgba(0,184,255,0.12) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 60% 60% at 50% 45%, rgba(0,184,255,0.12) 0%, transparent 70%)',
         }} />
         <div className="relative w-full overflow-hidden rounded-2xl" style={{
-          maxWidth: 'min(400px, calc((100vh - 200px) * 0.741))', aspectRatio: '848 / 1144', background: '#000',
+          maxWidth: 'min(1000px, calc((100vh - 190px) * 1.7778))', aspectRatio: '16 / 9', background: '#000',
           border: `1px solid ${C.cyan}50`, boxShadow: `0 0 60px ${C.cyan}25, 0 24px 60px rgba(0,0,0,0.55)`,
         }}>
           <video
             controls playsInline preload="none"
-            poster="/avatares/helen-demo-poster.jpg"
-            src="/avatares/helen-demo.mp4"
-            aria-label={lang === 'es' ? 'Demo en vídeo de Helen, conserje virtual' : 'Video demo of Helen, virtual concierge'}
+            poster="/avatares/presentacion-poster.jpg"
+            src="/avatares/presentacion.mp4"
+            aria-label={lang === 'es' ? 'Vídeo de presentación de los avatares MAIGIA' : 'MAIGIA avatars presentation video'}
             className="absolute inset-0 w-full h-full object-cover" />
         </div>
         <p className="relative" style={{ color: C.gray, fontSize: 12, letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 16 }}>
-          {lang === 'es' ? 'Helen · demo de conserje virtual' : 'Helen · virtual concierge demo'}
+          {lang === 'es' ? 'Presentación · Avatares IA' : 'Presentation · AI Avatars'}
         </p>
       </section>
 
@@ -510,12 +551,12 @@ export default function AvataresPage() {
               <div className={`flex flex-col md:flex-row items-center gap-10 md:gap-16 ${imageRight ? 'md:flex-row-reverse' : ''}`}>
 
                 {/* Imagen / vídeo */}
-                <div className="w-full md:w-[38%] shrink-0">
+                <div className={`w-full shrink-0 ${a.player ? 'md:w-[54%]' : 'md:w-[38%]'}`}>
                   <AvatarMedia a={a} lang={lang} />
                 </div>
 
                 {/* Texto */}
-                <div className="w-full md:w-[62%] flex flex-col gap-5">
+                <div className={`w-full flex flex-col gap-5 ${a.player ? 'md:w-[46%]' : 'md:w-[62%]'}`}>
                   <div>
                     <div className="flex items-center gap-3 mb-3">
                       <span style={{
