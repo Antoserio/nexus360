@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { GlowCursor, CursorParticles } from './components/GlowCursor'
 import { useLang, type Lang } from '@/lib/lang'
 import { LangToggle } from '@/components/LangToggle'
+import { OPPORTUNITY, MODULES, DEPLOYMENT, CAPABILITIES, MARKETS, OFFER, type T } from '@/lib/avataresContent'
 
 const C = {
   bg: '#05070D', blue: '#00B8FF', cyan: '#22D3FF',
@@ -9,13 +10,12 @@ const C = {
   white: '#F4F7FB', gray: '#AAB3C2', border: '#223044',
 }
 
-type T = { es: string; en: string }
-
 interface Avatar {
   num: string
   name: string
   accent: string
-  image: string
+  image?: string
+  status?: T
   imagePosition?: string
   video?: string
   youtube?: { cas: string; eng: string }
@@ -24,44 +24,50 @@ interface Avatar {
   note?: T
 }
 
+const TAGS_LIVE: T[] = [
+  { es: 'Conversación en vivo', en: 'Live conversation' },
+  { es: 'Multilingüe', en: 'Multilingual' },
+  { es: 'Presencia en eventos', en: 'Event presence' },
+  { es: 'Captación de leads', en: 'Lead capture' },
+]
+
 const AVATARS: Avatar[] = [
   {
     num: '01', name: 'Viky · Girasomnis', accent: C.blue,
     image: '/avatares/viky.jpg',
     youtube: { cas: 'W0EKcrfuCL8', eng: 'qmQq8Bkq_TY' },
     desc: {
-      es: 'Avatar conversacional interactivo para eventos, marcas y espacios corporativos. Reel de presentación con contenido LED de alta gama, disponible en español e inglés.',
-      en: 'Interactive conversational avatar for events, brands and corporate spaces. Presentation reel with high-end LED content, available in Spanish and English.',
+      es: 'Nuestro primer modelo: avatar conversacional interactivo para eventos, marcas y espacios corporativos. Reel de presentación con contenido LED de alta gama, disponible en español e inglés.',
+      en: 'Our first model: an interactive conversational avatar for events, brands and corporate spaces. Presentation reel with high-end LED content, available in Spanish and English.',
     },
-    tags: [
-      { es: 'Conversación en vivo', en: 'Live conversation' },
-      { es: 'Multilingüe', en: 'Multilingual' },
-      { es: 'Presencia en eventos', en: 'Event presence' },
-      { es: 'Captación de leads', en: 'Lead capture' },
-    ],
+    tags: TAGS_LIVE,
   },
   {
     num: '02', name: 'Viky · DES', accent: C.blue,
     image: '/avatares/viky.jpg',
     video: '/avatares/viky-des.mp4',
     desc: {
-      es: 'Viky ha conversado en tiempo real con cientos de personas sobre el escenario de DES Málaga 2026, manteniendo más de 800 conversaciones reales con asistentes.',
-      en: 'Viky has held real-time conversations with hundreds of people on stage at DES Málaga 2026, holding more than 800 real conversations with attendees.',
+      es: 'Viky actuó en el escenario de DES Málaga 2026 en tiempo real, conversando en vivo con la presentadora en varios momentos y manteniendo más de 800 conversaciones reales con asistentes.',
+      en: 'Viky performed on stage at DES Málaga 2026 in real time, chatting live with the host at several points and holding more than 800 real conversations with attendees.',
     },
-    tags: [
-      { es: 'Conversación en vivo', en: 'Live conversation' },
-      { es: 'Multilingüe', en: 'Multilingual' },
-      { es: 'Presencia en eventos', en: 'Event presence' },
-      { es: 'Captación de leads', en: 'Lead capture' },
-    ],
+    tags: TAGS_LIVE,
   },
   {
-    num: '03', name: 'Joy', accent: C.cyan,
+    num: '03', name: 'Viky · Versión Fluge', accent: C.goldSoft,
+    image: '/viky-fluge.jpg',
+    desc: {
+      es: 'Variante de Viky desplegada con Fluge Audiovisuales: sesión conversacional en vivo y demostración en vídeo del avatar funcionando. Para hablar con ella, llámala por su nombre: «Viky».',
+      en: 'A variant of Viky deployed with Fluge Audiovisuales: a live conversational session and a video demo of the avatar at work. To talk to her, call her by name: "Viky".',
+    },
+    tags: TAGS_LIVE,
+  },
+  {
+    num: '04', name: 'Joy', accent: C.cyan,
     image: '/avatares/joy.png',
     video: '/avatares/joy-hotel.mp4',
     desc: {
-      es: 'Humano digital 3D con presencia realista: expresiones faciales, mirada, parpadeo, gestos y sincronización labial. Pensada para hospitality, turismo, marca y atención premium.',
-      en: 'A 3D digital human with a realistic presence: facial expressions, gaze, blinking, gestures and lip sync. Designed for hospitality, tourism, branding and premium guest care.',
+      es: 'Humano digital 3D con presencia realista: expresiones faciales, mirada, parpadeo, gestos y sincronización labial. Ideal para hospitality, turismo, marca y atención premium.',
+      en: 'A 3D digital human with a realistic presence: facial expressions, gaze, blinking, gestures and lip sync. Ideal for hospitality, tourism, branding and premium guest care.',
     },
     tags: [
       { es: 'Hospitality y turismo', en: 'Hospitality & tourism' },
@@ -70,17 +76,17 @@ const AVATARS: Avatar[] = [
       { es: 'Multilingüe', en: 'Multilingual' },
     ],
     note: {
-      es: '📍 Próxima parada: estaremos con Joy en el TIS Sevilla (Tourism Innovation Summit), con un mapa interactivo del recinto diseñado en exclusiva para ellos.',
-      en: '📍 Next stop: we\'ll be with Joy at TIS Sevilla (Tourism Innovation Summit), with an interactive venue map designed exclusively for them.',
+      es: '📍 Versión TIS Sevilla: Joy preparada para el Tourism Innovation Summit (Sevilla, 6–8 de octubre de 2026) y enlazada a un mapa interactivo del evento creado en exclusiva para ellos.',
+      en: '📍 TIS Sevilla edition: Joy set up for the Tourism Innovation Summit (Seville, 6–8 October 2026) and linked to an interactive event map created exclusively for them.',
     },
   },
   {
-    num: '04', name: 'Toby', accent: C.gold,
+    num: '05', name: 'Toby', accent: C.gold,
     image: '/avatares/toby.png',
     imagePosition: 'center 30%',
     desc: {
-      es: 'Personaje robótico generado proceduralmente, con ojos y núcleo luminosos y animaciones propias. Latencia casi cero y capaz de hablar en más de 50 idiomas en tiempo real.',
-      en: 'A procedurally generated robotic character, with glowing eyes and core and its own animations. Near-zero latency and able to speak in more than 50 languages in real time.',
+      es: 'Robot 3D metálico generado proceduralmente, con ojos y núcleo luminosos y animaciones idle. Latencia casi cero y capaz de hablar en más de 50 idiomas en tiempo real. Ideal para industria, educación y tecnología.',
+      en: 'A metallic 3D robot generated procedurally, with glowing eyes and core and idle animations. Near-zero latency and able to speak more than 50 languages in real time. Ideal for industry, education and technology.',
     },
     tags: [
       { es: 'Industria y tecnología', en: 'Industry & technology' },
@@ -90,17 +96,72 @@ const AVATARS: Avatar[] = [
     ],
   },
   {
-    num: '05', name: 'Velázquez', accent: C.purple,
+    num: '06', name: 'Velázquez', accent: C.purple,
     image: '/avatares/velazquez.png',
     desc: {
-      es: 'Personaje de marca a medida: embajador corporativo o histórico. Personalidad, vestuario, colores, entorno y tono se diseñan a medida de cada cliente.',
-      en: 'A custom brand character: corporate or historical ambassador. Personality, wardrobe, colours, setting and tone are all designed to each client\'s needs.',
+      es: 'Personaje de marca a medida: embajador corporativo o personaje histórico. Personalidad, vestuario, colores, entorno y tono se alinean con la identidad del cliente.',
+      en: 'A custom brand character: corporate ambassador or historical figure. Personality, wardrobe, colours, setting and tone are aligned with the client\'s identity.',
     },
     tags: [
       { es: 'Personajes a medida', en: 'Custom characters' },
       { es: 'Museos y cultura', en: 'Museums & culture' },
       { es: 'Marca e institucional', en: 'Brand & institutional' },
       { es: 'Eventos', en: 'Events' },
+    ],
+  },
+  {
+    num: '07', name: 'Helen', accent: C.cyan,
+    status: { es: 'Demo en preparación', en: 'Demo in preparation' },
+    desc: {
+      es: 'Versión humana de cuerpo completo: humano digital con apariencia totalmente humana. Presencia natural para recepción, eventos y atención de marca.',
+      en: 'Full-body human version: a digital human with a fully human appearance. A natural presence for reception, events and brand service.',
+    },
+    tags: [
+      { es: 'Cuerpo completo', en: 'Full body' },
+      { es: 'Recepción', en: 'Reception' },
+      { es: 'Eventos', en: 'Events' },
+      { es: 'Atención de marca', en: 'Brand service' },
+    ],
+  },
+  {
+    num: '08', name: 'Mia · Fluge Audiovisuales', accent: C.goldSoft,
+    image: '/mia-fluge.jpg', imagePosition: 'center 18%',
+    desc: {
+      es: 'Humana digital creada para Fluge Audiovisuales. Presenta la marca, sus servicios y atiende a clientes en eventos y espacios corporativos.',
+      en: 'A digital human created for Fluge Audiovisuales. She presents the brand and its services and looks after clients at events and corporate spaces.',
+    },
+    tags: [
+      { es: 'Presentadora de marca', en: 'Brand presenter' },
+      { es: 'Eventos corporativos', en: 'Corporate events' },
+      { es: 'Atención a clientes', en: 'Client service' },
+      { es: 'Conversación en vivo', en: 'Live conversation' },
+    ],
+  },
+  {
+    num: '09', name: 'Max', accent: C.blue,
+    status: { es: 'En producción', en: 'In production' },
+    desc: {
+      es: 'Nuevo humano digital 3D en desarrollo. Presencia corporativa elegante, ideal para recepción, showrooms y eventos de marca.',
+      en: 'A new 3D digital human in development. An elegant corporate presence, ideal for reception, showrooms and brand events.',
+    },
+    tags: [
+      { es: 'Presencia corporativa', en: 'Corporate presence' },
+      { es: 'Recepción', en: 'Reception' },
+      { es: 'Showrooms', en: 'Showrooms' },
+      { es: 'Eventos de marca', en: 'Brand events' },
+    ],
+  },
+  {
+    num: '10', name: 'Joy VR · Joy Offline', accent: C.purple,
+    status: { es: 'En producción', en: 'In production' },
+    desc: {
+      es: 'Dos variantes de Joy en desarrollo: una para inmersión en realidad virtual y experiencias 360º, y otra para despliegue local sin dependencia de nube, pensada para entornos con requisitos estrictos de privacidad y protección de datos.',
+      en: 'Two variants of Joy in development: one for virtual reality immersion and 360º experiences, and another for local deployment with no cloud dependency, designed for environments with strict privacy and data-protection requirements.',
+    },
+    tags: [
+      { es: 'Realidad virtual y 360º', en: 'VR & 360º' },
+      { es: 'Sin dependencia de nube', en: 'No cloud dependency' },
+      { es: 'Privacidad de datos', en: 'Data privacy' },
     ],
   },
 ]
@@ -231,13 +292,29 @@ function AvatarMedia({ a, lang }: { a: Avatar; lang: Lang }) {
           autoPlay muted loop playsInline preload="none"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
-      ) : (
+      ) : a.image ? (
         <img src={a.image} alt={lang === 'es' ? `Avatar ${a.name}` : `${a.name} avatar`} loading="lazy"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: a.imagePosition ?? 'center 15%' }} />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center"
+          style={{ background: `radial-gradient(ellipse 70% 55% at 50% 42%, ${a.accent}30 0%, #071120 70%)` }}>
+          <span className="font-black" style={{
+            fontFamily: "'Syne', sans-serif", fontSize: 'clamp(3rem, 9vw, 5.5rem)', letterSpacing: '-0.04em',
+            color: 'transparent', WebkitTextStroke: `1.5px ${a.accent}80`,
+          }}>
+            {a.name.split(' ')[0]}
+          </span>
+        </div>
       )}
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: `linear-gradient(180deg, transparent 55%, rgba(5,7,13,0.75) 100%)` }} />
+      {a.status && (
+        <span className="absolute top-3 left-3 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full"
+          style={{ background: 'rgba(5,7,13,0.7)', backdropFilter: 'blur(6px)', border: `1px solid ${a.accent}70`, color: a.accent }}>
+          {a.status[lang]}
+        </span>
+      )}
       <span className="absolute bottom-4 left-5 font-black" style={{ fontSize: 42, color: `${a.accent}55`, letterSpacing: '-0.03em' }}>
         {a.num}
       </span>
@@ -257,14 +334,37 @@ function AvatarMedia({ a, lang }: { a: Avatar; lang: Lang }) {
   )
 }
 
+function SectionHead({ eyebrow, title, lang, align = 'left' }: { eyebrow: T; title: T; lang: Lang; align?: 'left' | 'center' }) {
+  return (
+    <div style={{ textAlign: align, marginBottom: 40 }}>
+      <p style={{ color: C.blue, fontSize: 12, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 12 }}>
+        {eyebrow[lang]}
+      </p>
+      <h2 style={{
+        fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.03em', lineHeight: 1.1,
+        fontSize: 'clamp(1.7rem,3.2vw,2.6rem)', color: C.white, maxWidth: 760,
+        marginInline: align === 'center' ? 'auto' : undefined,
+      }}>
+        {title[lang]}
+      </h2>
+    </div>
+  )
+}
+
+const cardStyle: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.03)', border: `1px solid ${C.border}`, borderRadius: 16, padding: 24,
+}
+
 export default function AvataresPage() {
   const [lang, setLang] = useLang()
   const [contactOpen, setContactOpen] = useState(false)
   const [formSent, setFormSent] = useState(false)
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null)
+  const [prefill, setPrefill] = useState<T | null>(null)
 
-  const openContact = (avatarName?: string) => {
+  const openContact = (avatarName?: string, customPrefill?: T) => {
     setSelectedAvatar(avatarName ?? null)
+    setPrefill(customPrefill ?? null)
     setContactOpen(true)
   }
 
@@ -315,8 +415,8 @@ export default function AvataresPage() {
         </h1>
         <p className="relative mt-5" style={{ color: C.gray, fontSize: 'clamp(0.95rem,1.3vw,1.15rem)', maxWidth: 620 }}>
           {lang === 'es'
-            ? 'Cinco avatares listos para llevar a tu evento, stand o espacio. Cuéntanos tu proyecto y te mostramos cuál encaja mejor — y si quieres, lo pruebas en directo.'
-            : 'Five avatars ready to bring to your event, stand or space. Tell us about your project and we\'ll show you which one fits best — and if you like, you can try it live.'}
+            ? 'Un catálogo de avatares listos para llevar a tu evento, stand o espacio. Cuéntanos tu proyecto y te mostramos cuál encaja mejor — y si quieres, lo pruebas en directo.'
+            : 'A catalogue of avatars ready to bring to your event, stand or space. Tell us about your project and we\'ll show you which one fits best — and if you like, you can try it live.'}
         </p>
         <div className="relative flex flex-wrap items-center justify-center gap-4 mt-8">
           <button onClick={() => openContact()}
@@ -335,6 +435,33 @@ export default function AvataresPage() {
             }}>
             {lang === 'es' ? 'Ver avatares ↓' : 'See avatars ↓'}
           </a>
+        </div>
+      </section>
+
+      {/* ── LA OPORTUNIDAD ── */}
+      <section className="relative max-w-6xl mx-auto px-6" style={{ padding: '70px 24px 30px' }}>
+        <SectionHead eyebrow={OPPORTUNITY.eyebrow} title={OPPORTUNITY.title} lang={lang} />
+        <p style={{ color: C.gray, fontSize: '1.05rem', lineHeight: 1.7, maxWidth: 680, marginTop: -16, marginBottom: 36 }}>
+          {OPPORTUNITY.text[lang]}
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {OPPORTUNITY.pillars.map((p, i) => (
+            <div key={i} style={cardStyle}>
+              <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, fontSize: '1.05rem', color: C.white, marginBottom: 10 }}>
+                {p.title[lang]}
+              </h3>
+              <p style={{ color: C.gray, fontSize: '0.9rem', lineHeight: 1.65 }}>{p.text[lang]}</p>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-2xl" style={{
+          marginTop: 20, padding: 28, border: `1px solid ${C.cyan}40`,
+          background: `linear-gradient(135deg, ${C.cyan}12 0%, rgba(255,255,255,0.02) 100%)`,
+        }}>
+          <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, fontSize: '1.2rem', color: C.white, marginBottom: 10 }}>
+            {OPPORTUNITY.tis.title[lang]}
+          </h3>
+          <p style={{ color: C.gray, fontSize: '0.95rem', lineHeight: 1.7, maxWidth: 820 }}>{OPPORTUNITY.tis.text[lang]}</p>
         </div>
       </section>
 
@@ -425,6 +552,134 @@ export default function AvataresPage() {
             </div>
           )
         })}
+      </section>
+
+      {/* ── ARQUITECTURA MODULAR ── */}
+      <section className="max-w-6xl mx-auto px-6" style={{ padding: '30px 24px 80px' }}>
+        <SectionHead eyebrow={MODULES.eyebrow} title={MODULES.title} lang={lang} />
+        <div className="rounded-2xl overflow-hidden" style={{ border: `1px solid ${C.border}` }}>
+          {MODULES.items.map((m, i) => (
+            <div key={i} className="flex flex-col md:flex-row md:items-start gap-2 md:gap-6" style={{
+              padding: '18px 22px', borderTop: i === 0 ? 'none' : `1px solid ${C.border}`,
+              background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent',
+            }}>
+              <h3 className="md:w-[220px] shrink-0" style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, fontSize: '1rem', color: C.white }}>
+                {m.name[lang]}
+              </h3>
+              <p className="flex-1" style={{ color: C.gray, fontSize: '0.92rem', lineHeight: 1.65 }}>{m.what[lang]}</p>
+              <span className="md:w-[130px] shrink-0 md:text-right" style={{ color: C.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                {m.mode[lang]}
+              </span>
+            </div>
+          ))}
+        </div>
+        <p style={{ color: C.gray, fontSize: '0.88rem', lineHeight: 1.65, marginTop: 18, maxWidth: 720, opacity: 0.85 }}>{MODULES.note[lang]}</p>
+      </section>
+
+      {/* ── DESPLIEGUE FÍSICO ── */}
+      <section className="max-w-6xl mx-auto px-6" style={{ padding: '0 24px 80px' }}>
+        <div className="rounded-2xl" style={{
+          padding: 'clamp(24px,4vw,44px)', border: `1px solid ${C.border}`,
+          background: 'linear-gradient(135deg, rgba(27,61,255,0.10) 0%, rgba(255,255,255,0.02) 100%)',
+        }}>
+          <span className="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full"
+            style={{ border: `1px solid ${C.blue}60`, color: C.blue, marginBottom: 18 }}>
+            {DEPLOYMENT.chip[lang]}
+          </span>
+          <p style={{ color: C.blue, fontSize: 12, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 10 }}>
+            {DEPLOYMENT.eyebrow[lang]}
+          </p>
+          <h2 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.03em', fontSize: 'clamp(1.6rem,3vw,2.3rem)', color: C.white, marginBottom: 16 }}>
+            {DEPLOYMENT.title[lang]}
+          </h2>
+          <p style={{ color: C.gray, fontSize: '1rem', lineHeight: 1.7, maxWidth: 720 }}>{DEPLOYMENT.text[lang]}</p>
+        </div>
+      </section>
+
+      {/* ── CAPACIDADES ── */}
+      <section className="max-w-6xl mx-auto px-6" style={{ padding: '0 24px 80px' }}>
+        <SectionHead eyebrow={CAPABILITIES.eyebrow} title={CAPABILITIES.title} lang={lang} />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {CAPABILITIES.items.map((c, i) => (
+            <div key={i} style={cardStyle}>
+              <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, fontSize: '1.05rem', color: C.white, marginBottom: 10 }}>{c.title[lang]}</h3>
+              <p style={{ color: C.gray, fontSize: '0.9rem', lineHeight: 1.65 }}>{c.text[lang]}</p>
+            </div>
+          ))}
+        </div>
+        <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, fontSize: '1.15rem', color: C.white, margin: '40px 0 16px' }}>
+          {CAPABILITIES.voiceTitle[lang]}
+        </h3>
+        <div className="grid gap-4 md:grid-cols-3">
+          {CAPABILITIES.voice.map((v, i) => (
+            <div key={i} style={{ ...cardStyle, borderColor: `${C.blue}30` }}>
+              <h4 style={{ color: C.blue, fontSize: '0.95rem', fontWeight: 700, marginBottom: 8 }}>{v.title[lang]}</h4>
+              <p style={{ color: C.gray, fontSize: '0.88rem', lineHeight: 1.65 }}>{v.text[lang]}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── SOLUCIONES POR MERCADO ── */}
+      <section className="max-w-6xl mx-auto px-6" style={{ padding: '0 24px 80px' }}>
+        <SectionHead eyebrow={MARKETS.eyebrow} title={MARKETS.title} lang={lang} />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {MARKETS.items.map((m, i) => (
+            <div key={i} style={cardStyle}>
+              <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, fontSize: '1rem', color: C.white, marginBottom: 10 }}>{m.title[lang]}</h3>
+              <p style={{ color: C.gray, fontSize: '0.88rem', lineHeight: 1.65 }}>{m.text[lang]}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── OFERTA ── */}
+      <section className="max-w-6xl mx-auto px-6" style={{ padding: '0 24px 40px' }}>
+        <SectionHead eyebrow={OFFER.eyebrow} title={OFFER.title} lang={lang} />
+        <div className="grid gap-4 md:grid-cols-3">
+          {OFFER.tiers.map(tier => (
+            <div key={tier.name} className="flex flex-col" style={{
+              ...cardStyle, padding: 28, position: 'relative',
+              border: `1px solid ${tier.popular ? C.blue : C.border}`,
+              boxShadow: tier.popular ? '0 0 40px rgba(0,184,255,0.15)' : 'none',
+            }}>
+              {tier.popular && (
+                <span className="absolute text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full"
+                  style={{ top: -12, left: 24, background: C.blue, color: '#05070D' }}>
+                  {OFFER.popular[lang]}
+                </span>
+              )}
+              <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: '1.4rem', color: C.white, letterSpacing: '-0.02em' }}>{tier.name}</h3>
+              <p style={{ color: C.blue, fontSize: '0.85rem', fontWeight: 600, marginBottom: 18 }}>{tier.tagline[lang]}</p>
+              <ul className="flex flex-col gap-2.5" style={{ listStyle: 'none', padding: 0, margin: 0, flex: 1 }}>
+                {tier.items.map((it, ii) => (
+                  <li key={ii} style={{ color: C.gray, fontSize: '0.9rem', lineHeight: 1.55, display: 'flex', gap: 10 }}>
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.blue, marginTop: 8, flexShrink: 0 }} />
+                    <span>{it[lang]}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-5" style={{ ...cardStyle, marginTop: 20, padding: 28 }}>
+          <div>
+            <h3 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 650, fontSize: '1.1rem', color: C.white, marginBottom: 6 }}>{OFFER.investment.title[lang]}</h3>
+            <p style={{ color: C.gray, fontSize: '0.92rem', lineHeight: 1.65, maxWidth: 640 }}>{OFFER.investment.text[lang]}</p>
+          </div>
+          <button onClick={() => openContact(undefined, {
+              es: 'Me gustaría solicitar una propuesta personalizada de avatar. ',
+              en: 'I\'d like to request a personalised avatar proposal. ',
+            })}
+            className="shrink-0"
+            style={{
+              background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white, border: 'none', cursor: 'pointer',
+              padding: '13px 28px', borderRadius: 999, fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap',
+            }}>
+            {OFFER.cta[lang]}
+          </button>
+        </div>
+        <p style={{ color: C.border, fontSize: 11, textAlign: 'center', marginTop: 36, letterSpacing: '0.04em' }}>{OFFER.credit[lang]}</p>
       </section>
 
       {/* ── CIERRE ── */}
@@ -543,7 +798,7 @@ export default function AvataresPage() {
                   <div className="flex flex-col gap-1">
                     <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Cuéntanos tu idea' : 'Tell us your idea'}</label>
                     <textarea name="mensaje" required rows={4}
-                      defaultValue={selectedAvatar ? (lang === 'es' ? `Me interesa el avatar ${selectedAvatar} para mi evento/espacio. ` : `I'm interested in the ${selectedAvatar} avatar for my event/space. `) : ''}
+                      defaultValue={prefill ? prefill[lang] : selectedAvatar ? (lang === 'es' ? `Me interesa el avatar ${selectedAvatar} para mi evento/espacio. ` : `I'm interested in the ${selectedAvatar} avatar for my event/space. `) : ''}
                       placeholder={lang === 'es' ? 'Describe tu proyecto, evento, marca o lo que necesitas...' : 'Describe your project, event, brand or what you need...'}
                       className="rounded-xl px-4 py-3 text-sm outline-none resize-none"
                       style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }} />
