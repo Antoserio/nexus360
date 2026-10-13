@@ -35,36 +35,7 @@ const TAGS_LIVE: T[] = [
 
 const AVATARS: Avatar[] = [
   {
-    num: '01', name: 'Viky · Girasomnis', accent: C.blue,
-    image: '/avatares/viky.jpg',
-    youtube: { cas: 'W0EKcrfuCL8', eng: 'qmQq8Bkq_TY' },
-    desc: {
-      es: 'Nuestro primer modelo: avatar conversacional interactivo para eventos, marcas y espacios corporativos. Reel de presentación con contenido LED de alta gama, disponible en español e inglés.',
-      en: 'Our first model: an interactive conversational avatar for events, brands and corporate spaces. Presentation reel with high-end LED content, available in Spanish and English.',
-    },
-    tags: TAGS_LIVE,
-  },
-  {
-    num: '02', name: 'Viky · DES', accent: C.blue,
-    image: '/avatares/viky.jpg',
-    video: '/avatares/viky-des.mp4',
-    desc: {
-      es: 'Viky actuó en el escenario de DES Málaga 2026 en tiempo real, conversando en vivo con la presentadora en varios momentos y manteniendo más de 800 conversaciones reales con asistentes.',
-      en: 'Viky performed on stage at DES Málaga 2026 in real time, chatting live with the host at several points and holding more than 800 real conversations with attendees.',
-    },
-    tags: TAGS_LIVE,
-  },
-  {
-    num: '03', name: 'Viky · Versión Fluge', accent: C.goldSoft,
-    image: '/viky-fluge.jpg',
-    desc: {
-      es: 'Variante de Viky desplegada con Fluge Audiovisuales: sesión conversacional en vivo y demostración en vídeo del avatar funcionando. Para hablar con ella, llámala por su nombre: «Viky».',
-      en: 'A variant of Viky deployed with Fluge Audiovisuales: a live conversational session and a video demo of the avatar at work. To talk to her, call her by name: "Viky".',
-    },
-    tags: TAGS_LIVE,
-  },
-  {
-    num: '04', name: 'Joy', accent: C.cyan,
+    num: '01', name: 'Joy', accent: C.cyan,
     image: '/avatares/joy.png',
     player: { src: '/avatares/joy-tis.mp4', poster: '/avatares/joy-tis-poster.jpg' },
     desc: {
@@ -83,22 +54,7 @@ const AVATARS: Avatar[] = [
     },
   },
   {
-    num: '05', name: 'Toby', accent: C.gold,
-    image: '/avatares/toby.png',
-    imagePosition: 'center 30%',
-    desc: {
-      es: 'Robot 3D metálico generado proceduralmente, con ojos y núcleo luminosos y animaciones idle. Latencia casi cero y capaz de hablar en más de 50 idiomas en tiempo real. Ideal para industria, educación y tecnología.',
-      en: 'A metallic 3D robot generated procedurally, with glowing eyes and core and idle animations. Near-zero latency and able to speak more than 50 languages in real time. Ideal for industry, education and technology.',
-    },
-    tags: [
-      { es: 'Industria y tecnología', en: 'Industry & technology' },
-      { es: 'Educación', en: 'Education' },
-      { es: '+50 idiomas', en: '50+ languages' },
-      { es: 'Latencia casi cero', en: 'Near-zero latency' },
-    ],
-  },
-  {
-    num: '06', name: 'Velázquez', accent: C.purple,
+    num: '02', name: 'Velázquez', accent: C.purple,
     image: '/avatares/velazquez.png',
     player: { src: '/avatares/velazquez-tis.mp4', poster: '/avatares/velazquez-tis-poster.jpg' },
     desc: {
@@ -113,7 +69,22 @@ const AVATARS: Avatar[] = [
     ],
   },
   {
-    num: '07', name: 'Helen', accent: C.cyan,
+    num: '03', name: 'Mia · Fluge Audiovisuales', accent: C.goldSoft,
+    image: '/mia-fluge.jpg', imagePosition: 'center 18%',
+    player: { src: '/avatares/mia-tis.mp4', poster: '/avatares/mia-tis-poster.jpg' },
+    desc: {
+      es: 'Humana digital creada para Fluge Audiovisuales. Presenta la marca, sus servicios y atiende a clientes en eventos y espacios corporativos.',
+      en: 'A digital human created for Fluge Audiovisuales. She presents the brand and its services and looks after clients at events and corporate spaces.',
+    },
+    tags: [
+      { es: 'Presentadora de marca', en: 'Brand presenter' },
+      { es: 'Eventos corporativos', en: 'Corporate events' },
+      { es: 'Atención a clientes', en: 'Client service' },
+      { es: 'Conversación en vivo', en: 'Live conversation' },
+    ],
+  },
+  {
+    num: '04', name: 'Helen', accent: C.cyan,
     image: '/avatares/helen.jpg', imagePosition: 'center 20%',
     video: '/avatares/helen-demo.mp4',
     status: { es: 'Demo en preparación', en: 'Demo in preparation' },
@@ -129,19 +100,48 @@ const AVATARS: Avatar[] = [
     ],
   },
   {
-    num: '08', name: 'Mia · Fluge Audiovisuales', accent: C.goldSoft,
-    image: '/mia-fluge.jpg', imagePosition: 'center 18%',
-    player: { src: '/avatares/mia-tis.mp4', poster: '/avatares/mia-tis-poster.jpg' },
+    num: '05', name: 'Toby', accent: C.gold,
+    image: '/avatares/toby.png',
+    imagePosition: 'center 30%',
     desc: {
-      es: 'Humana digital creada para Fluge Audiovisuales. Presenta la marca, sus servicios y atiende a clientes en eventos y espacios corporativos.',
-      en: 'A digital human created for Fluge Audiovisuales. She presents the brand and its services and looks after clients at events and corporate spaces.',
+      es: 'Robot 3D metálico generado proceduralmente, con ojos y núcleo luminosos y animaciones idle. Latencia casi cero y capaz de hablar en más de 50 idiomas en tiempo real. Ideal para industria, educación y tecnología.',
+      en: 'A metallic 3D robot generated procedurally, with glowing eyes and core and idle animations. Near-zero latency and able to speak more than 50 languages in real time. Ideal for industry, education and technology.',
     },
     tags: [
-      { es: 'Presentadora de marca', en: 'Brand presenter' },
-      { es: 'Eventos corporativos', en: 'Corporate events' },
-      { es: 'Atención a clientes', en: 'Client service' },
-      { es: 'Conversación en vivo', en: 'Live conversation' },
+      { es: 'Industria y tecnología', en: 'Industry & technology' },
+      { es: 'Educación', en: 'Education' },
+      { es: '+50 idiomas', en: '50+ languages' },
+      { es: 'Latencia casi cero', en: 'Near-zero latency' },
     ],
+  },
+  {
+    num: '06', name: 'Viky · Girasomnis', accent: C.blue,
+    image: '/avatares/viky.jpg',
+    youtube: { cas: 'W0EKcrfuCL8', eng: 'qmQq8Bkq_TY' },
+    desc: {
+      es: 'Nuestro primer modelo: avatar conversacional interactivo para eventos, marcas y espacios corporativos. Reel de presentación con contenido LED de alta gama, disponible en español e inglés.',
+      en: 'Our first model: an interactive conversational avatar for events, brands and corporate spaces. Presentation reel with high-end LED content, available in Spanish and English.',
+    },
+    tags: TAGS_LIVE,
+  },
+  {
+    num: '07', name: 'Viky · DES', accent: C.blue,
+    image: '/avatares/viky.jpg',
+    video: '/avatares/viky-des.mp4',
+    desc: {
+      es: 'Viky actuó en el escenario de DES Málaga 2026 en tiempo real, conversando en vivo con la presentadora en varios momentos y manteniendo más de 800 conversaciones reales con asistentes.',
+      en: 'Viky performed on stage at DES Málaga 2026 in real time, chatting live with the host at several points and holding more than 800 real conversations with attendees.',
+    },
+    tags: TAGS_LIVE,
+  },
+  {
+    num: '08', name: 'Viky · Versión Fluge', accent: C.goldSoft,
+    image: '/viky-fluge.jpg',
+    desc: {
+      es: 'Variante de Viky desplegada con Fluge Audiovisuales: sesión conversacional en vivo y demostración en vídeo del avatar funcionando. Para hablar con ella, llámala por su nombre: «Viky».',
+      en: 'A variant of Viky deployed with Fluge Audiovisuales: a live conversational session and a video demo of the avatar at work. To talk to her, call her by name: "Viky".',
+    },
+    tags: TAGS_LIVE,
   },
   {
     num: '09', name: 'Max', accent: C.blue,
