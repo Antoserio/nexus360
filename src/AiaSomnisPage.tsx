@@ -1297,6 +1297,21 @@ export default function AiaSomnisPage() {
                 {label[lang]}
               </a>
             ))}
+            <a href="/maigiaos/"
+              className="transition-all duration-300"
+              style={{
+                color: C.blue, textDecoration: 'none',
+                fontFamily: "'Syne', sans-serif",
+                fontSize: '13px', fontWeight: 700,
+                letterSpacing: '0.06em',
+                border: `1px solid ${C.blue}55`,
+                padding: '5px 14px', borderRadius: 999,
+                background: 'transparent',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = `${C.blue}18`; e.currentTarget.style.borderColor = C.blue }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = `${C.blue}55` }}>
+              MAIGIA OS
+            </a>
             <LangToggle lang={lang} setLang={setLang} dim={C.gray} />
             <a href="#contacto"
               onClick={e => { e.preventDefault(); setContactOpen(true) }}
