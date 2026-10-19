@@ -296,22 +296,6 @@ body.mos-modal-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.maigia-os *,.maigia-os *:before,.maigia-os *:after{transition:none!important;animation:none!important}}
 
-/* ── MAIGIA global nav (shared with maigia.tech) ── */
-.maigia-global-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(5,7,13,0.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,184,255,0.18);box-shadow:0 1px 24px rgba(0,0,0,0.6)}
-.maigia-nav-logo{display:flex;align-items:center;text-decoration:none}
-.maigia-nav-links{display:flex;align-items:center;gap:32px}
-.maigia-nav-links a{color:#AAB3C2;text-decoration:none;font-family:'Syne',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:.04em;transition:color .2s}
-.maigia-nav-links a:hover{color:#F4F7FB}
-.maigia-nav-active{color:#00B8FF!important;border:1px solid rgba(0,184,255,0.35);padding:5px 14px;border-radius:999px}
-.maigia-nav-cta{background:linear-gradient(90deg,#00B8FF,#1B3DFF);color:#05070D!important;padding:8px 22px;border-radius:999px;font-weight:700;font-size:13px}
-.maigia-nav-langs{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:#AAB3C2;font-family:'Orbitron',monospace}
-.maigia-nav-langs a{color:#AAB3C2;text-decoration:none;padding:4px 6px;transition:color .2s}
-.maigia-nav-langs a:hover{color:#F4F7FB}
-.maigia-nav-langs [aria-current]{color:#00B8FF}
-.maigia-nav-langs span{opacity:.4}
-body.maigia-os>main,body.maigia-os>.mos-hero-wrap{padding-top:64px}
-@media(max-width:768px){.maigia-nav-links{display:none}.maigia-global-nav{padding:0 20px}}
-
 @media(max-width:600px){
  .mos-hero:before{inset:0;background-size:36px 36px}
  .mos-hero-film{padding:8px}
