@@ -111,6 +111,7 @@ const SERVICES: {
     ],
     accent: '#F6B93B', glow: 'rgba(246,185,59,0.22)',
     reel: '/Soluciones Digitales.mp4',
+    categoryHref: '/maigiaos/', categoryLabel: { es: 'Descubre MAIGIA OS', en: 'Discover MAIGIA OS' },
   },
 ]
 
