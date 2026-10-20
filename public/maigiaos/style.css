@@ -295,6 +295,8 @@ body.mos-modal-open{overflow:hidden}
  .mos-film-label strong{font-size:.75rem}.mos-film-trigger-wide .mos-film-label strong{max-width:82%;font-size:.6875rem}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.maigia-os *,.maigia-os *:before,.maigia-os *:after{transition:none!important;animation:none!important}}
+.mos-back-home{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--mos-line);border-radius:999px;font-size:.8125rem;font-weight:600;color:var(--mos-muted);text-decoration:none;transition:color .2s,border-color .2s;white-space:nowrap}
+.mos-back-home:hover{color:var(--mos-blue);border-color:#4a6070}
 
 @media(max-width:600px){
  .mos-hero:before{inset:0;background-size:36px 36px}
