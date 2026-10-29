@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import AiaSomnisPage from './AiaSomnisPage'
+import { currentPath } from '@/lib/ssrPath'
 
 const ConvertPage   = lazy(() => import('./ConvertPage'))
 const SplatPage     = lazy(() => import('./SplatPage'))
@@ -11,7 +12,7 @@ const NotFoundPage  = lazy(() => import('./NotFoundPage'))
 const LEGAL_PATHS = ['/aviso-legal', '/politica-privacidad', '/politica-cookies']
 
 function App() {
-  const path = window.location.pathname.replace(/\/+$/, '') || '/'
+  const path = currentPath().replace(/\/+$/, '') || '/'
   if (path === '/convert')   return <Suspense><ConvertPage /></Suspense>
   if (path === '/splat')     return <Suspense><SplatPage /></Suspense>
   if (path === '/proyectos') return <Suspense><ProyectosPage /></Suspense>

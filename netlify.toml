@@ -1,5 +1,5 @@
 [build]
-  command   = "vite build"
+  command   = "npm run build:site"   # vite build + pre-render del HTML (F08)
   publish   = "dist"
 
 [build.environment]

@@ -1768,8 +1768,8 @@ export default function AiaSomnisPage() {
                         ) : (
                           /* ── No video yet: ImageTrail + dark bg image + mouse hint ── */
                           <ImageTrail images={TRAIL_IMAGES[i]} triggerDistance={30} maxImages={8}
-                            imageWidth={window.innerWidth < 768 ? 90 : 160}
-                            imageHeight={window.innerWidth < 768 ? 90 : 160}
+                            imageWidth={typeof window !== 'undefined' && window.innerWidth < 768 ? 90 : 160}
+                            imageHeight={typeof window !== 'undefined' && window.innerWidth < 768 ? 90 : 160}
                             maxRotation={8}>
                             <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 cursor-none select-none">
 

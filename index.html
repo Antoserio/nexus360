@@ -105,6 +105,13 @@
     }
     </script>
 
+    <!-- Sin JavaScript: el HTML ya trae el contenido (pre-render). Se oculta
+         la pantalla de carga y se muestran los bloques que esperan animación. -->
+    <noscript><style>
+      #root [aria-hidden="true"][style*="z-index:1000"]{display:none!important}
+      #root [style*="opacity:0"]{opacity:1!important}
+    </style></noscript>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />

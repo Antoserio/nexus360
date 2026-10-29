@@ -1,3 +1,4 @@
+import { currentPath } from '@/lib/ssrPath'
 import { useEffect } from 'react'
 import { useLang } from '@/lib/lang'
 import { LangToggle } from '@/components/LangToggle'
@@ -14,7 +15,7 @@ const DOCS: Record<string, { doc: LegalDoc; path: string }> = {
 }
 
 function slugFromPath(): keyof typeof DOCS {
-  const p = window.location.pathname.replace(/\/$/, '').replace(/^\//, '')
+  const p = currentPath().replace(/\/$/, '').replace(/^\//, '')
   return (p in DOCS ? p : 'aviso-legal') as keyof typeof DOCS
 }
 

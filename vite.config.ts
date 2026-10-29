@@ -38,12 +38,15 @@ const ROUTE_META: Record<string, { title: string; description: string; image: st
 }
 
 function routeMeta(): Plugin {
+  let isSSR = false
   const esc = (v: string) => v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
   return {
     name: 'route-meta',
     apply: 'build',
     enforce: 'post',
+    configResolved(c) { isSSR = !!c.build.ssr },
     closeBundle() {
+      if (isSSR) return  // el build de pre-render (dist-ssr) no toca dist/
       const dist = path.resolve(__dirname, 'dist')
       const base = fs.readFileSync(path.join(dist, 'index.html'), 'utf-8')
       for (const [slug, m] of Object.entries(ROUTE_META)) {
