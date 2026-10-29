@@ -582,27 +582,52 @@ const TICKER_ITEMS = ['AI PARA EVENTOS', 'MARCAS Y CULTURA', 'AI FOR EVENTS', 'B
 
 // ── Loading Screen ────────────────────────────────────────────────────────────
 function LoadingScreen({ onDone }: { onDone: () => void }) {
-  // Antes: progreso aleatorio + mínimo artificial de 2.800 ms + 700 ms de fundido
-  // (≥3,5 s de espera aunque todo estuviera listo). Ahora la pantalla solo cubre
-  // la carga real de las tipografías (para evitar el salto de fuente del hero),
-  // con un tope de 1 s; el robot 3D ya se carga de forma progresiva por su cuenta.
+  // Contador de entrada. Antes: % aleatorio + mínimo de 2.800 ms + 700 ms de
+  // fundido (≥3,5 s aunque todo estuviera listo). Ahora:
+  //  - el % sigue la carga REAL de lo que necesita el hero (tipografías + logo);
+  //  - si eso carga antes, la animación completa 00→100 en COUNT_MS y funde en
+  //    FADE_MS (1,2 s en total como mucho con buena conexión);
+  //  - con conexión lenta dura lo que tarde la carga real, sin mínimo añadido,
+  //    y nunca más de MAX_MS para no bloquear la web si algo falla.
+  const [pct, setPct] = useState(0)
   const [leaving, setLeaving] = useState(false)
 
   useEffect(() => {
-    let done = false
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    const FADE_MS = reduce ? 0 : 350
-    const finish = () => {
-      if (done) return
-      done = true
-      setLeaving(true)
-      setTimeout(onDone, FADE_MS)
-    }
-    const cap = setTimeout(finish, 1000)
+    const COUNT_MS = reduce ? 0 : 750  // + suavizado y 300 ms de fundido ≈ 1,2 s
+    const FADE_MS = reduce ? 0 : 300
+    const MAX_MS = 4000
+
+    const tasks: Promise<unknown>[] = []
     const fonts = (document as Document & { fonts?: FontFaceSet }).fonts
-    if (fonts?.ready) fonts.ready.then(finish, finish)
-    else finish()
-    return () => { done = true; clearTimeout(cap) }
+    if (fonts?.ready) tasks.push(fonts.ready)
+    const logo = new Image()
+    logo.src = '/maigia-logo-girasomnis.png'
+    tasks.push(logo.decode ? logo.decode() : new Promise(r => { logo.onload = logo.onerror = r }))
+
+    let doneTasks = 0
+    tasks.forEach(t => t.then(() => { doneTasks++ }, () => { doneTasks++ }))
+
+    const start = performance.now()
+    let shown = 0, raf = 0, finished = false
+    const tick = (now: number) => {
+      const elapsed = Math.max(0, now - start)  // el timestamp de rAF puede ser anterior a start
+      const real = tasks.length ? (doneTasks / tasks.length) * 100 : 100
+      const timed = COUNT_MS ? Math.min(100, (elapsed / COUNT_MS) * 100) : 100
+      const target = elapsed >= MAX_MS ? 100 : Math.min(real, timed)
+      shown += (target - shown) * 0.25
+      if (target - shown < 0.5) shown = target
+      setPct(Math.max(0, Math.min(100, Math.floor(shown))))
+      if (shown >= 100 && !finished) {
+        finished = true
+        setLeaving(true)
+        setTimeout(onDone, FADE_MS)
+        return
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => { finished = true; cancelAnimationFrame(raf) }
   }, [onDone])
 
   return (
@@ -610,7 +635,7 @@ function LoadingScreen({ onDone }: { onDone: () => void }) {
       aria-hidden="true"
       initial={{ opacity: 1 }}
       animate={{ opacity: leaving ? 0 : 1 }}
-      transition={{ duration: 0.35 }}
+      transition={{ duration: 0.3 }}
       style={{ position: 'fixed', inset: 0, background: C.bg, zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', pointerEvents: leaving ? 'none' : 'auto' }}
     >
       {/* Ticker background */}
@@ -635,6 +660,19 @@ function LoadingScreen({ onDone }: { onDone: () => void }) {
         transition={{ duration: 0.6 }}
         style={{ height: 80, marginBottom: 48, position: 'relative', zIndex: 1 }} />
 
+      {/* Counter */}
+      <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+        <motion.div
+          key={pct}
+          initial={{ opacity: 0.6, y: 4 }} animate={{ opacity: 1, y: 0 }}
+          style={{ fontSize: 'clamp(4rem,12vw,9rem)', fontWeight: 900, color: C.white, lineHeight: 1, letterSpacing: '-0.04em' }}>
+          {String(pct).padStart(2, '0')}
+          <span style={{ fontSize: '0.35em', color: C.blue }}>%</span>
+        </motion.div>
+        <div style={{ width: 200, height: 1, background: C.border, borderRadius: 1, margin: '16px auto 0', overflow: 'hidden' }}>
+          <div style={{ height: '100%', background: C.blue, width: `${pct}%` }} />
+        </div>
+      </div>
     </motion.div>
   )
 }
