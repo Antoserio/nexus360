@@ -64,6 +64,15 @@ function routeMeta(): Plugin {
         set(/<meta name="twitter:image" content="[^"]*" \/>/, `<meta name="twitter:image" content="${img}" />`)
         fs.writeFileSync(path.join(dist, `${slug}.html`), html)
       }
+
+      // 404.html — Netlify lo sirve con estado 404 para cualquier ruta que no
+      // exista. Sin canonical y con noindex; React pinta NotFoundPage.
+      let nf = base
+      const put = (re: RegExp, to: string) => { if (!re.test(nf)) throw new Error(`route-meta 404: no encuentro ${re}`); nf = nf.replace(re, () => to) }
+      put(/<title>[^<]*<\/title>/, '<title>Página no encontrada — MAIGIA</title>')
+      put(/<meta name="robots" content="[^"]*" \/>/, '<meta name="robots" content="noindex, follow" />')
+      put(/\s*<link rel="canonical" href="[^"]*" \/>/, '')
+      fs.writeFileSync(path.join(dist, '404.html'), nf)
     },
   }
 }

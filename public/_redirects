@@ -1,6 +1,13 @@
+# Rutas de la SPA con HTML propio (lo genera el plugin route-meta de vite.config.ts)
 /avatares              /avatares.html              200
 /proyectos             /proyectos.html             200
 /aviso-legal           /aviso-legal.html           200
 /politica-privacidad   /politica-privacidad.html   200
 /politica-cookies      /politica-cookies.html      200
-/*  /index.html  200
+
+# Herramientas internas de la SPA
+/convert               /index.html                 200
+/splat                 /index.html                 200
+
+# Sin comodín "/* /index.html 200": cualquier otra ruta inexistente recibe
+# dist/404.html con estado 404 (antes devolvía la portada con 200).

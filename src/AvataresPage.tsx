@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { GlowCursor, CursorParticles } from './components/GlowCursor'
 import { useLang, type Lang } from '@/lib/lang'
 import { LangToggle } from '@/components/LangToggle'
+import { ContactModal } from '@/components/ContactModal'
 import { OPPORTUNITY, MODULES, DEPLOYMENT, CAPABILITIES, MARKETS, OFFER, type T } from '@/lib/avataresContent'
 
 const C = {
@@ -407,7 +408,7 @@ const cardStyle: React.CSSProperties = {
 export default function AvataresPage() {
   const [lang, setLang] = useLang()
   const [contactOpen, setContactOpen] = useState(false)
-  const [formSent, setFormSent] = useState(false)
+  const closeContact = useCallback(() => setContactOpen(false), [])
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null)
   const [prefill, setPrefill] = useState<T | null>(null)
 
@@ -786,114 +787,9 @@ export default function AvataresPage() {
       </section>
 
       {/* ── MODAL DE CONTACTO ── */}
-      {contactOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-          onClick={() => setContactOpen(false)}>
-          <div className="absolute inset-0" style={{ background: 'rgba(5,7,13,0.92)', backdropFilter: 'blur(12px)' }} />
-
-          <div className="relative w-full max-w-lg rounded-2xl p-8 md:p-10"
-            style={{ background: '#071120', border: `1px solid ${C.border}`, boxShadow: '0 32px 80px rgba(0,0,0,0.6)' }}
-            onClick={e => e.stopPropagation()}>
-
-            <button onClick={() => { setContactOpen(false); setFormSent(false) }}
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full"
-              style={{ background: 'rgba(255,255,255,0.06)', color: C.gray, border: 'none', cursor: 'pointer' }}>✕</button>
-
-            {formSent ? (
-              <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center"
-                  style={{ background: 'rgba(123,47,255,0.15)', border: '1px solid #7B2FFF' }}>
-                  <span style={{ fontSize: 28 }}>✓</span>
-                </div>
-                <h3 className="text-xl" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>{lang === 'es' ? '¡Mensaje enviado!' : 'Message sent!'}</h3>
-                <p style={{ color: C.gray }}>{lang === 'es' ? 'Te responderemos lo antes posible.' : 'We\'ll get back to you as soon as possible.'}</p>
-                <button onClick={() => { setContactOpen(false); setFormSent(false) }}
-                  className="mt-2 px-6 py-2 rounded-full text-sm font-bold"
-                  style={{ background: 'linear-gradient(135deg,#7B2FFF,#1B3DFF)', color: C.white, border: 'none', cursor: 'pointer' }}>
-                  {lang === 'es' ? 'Cerrar' : 'Close'}
-                </button>
-              </div>
-            ) : (
-              <>
-                <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 64, objectFit: 'contain', marginBottom: 20 }} />
-                <h2 className="text-2xl mb-1" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>{lang === 'es' ? 'Cuéntanos tu proyecto' : 'Tell us about your project'}</h2>
-                <p className="text-sm mb-6" style={{ color: C.gray }}>{lang === 'es' ? 'Responderemos en menos de 24h.' : 'We\'ll reply within 24h.'}</p>
-
-                <form
-                  name="contacto-aiasomnis"
-                  method="POST"
-                  data-netlify="true"
-                  onSubmit={async e => {
-                    e.preventDefault()
-                    const form = e.currentTarget as HTMLFormElement
-                    const params = new URLSearchParams()
-                    new FormData(form).forEach((v, k) => params.append(k, v.toString()))
-                    const data = params.toString()
-                    try {
-                      await fetch('/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: data,
-                      })
-                    } catch (_) { /* en local puede fallar, en Netlify funciona */ }
-                    setFormSent(true)
-                  }}
-                  className="flex flex-col gap-4">
-
-                  <input type="hidden" name="form-name" value="contacto-aiasomnis" />
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Nombre' : 'Name'}</label>
-                      <input name="nombre" required placeholder={lang === 'es' ? 'Tu nombre' : 'Your name'}
-                        className="rounded-xl px-4 py-3 text-sm outline-none"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }} />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Email</label>
-                      <input name="email" type="email" required placeholder="tu@email.com"
-                        className="rounded-xl px-4 py-3 text-sm outline-none"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }} />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Tipo de proyecto' : 'Project type'}</label>
-                    <select name="tipo" defaultValue="Avatar IA"
-                      style={{ background: '#0D1829', border: `1px solid ${C.border}`, color: C.white }}
-                      className="rounded-xl px-4 py-3 text-sm outline-none">
-                      <option value="">{lang === 'es' ? 'Selecciona una opción' : 'Select an option'}</option>
-                      <option>{lang === 'es' ? 'Avatar IA' : 'AI Avatar'}</option>
-                      <option>{lang === 'es' ? 'Instalación interactiva' : 'Interactive installation'}</option>
-                      <option>{lang === 'es' ? 'Producción audiovisual con IA' : 'AI audiovisual production'}</option>
-                      <option>{lang === 'es' ? 'Solución digital / Web' : 'Digital solution / Website'}</option>
-                      <option>{lang === 'es' ? 'Otro' : 'Other'}</option>
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Cuéntanos tu idea' : 'Tell us your idea'}</label>
-                    <textarea name="mensaje" required rows={4}
-                      defaultValue={prefill ? prefill[lang] : selectedAvatar ? (lang === 'es' ? `Me interesa el avatar ${selectedAvatar} para mi evento/espacio. ` : `I'm interested in the ${selectedAvatar} avatar for my event/space. `) : ''}
-                      placeholder={lang === 'es' ? 'Describe tu proyecto, evento, marca o lo que necesitas...' : 'Describe your project, event, brand or what you need...'}
-                      className="rounded-xl px-4 py-3 text-sm outline-none resize-none"
-                      style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }} />
-                  </div>
-
-                  <button type="submit"
-                    style={{
-                      background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white,
-                      border: 'none', cursor: 'pointer', padding: '13px', borderRadius: 999,
-                      fontSize: 14, fontWeight: 700, letterSpacing: '0.03em', marginTop: 4,
-                    }}>
-                    {lang === 'es' ? 'Enviar mensaje' : 'Send message'}
-                  </button>
-                </form>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <ContactModal open={contactOpen} onClose={closeContact} lang={lang} defaultType="Avatar IA"
+        key={`${prefill ? prefill.es : ''}|${selectedAvatar ?? ''}`}
+        defaultMessage={prefill ? prefill[lang] : selectedAvatar ? (lang === 'es' ? `Me interesa el avatar ${selectedAvatar} para mi evento/espacio. ` : `I'm interested in the ${selectedAvatar} avatar for my event/space. `) : ''} />
     </div>
   )
 }

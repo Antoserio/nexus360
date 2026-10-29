@@ -6,10 +6,8 @@
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
   NODE_VERSION = "20"
 
-[[redirects]]
-  from = "/*"
-  to   = "/index.html"
-  status = 200
+# Las reescrituras de rutas viven en public/_redirects. Aquí NO va un comodín
+# "/*" -> index.html: haría que cualquier URL inexistente devolviera 200.
 
 [[headers]]
   for = "/sitemap.xml"

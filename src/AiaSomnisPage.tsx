@@ -10,6 +10,8 @@ import { Mail, MapPin, ChevronDown, Cpu, Play, Share2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useLang, type Lang } from '@/lib/lang'
 import { LangToggle } from '@/components/LangToggle'
+import { ContactModal } from '@/components/ContactModal'
+import { SceneBoundary } from '@/components/SceneBoundary'
 
 type T = { es: string; en: string }
 
@@ -114,11 +116,11 @@ const SERVICES: {
   },
 ]
 
-const TEAM: { name: string; role: T; initials: string; photo: string; imgStyle: React.CSSProperties }[] = [
+const TEAM: { name: string; role: T; initials: string; photo: string; srcSet?: string; imgStyle: React.CSSProperties }[] = [
   { name: 'Paco Gramaje',      role: { es: 'Business Developer', en: 'Business Developer' }, initials: 'PG', photo: '/team/paco.jpg',   imgStyle: { objectPosition: 'center 12%' } },
-  { name: 'Leonardo Bautista', role: { es: 'Director Creativo', en: 'Creative Director' },   initials: 'LB', photo: '/team/LEO.png',    imgStyle: { objectPosition: 'center 10%' } },
-  { name: 'Anto Loriso',       role: { es: 'CTO', en: 'CTO' },                                initials: 'AL', photo: '/team/anto.jpg',   imgStyle: { objectPosition: 'center 20%' } },
-  { name: 'Martin Julià',      role: { es: '3D & IA Developer', en: '3D & AI Developer' },    initials: 'MJ', photo: '/team/MARTIN.png', imgStyle: { objectPosition: 'center 10%' } },
+  { name: 'Leonardo Bautista', role: { es: 'Director Creativo', en: 'Creative Director' },   initials: 'LB', photo: '/team/leo-800.webp', srcSet: '/team/leo-400.webp 400w, /team/leo-800.webp 800w',  imgStyle: { objectPosition: 'center 10%' } },
+  { name: 'Anto Loriso',       role: { es: 'CTO', en: 'CTO' },                                initials: 'AL', photo: '/team/anto-800.webp', srcSet: '/team/anto-400.webp 400w, /team/anto-800.webp 800w', imgStyle: { objectPosition: 'center 20%' } },
+  { name: 'Martin Julià',      role: { es: '3D & IA Developer', en: '3D & AI Developer' },    initials: 'MJ', photo: '/team/martin-800.webp', srcSet: '/team/martin-400.webp 400w, /team/martin-800.webp 800w', imgStyle: { objectPosition: 'center 10%' } },
 ]
 
 
@@ -580,33 +582,36 @@ const TICKER_ITEMS = ['AI PARA EVENTOS', 'MARCAS Y CULTURA', 'AI FOR EVENTS', 'B
 
 // ── Loading Screen ────────────────────────────────────────────────────────────
 function LoadingScreen({ onDone }: { onDone: () => void }) {
-  const [pct, setPct] = useState(0)
+  // Antes: progreso aleatorio + mínimo artificial de 2.800 ms + 700 ms de fundido
+  // (≥3,5 s de espera aunque todo estuviera listo). Ahora la pantalla solo cubre
+  // la carga real de las tipografías (para evitar el salto de fuente del hero),
+  // con un tope de 1 s; el robot 3D ya se carga de forma progresiva por su cuenta.
   const [leaving, setLeaving] = useState(false)
 
   useEffect(() => {
-    let p = 0
-    const start = Date.now()
-    const MIN_MS = 2800
-    const interval = setInterval(() => {
-      p += Math.random() * 3 + 0.8
-      if (p >= 100) {
-        p = 100
-        clearInterval(interval)
-        const elapsed = Date.now() - start
-        const wait = Math.max(0, MIN_MS - elapsed)
-        setTimeout(() => { setLeaving(true); setTimeout(onDone, 700) }, wait)
-      }
-      setPct(Math.floor(p))
-    }, 50)
-    return () => clearInterval(interval)
+    let done = false
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const FADE_MS = reduce ? 0 : 350
+    const finish = () => {
+      if (done) return
+      done = true
+      setLeaving(true)
+      setTimeout(onDone, FADE_MS)
+    }
+    const cap = setTimeout(finish, 1000)
+    const fonts = (document as Document & { fonts?: FontFaceSet }).fonts
+    if (fonts?.ready) fonts.ready.then(finish, finish)
+    else finish()
+    return () => { done = true; clearTimeout(cap) }
   }, [onDone])
 
   return (
     <motion.div
+      aria-hidden="true"
       initial={{ opacity: 1 }}
       animate={{ opacity: leaving ? 0 : 1 }}
-      transition={{ duration: 0.7 }}
-      style={{ position: 'fixed', inset: 0, background: C.bg, zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}
+      transition={{ duration: 0.35 }}
+      style={{ position: 'fixed', inset: 0, background: C.bg, zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', pointerEvents: leaving ? 'none' : 'auto' }}
     >
       {/* Ticker background */}
       <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, transform: 'translateY(-50%)', overflow: 'hidden', pointerEvents: 'none' }}>
@@ -630,19 +635,6 @@ function LoadingScreen({ onDone }: { onDone: () => void }) {
         transition={{ duration: 0.6 }}
         style={{ height: 80, marginBottom: 48, position: 'relative', zIndex: 1 }} />
 
-      {/* Counter */}
-      <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-        <motion.div
-          key={pct}
-          initial={{ opacity: 0.6, y: 4 }} animate={{ opacity: 1, y: 0 }}
-          style={{ fontSize: 'clamp(4rem,12vw,9rem)', fontWeight: 900, color: C.white, lineHeight: 1, letterSpacing: '-0.04em' }}>
-          {String(pct).padStart(2, '0')}
-          <span style={{ fontSize: '0.35em', color: C.blue }}>%</span>
-        </motion.div>
-        <div style={{ width: 200, height: 1, background: C.border, borderRadius: 1, margin: '16px auto 0', overflow: 'hidden' }}>
-          <motion.div style={{ height: '100%', background: C.blue, width: `${pct}%`, transition: 'width 0.05s linear' }} />
-        </div>
-      </div>
     </motion.div>
   )
 }
@@ -825,7 +817,7 @@ function StickyRobotSection({ ready, lang }: { ready: boolean; lang: Lang }) {
           zIndex: 1,
         }}>
           {robotInView ? (
-            <Suspense fallback={
+            <SceneBoundary><Suspense fallback={
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div className="w-12 h-12 rounded-full border-2 border-transparent animate-spin"
                   style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
@@ -835,7 +827,7 @@ function StickyRobotSection({ ready, lang }: { ready: boolean; lang: Lang }) {
                 scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                 style={{ width: '100%', height: '100%' }}
               />
-            </Suspense>
+            </Suspense></SceneBoundary>
           ) : (
             <div style={{ width: '100%', height: '100%' }} />
           )}
@@ -862,9 +854,6 @@ function StickyRobotSection({ ready, lang }: { ready: boolean; lang: Lang }) {
             style={{ height: 'clamp(200px, 30vw, 400px)', width: 'auto', objectFit: 'contain',
               filter: 'drop-shadow(0 0 40px rgba(0,184,255,0.75)) drop-shadow(0 0 20px rgba(0,184,255,0.4))' }}
           />
-          <h1 style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>
-            MAIGIA — Agencia de Inteligencia Artificial para Experiencias Extraordinarias
-          </h1>
           <p style={{
             color: C.white,
             fontSize: 'clamp(1.15rem, 2.6vw, 2.1rem)',
@@ -1103,11 +1092,11 @@ function AboutSection({ lang }: { lang: Lang }) {
             </div>
             <div className="flex gap-4 justify-center">
               {[
-                { Icon: IconLinkedin,  url: 'https://www.linkedin.com/company/girasomnis/' },
-                { Icon: IconYoutube,   url: 'https://www.youtube.com/@PacoGramajegirasomnis' },
-                { Icon: IconInstagram, url: 'https://www.instagram.com/aiasomnis' },
-              ].map(({ Icon, url }, i) => (
-                <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                { Icon: IconLinkedin,  url: 'https://www.linkedin.com/company/girasomnis/', label: 'LinkedIn' },
+                { Icon: IconYoutube,   url: 'https://www.youtube.com/@PacoGramajegirasomnis', label: 'YouTube' },
+                { Icon: IconInstagram, url: 'https://www.instagram.com/aiasomnis', label: 'Instagram' },
+              ].map(({ Icon, url, label }, i) => (
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer" aria-label={label}
                   className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
                   style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${C.border}`, color: C.gray }}
                   onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = C.blue; (e.currentTarget as HTMLAnchorElement).style.color = C.blue }}
@@ -1130,7 +1119,7 @@ export default function AiaSomnisPage() {
   const [activeService, setActiveService] = useState(0)
   const [scrolledPastHero, setScrolledPastHero] = useState(false)
   const [contactOpen, setContactOpen] = useState(false)
-  const [formSent, setFormSent] = useState(false)
+  const closeContact = useCallback(() => setContactOpen(false), [])
   const [splineInView, setSplineInView] = useState(false)
   const [splineReady, setSplineReady] = useState(false)
   const [heroQuadrant, setHeroQuadrant] = useState<0|1|2|3|null>(null)
@@ -1258,6 +1247,12 @@ export default function AiaSomnisPage() {
       <CursorParticles />
       {loading && <LoadingScreen onDone={handleLoadDone} />}
 
+      <a href="#contenido"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[300] focus:rounded-full focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
+        style={{ background: C.blue, color: C.bg }}>
+        {lang === 'es' ? 'Saltar al contenido' : 'Skip to content'}
+      </a>
+
       {/* ── STICKY NAV ── */}
       <nav className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10"
         style={{ height: 64 }}>
@@ -1340,6 +1335,13 @@ export default function AiaSomnisPage() {
           </div>
         </div>
       </nav>
+
+      <main id="contenido" tabIndex={-1} className="outline-none">
+      <h1 className="sr-only">
+        {lang === 'es'
+          ? 'MAIGIA — Agencia de Inteligencia Artificial para Experiencias Extraordinarias'
+          : 'MAIGIA — Artificial Intelligence Agency for Extraordinary Experiences'}
+      </h1>
 
       {/* ── SOCIAL ICONS — fixed bottom-left ── */}
       <div className="fixed bottom-8 left-6 z-50 flex flex-col gap-4"
@@ -1436,14 +1438,14 @@ export default function AiaSomnisPage() {
             pointerEvents: 'auto',
           }}>
             {!isDesktop && splineInView && splineReady ? (
-              <Suspense fallback={
+              <SceneBoundary><Suspense fallback={
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
                     style={{ borderTopColor: C.blue, borderRightColor: `${C.blue}30` }} />
                 </div>
               }>
                 <Spline scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" style={{ width: '100%', height: '100%' }} />
-              </Suspense>
+              </Suspense></SceneBoundary>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <div className="w-10 h-10 rounded-full border-2 border-transparent animate-spin"
@@ -1557,7 +1559,9 @@ export default function AiaSomnisPage() {
                 key={s.num}
                 onClick={() => scrollTo(i)}
                 whileTap={{ scale: 0.82 }}
-                style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+                aria-label={`${s.num} · ${s.title[lang]}`}
+                aria-current={isActive ? 'true' : undefined}
+                style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 8, margin: -8 }}
               >
                 <motion.div
                   animate={{
@@ -1897,8 +1901,12 @@ export default function AiaSomnisPage() {
                     <>
                       <img
                         src={member.photo}
+                        srcSet={member.srcSet}
+                        sizes="(min-width: 768px) 25vw, 50vw"
+                        width={600} height={800}
                         alt={member.name}
                         loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                         style={member.imgStyle}
                       />
@@ -1998,8 +2006,12 @@ export default function AiaSomnisPage() {
         preload="none"
         onEnded={handleTrackEnd}
       />
+      </main>
+
       <motion.button
         onClick={toggleSound}
+        aria-label={lang === 'es' ? 'Música de fondo' : 'Background music'}
+        aria-pressed={soundOn}
         className="fixed z-50 flex items-center gap-2 rounded-full cursor-pointer"
         style={{
           bottom: '1.5rem',
@@ -2051,11 +2063,11 @@ export default function AiaSomnisPage() {
           </div>
           <div className="flex gap-4">
             {[
-              { Icon: IconLinkedin,  url: 'https://www.linkedin.com/company/girasomnis/' },
-              { Icon: IconYoutube,   url: 'https://www.youtube.com/@PacoGramajegirasomnis' },
-              { Icon: IconInstagram, url: 'https://www.instagram.com/aiasomnis' },
-            ].map(({ Icon, url }, i) => (
-              <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+              { Icon: IconLinkedin,  url: 'https://www.linkedin.com/company/girasomnis/', label: 'LinkedIn' },
+              { Icon: IconYoutube,   url: 'https://www.youtube.com/@PacoGramajegirasomnis', label: 'YouTube' },
+              { Icon: IconInstagram, url: 'https://www.instagram.com/aiasomnis', label: 'Instagram' },
+            ].map(({ Icon, url, label }, i) => (
+              <a key={i} href={url} target="_blank" rel="noopener noreferrer" aria-label={label}
                 className="transition-colors duration-300" style={{ color: C.border }}
                 onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = C.blue}
                 onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = C.border}>
@@ -2092,121 +2104,7 @@ export default function AiaSomnisPage() {
       </footer>
 
       {/* ══════════ CONTACT MODAL ══════════ */}
-      {contactOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-          onClick={() => setContactOpen(false)}>
-          {/* Backdrop */}
-          <div className="absolute inset-0" style={{ background: 'rgba(5,7,13,0.92)', backdropFilter: 'blur(12px)' }} />
-
-          {/* Panel */}
-          <motion.div
-            className="relative w-full max-w-lg rounded-2xl p-8 md:p-10"
-            style={{ background: '#071120', border: `1px solid ${C.border}`, boxShadow: '0 32px 80px rgba(0,0,0,0.6)' }}
-            initial={{ opacity: 0, y: 40, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            onClick={e => e.stopPropagation()}>
-
-            {/* Close */}
-            <button onClick={() => { setContactOpen(false); setFormSent(false) }}
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full transition-all"
-              style={{ background: 'rgba(255,255,255,0.06)', color: C.gray }}>✕</button>
-
-            {formSent ? (
-              <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center"
-                  style={{ background: 'rgba(123,47,255,0.15)', border: '1px solid #7B2FFF' }}>
-                  <span style={{ fontSize: 28 }}>✓</span>
-                </div>
-                <h3 className="text-xl" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>{lang === 'es' ? '¡Mensaje enviado!' : 'Message sent!'}</h3>
-                <p style={{ color: C.gray }}>{lang === 'es' ? 'Te responderemos lo antes posible.' : "We'll get back to you as soon as possible."}</p>
-                <button onClick={() => { setContactOpen(false); setFormSent(false) }}
-                  className="mt-2 px-6 py-2 rounded-full text-sm font-bold"
-                  style={{ background: 'linear-gradient(135deg,#7B2FFF,#1B3DFF)', color: C.white }}>
-                  {lang === 'es' ? 'Cerrar' : 'Close'}
-                </button>
-              </div>
-            ) : (
-              <>
-                <img src="/maigia-logo-girasomnis.png" alt="MAIGIA by Girasomnis" style={{ height: 64, objectFit: 'contain', marginBottom: 20 }} />
-                <h2 className="text-2xl mb-1" style={{ color: C.white, fontFamily: "'Syne', sans-serif", fontWeight: 650, letterSpacing: '-0.02em' }}>{lang === 'es' ? 'Cuéntanos tu proyecto' : 'Tell us about your project'}</h2>
-                <p className="text-sm mb-6" style={{ color: C.gray }}>{lang === 'es' ? 'Responderemos en menos de 24h.' : "We'll reply within 24h."}</p>
-
-                <form
-                  name="contacto-aiasomnis"
-                  method="POST"
-                  data-netlify="true"
-                  onSubmit={async e => {
-                    e.preventDefault()
-                    const form = e.currentTarget as HTMLFormElement
-                    const params = new URLSearchParams()
-                    new FormData(form).forEach((v, k) => params.append(k, v.toString()))
-                    const data = params.toString()
-                    try {
-                      await fetch('/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: data,
-                      })
-                    } catch (_) { /* en local puede fallar, en Netlify funciona */ }
-                    setFormSent(true)
-                  }}
-                  className="flex flex-col gap-4">
-
-                  <input type="hidden" name="form-name" value="contacto-aiasomnis" />
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col gap-1">
-                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Nombre' : 'Name'}</label>
-                      <input name="nombre" required placeholder={lang === 'es' ? 'Tu nombre' : 'Your name'}
-                        className="rounded-xl px-4 py-3 text-sm outline-none transition-all"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
-                        onFocus={e => e.currentTarget.style.borderColor = C.blue}
-                        onBlur={e => e.currentTarget.style.borderColor = C.border} />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>Email</label>
-                      <input name="email" type="email" required placeholder={lang === 'es' ? 'tu@email.com' : 'you@email.com'}
-                        className="rounded-xl px-4 py-3 text-sm outline-none transition-all"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
-                        onFocus={e => e.currentTarget.style.borderColor = C.blue}
-                        onBlur={e => e.currentTarget.style.borderColor = C.border} />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Tipo de proyecto' : 'Project type'}</label>
-                    <select name="tipo" style={{ background: '#0D1829', border: `1px solid ${C.border}`, color: C.white }}
-                      className="rounded-xl px-4 py-3 text-sm outline-none">
-                      <option value="">{lang === 'es' ? 'Selecciona una opción' : 'Select an option'}</option>
-                      <option>{lang === 'es' ? 'Avatar IA' : 'AI Avatar'}</option>
-                      <option>{lang === 'es' ? 'Instalación interactiva' : 'Interactive installation'}</option>
-                      <option>{lang === 'es' ? 'Producción audiovisual con IA' : 'AI audiovisual production'}</option>
-                      <option>{lang === 'es' ? 'Solución digital / Web' : 'Digital solution / Website'}</option>
-                      <option>{lang === 'es' ? 'Otro' : 'Other'}</option>
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs uppercase tracking-wider" style={{ color: C.gray }}>{lang === 'es' ? 'Cuéntanos tu idea' : 'Tell us your idea'}</label>
-                    <textarea name="mensaje" required rows={4} placeholder={lang === 'es' ? 'Describe tu proyecto, evento, marca o lo que necesitas...' : 'Describe your project, event, brand or what you need...'}
-                      className="rounded-xl px-4 py-3 text-sm outline-none transition-all resize-none"
-                      style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, color: C.white }}
-                      onFocus={e => e.currentTarget.style.borderColor = C.blue}
-                      onBlur={e => e.currentTarget.style.borderColor = C.border} />
-                  </div>
-
-                  <button type="submit"
-                    className="w-full py-3.5 rounded-xl font-bold text-sm tracking-wide mt-1"
-                    style={{ background: `linear-gradient(135deg, ${C.deep} 0%, ${C.blue} 60%, ${C.cyan} 100%)`, color: C.white, boxShadow: `0 0 32px ${C.blue}66` }}>
-                    {lang === 'es' ? 'Enviar proyecto →' : 'Send project →'}
-                  </button>
-                </form>
-              </>
-            )}
-          </motion.div>
-        </div>
-      )}
+      <ContactModal open={contactOpen} onClose={closeContact} lang={lang} />
     </div>
   )
 }
