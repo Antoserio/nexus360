@@ -138,6 +138,14 @@
       if (open === wasOpen) return;
       wasOpen = open;
       if (open) {
+        // F15: preseleccionar el servicio de la página si el usuario no ha elegido otro
+        var sel = form.querySelector('select[name=tipo]');
+        // (se compara por palabra clave porque el texto de la opción se traduce en EN)
+        var def = /^\/maigiaapps/.test(location.pathname) ? /interactiv/i
+                : /^\/maigiaav/.test(location.pathname) ? /audiovisual/i : null;
+        if (sel && def && !sel.value) {
+          for (var k = 0; k < sel.options.length; k++) if (def.test(sel.options[k].text)) { sel.selectedIndex = k; break; }
+        }
         opener = document.activeElement;
         prevOverflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';

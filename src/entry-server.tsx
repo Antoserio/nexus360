@@ -14,3 +14,6 @@ export async function render(path: string): Promise<string> {
   for await (const c of prelude) chunks.push(Buffer.from(c))
   return Buffer.concat(chunks).toString('utf8')
 }
+
+// Datos para JSON-LD generado en el pre-render (FAQPage de /avatares).
+export { FAQ } from '@/lib/avataresContent'

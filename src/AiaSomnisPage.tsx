@@ -915,7 +915,9 @@ function StickyRobotSection({ ready, lang }: { ready: boolean; lang: Lang }) {
             maxWidth: 360,
             margin: 0,
           }}>
-            Avatares, agentes y experiencias inteligentes que hablan, ven, reaccionan y conectan el mundo físico con el digital.
+            {lang === 'es'
+              ? 'Avatares, agentes y experiencias inteligentes que hablan, ven, reaccionan y conectan el mundo físico con el digital.'
+              : 'Avatars, agents and intelligent experiences that speak, see, react and connect the physical world with the digital one.'}
           </p>
         </div>
 
@@ -1156,6 +1158,14 @@ export default function AiaSomnisPage() {
   const [heroVisible, setHeroVisible] = useState(false)
   const [activeService, setActiveService] = useState(0)
   const [scrolledPastHero, setScrolledPastHero] = useState(false)
+  // Menú móvil (F14): en móvil no había acceso a Servicios / Equipo / OS
+  const [menuOpen, setMenuOpen] = useState(false)
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false) }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [menuOpen])
   const [contactOpen, setContactOpen] = useState(false)
   const closeContact = useCallback(() => setContactOpen(false), [])
   // Título de la pestaña en el idioma visible (T07 del plan AEO)
@@ -1368,7 +1378,7 @@ export default function AiaSomnisPage() {
             </a>
           </div>
 
-          {/* Mobile: lang toggle + contact button */}
+          {/* Mobile: lang toggle + contact button + menú */}
           <div className="md:hidden flex items-center gap-3">
             <LangToggle lang={lang} setLang={setLang} dim={C.gray} />
             <a href="#contacto" onClick={e => { e.preventDefault(); setContactOpen(true) }}
@@ -1376,8 +1386,42 @@ export default function AiaSomnisPage() {
               style={{ background: `linear-gradient(90deg, ${C.blue}, ${C.deep})`, color: C.white }}>
               {lang === 'es' ? 'Contacto' : 'Contact'}
             </a>
+            <button type="button" onClick={() => setMenuOpen(o => !o)}
+              aria-expanded={menuOpen} aria-controls="menu-movil"
+              aria-label={menuOpen ? (lang === 'es' ? 'Cerrar menú' : 'Close menu') : (lang === 'es' ? 'Abrir menú' : 'Open menu')}
+              className="flex items-center justify-center rounded-full"
+              style={{ width: 44, height: 44, marginRight: -8, background: 'none', border: 'none', color: C.white, cursor: 'pointer' }}>
+              <span aria-hidden="true" style={{ fontSize: 22, lineHeight: 1 }}>{menuOpen ? '✕' : '☰'}</span>
+            </button>
           </div>
         </div>
+        {menuOpen && (
+          <div id="menu-movil" className="md:hidden absolute left-0 right-0 z-20"
+            style={{ top: 64, background: 'rgba(5,7,13,0.97)', borderBottom: `1px solid ${C.border}`, backdropFilter: 'blur(12px)' }}>
+            <ul className="flex flex-col px-6 py-3">
+              {[
+                { href: '#servicios', label: { es: 'Servicios', en: 'Services' }, anchor: 'servicios' },
+                { href: '#equipo', label: { es: 'Equipo', en: 'Team' }, anchor: 'equipo' },
+                { href: '/avatares', label: { es: 'Avatares IA', en: 'AI Avatars' } },
+                { href: '/maigiaapps/', label: { es: 'Instalaciones interactivas', en: 'Interactive installations' } },
+                { href: '/maigiaav/', label: { es: 'Producción audiovisual', en: 'Audiovisual production' } },
+                { href: '/maigiaos/', label: { es: 'MAIGIA OS', en: 'MAIGIA OS' } },
+              ].map(item => (
+                <li key={item.href}>
+                  <a href={item.href}
+                    onClick={e => {
+                      setMenuOpen(false)
+                      if (item.anchor) { e.preventDefault(); document.getElementById(item.anchor)?.scrollIntoView({ behavior: 'smooth' }) }
+                    }}
+                    className="block py-3"
+                    style={{ color: C.white, textDecoration: 'none', fontFamily: "'Syne', sans-serif", fontSize: 16, fontWeight: 600, borderBottom: `1px solid ${C.border}55` }}>
+                    {item.label[lang]}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </nav>
 
       <main id="contenido" tabIndex={-1} className="outline-none">

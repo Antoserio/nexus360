@@ -7,7 +7,15 @@ import { pathToFileURL } from 'node:url'
 
 const dist = path.resolve('dist')
 const ssrEntry = path.resolve('dist-ssr/entry-server.js')
-const { render } = await import(pathToFileURL(ssrEntry).href)
+const { render, FAQ } = await import(pathToFileURL(ssrEntry).href)
+
+// JSON-LD extra por ruta (solo contenido que también es visible en la página)
+const EXTRA_LD = {
+  '/avatares': {
+    '@context': 'https://schema.org', '@type': 'FAQPage', '@id': 'https://maigia.tech/avatares#faq',
+    mainEntity: FAQ.items.map(f => ({ '@type': 'Question', name: f.q.es, acceptedAnswer: { '@type': 'Answer', text: f.a.es } })),
+  },
+}
 
 const ROUTES = [
   ['/', 'index.html'],
@@ -25,7 +33,9 @@ for (const [route, file] of ROUTES) {
     const html = fs.readFileSync(f, 'utf8')
     if (!html.includes('<div id="root"></div>')) throw new Error('no encuentro <div id="root"></div>')
     const body = await render(route)
-    fs.writeFileSync(f, html.replace('<div id="root"></div>', () => `<div id="root">${body}</div>`))
+    let out = html.replace('<div id="root"></div>', () => `<div id="root">${body}</div>`)
+    if (EXTRA_LD[route]) out = out.replace('</head>', () => `<script type="application/ld+json">${JSON.stringify(EXTRA_LD[route])}</script></head>`)
+    fs.writeFileSync(f, out)
     console.log(`prerender ${route} → ${file} (${(body.length / 1024).toFixed(0)} KB)`)
   } catch (e) {
     failed++

@@ -3,7 +3,7 @@ import { GlowCursor, CursorParticles } from './components/GlowCursor'
 import { useLang, type Lang } from '@/lib/lang'
 import { LangToggle } from '@/components/LangToggle'
 import { ContactModal } from '@/components/ContactModal'
-import { OPPORTUNITY, MODULES, DEPLOYMENT, CAPABILITIES, MARKETS, OFFER, type T } from '@/lib/avataresContent'
+import { OPPORTUNITY, MODULES, DEPLOYMENT, CAPABILITIES, MARKETS, OFFER, FAQ, PROOF, type T } from '@/lib/avataresContent'
 
 const C = {
   bg: '#05070D', blue: '#00B8FF', cyan: '#22D3FF',
@@ -631,6 +631,19 @@ export default function AvataresPage() {
         })}
       </section>
 
+      {/* ── PRUEBA: INTERACCIONES REALES ── */}
+      <section className="max-w-6xl mx-auto px-6" style={{ padding: '0 24px 70px' }}>
+        <SectionHead eyebrow={PROOF.eyebrow} title={PROOF.title} lang={lang} />
+        <div className="grid gap-4 sm:grid-cols-3">
+          {PROOF.items.map((it, i) => (
+            <div key={i} style={cardStyle}>
+              <p style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: 'clamp(2rem,4vw,2.6rem)', color: C.cyan, lineHeight: 1, marginBottom: 10 }}>{it.n}</p>
+              <p style={{ color: C.gray, fontSize: '0.92rem', lineHeight: 1.6 }}>{it.t[lang]}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── ARQUITECTURA MODULAR ── */}
       <section className="max-w-6xl mx-auto px-6" style={{ padding: '30px 24px 80px' }}>
         <SectionHead eyebrow={MODULES.eyebrow} title={MODULES.title} lang={lang} />
@@ -757,6 +770,19 @@ export default function AvataresPage() {
           </button>
         </div>
         <p style={{ color: C.border, fontSize: 11, textAlign: 'center', marginTop: 36, letterSpacing: '0.04em' }}>{OFFER.credit[lang]}</p>
+      </section>
+
+      {/* ── PREGUNTAS FRECUENTES ── */}
+      <section id="preguntas" className="max-w-4xl mx-auto px-6" style={{ padding: '40px 24px 40px' }}>
+        <SectionHead eyebrow={FAQ.eyebrow} title={FAQ.title} lang={lang} />
+        <div className="flex flex-col gap-3">
+          {FAQ.items.map((f, i) => (
+            <details key={i} style={{ ...cardStyle, padding: '18px 22px' }}>
+              <summary style={{ cursor: 'pointer', color: C.white, fontWeight: 650, fontSize: '1rem', listStyle: 'revert' }}>{f.q[lang]}</summary>
+              <p style={{ color: C.gray, fontSize: '0.92rem', lineHeight: 1.7, marginTop: 10 }}>{f.a[lang]}</p>
+            </details>
+          ))}
+        </div>
       </section>
 
       {/* ── CIERRE ── */}

@@ -169,3 +169,66 @@ export const OFFER = {
     en: 'Technology developed by IMMERSO LIVE S.L. · Co-produced with Fluge Audiovisuales',
   },
 }
+
+// Preguntas frecuentes (F19 auditoría / ficha Avatares del plan AEO).
+// Respuestas validadas por Antonio Lo Riso (30/10/2026). No incluir aquí
+// capacidades en desarrollo como si estuvieran disponibles.
+export const FAQ = {
+  eyebrow: { es: 'Antes de contratar', en: 'Before you hire' },
+  title: { es: 'Preguntas frecuentes', en: 'Frequently asked questions' },
+  items: [
+    {
+      q: { es: '¿Qué hay que instalar en el evento?', en: 'What needs to be installed at the event?' },
+      a: {
+        es: 'Un tótem o pantalla, micrófono, altavoces y conexión a red. Algunos de nuestros tótems vienen con todo preinstalado y algunos incluyen cámara.',
+        en: 'A totem or screen, a microphone, speakers and a network connection. Some of our totems come with everything pre-installed, and some include a camera.',
+      },
+    },
+    {
+      q: { es: '¿Funciona en un recinto ruidoso?', en: 'Does it work in a noisy venue?' },
+      a: {
+        es: 'Sí. Lo hemos comprobado en ferias y eventos con público, como DES Málaga 2026 y el Tourism Innovation Summit de Sevilla.',
+        en: 'Yes. We have tested it at trade fairs and live events, such as DES Málaga 2026 and the Tourism Innovation Summit in Seville.',
+      },
+    },
+    {
+      q: { es: '¿Funciona sin conexión a internet?', en: 'Does it work without an internet connection?' },
+      a: {
+        es: 'No. Necesita una conexión estable. Estamos desarrollando un modo sin conexión.',
+        en: 'No. It needs a stable connection. We are developing an offline mode.',
+      },
+    },
+    {
+      q: { es: '¿En qué idiomas habla?', en: 'Which languages does it speak?' },
+      a: {
+        es: 'Muchos. Lo hemos probado con público en español, inglés, portugués, ruso, japonés y azerí, entre otros.',
+        en: 'Many. We have tested it with real audiences in Spanish, English, Portuguese, Russian, Japanese and Azerbaijani, among others.',
+      },
+    },
+    {
+      q: { es: '¿Se graban las conversaciones?', en: 'Are conversations recorded?' },
+      a: {
+        es: 'Solo si el proyecto lo requiere: la grabación es opcional y se acuerda con cada cliente.',
+        en: 'Only if the project requires it: recording is optional and agreed with each client.',
+      },
+    },
+    {
+      q: { es: '¿Para qué se usa la cámara?', en: 'What is the camera used for?' },
+      a: {
+        es: 'Es opcional. Puede usarse para identificar a la persona o para que el avatar siga con la mirada a quien le habla.',
+        en: 'It is optional. It can be used to identify the person or to let the avatar follow the speaker with its gaze.',
+      },
+    },
+  ],
+}
+
+// Interacciones medidas en eventos reales (mismas cifras que immerso.live).
+export const PROOF = {
+  eyebrow: { es: 'En eventos reales', en: 'At real events' },
+  title: { es: 'Interacciones con público', en: 'Audience interactions' },
+  items: [
+    { n: '800+', t: { es: 'conversaciones en DES Málaga 2026, con Viky', en: 'conversations at DES Málaga 2026, with Viky' } },
+    { n: '1.200', t: { es: 'interacciones en el Tourism Innovation Summit de Sevilla 2026', en: 'interactions at the Tourism Innovation Summit, Seville 2026' } },
+    { n: '600', t: { es: 'de ellas las atendió Joy sola, recibiendo en la puerta', en: 'of them handled by Joy alone, greeting at the door' } },
+  ],
+}
