@@ -24,10 +24,18 @@ We create images, animations and visual worlds using AI, combining artistic dire
 - Use cases: advertising campaigns, LED screens, video mapping with AI, generative animations, concerts and shows
 - Key features: AI-generated content, video mapping, motion graphics
 
-### 4. Digital Solutions with AI
-We create digital solutions with AI to automate processes, capture leads, improve customer service and create smarter web experiences.
-- Use cases: AI-powered websites, virtual assistants, process automation, CRM integration, 3D web experiences
-- Key features: AI agents, web development, automation
+### 4. MAIGIA OS
+A single presenter directs content, lighting, sound and video with their voice. MAIGIA OS interprets the presenter's requests using information and actions prepared for each project.
+- Use cases: live presentations at events, conferences, product launches
+
+## Pages
+
+- Home: https://maigia.tech/
+- AI Avatars: https://maigia.tech/avatares
+- Interactive installations (MAIGIA Apps): https://maigia.tech/maigiaapps/
+- Audiovisual production: https://maigia.tech/maigiaav/
+- MAIGIA OS: https://maigia.tech/maigiaos/ (English: https://maigia.tech/maigiaos/en/)
+- Projects: https://maigia.tech/proyectos
 
 ## Team
 
@@ -51,4 +59,4 @@ YouTube: https://www.youtube.com/@PacoGramajegirasomnis
 
 ## Keywords
 
-AI agency Spain, agencia inteligencia artificial España, avatar IA, conversational AI avatar, instalaciones interactivas IA, interactive AI installation, producción audiovisual IA, AI audiovisual production, experiencias inmersivas, immersive experiences, videomapping IA, AI video mapping, eventos IA, AI events, MAIGIA, Girasomnis, Immerso
+AI agency Spain, agencia inteligencia artificial España, avatar IA, conversational AI avatar, instalaciones interactivas IA, interactive AI installation, producción audiovisual IA, AI audiovisual production, experiencias inmersivas, immersive experiences, videomapping IA, AI video mapping, eventos IA, AI events, voice-controlled presentations, MAIGIA OS, MAIGIA, Girasomnis, Immerso

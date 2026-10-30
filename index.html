@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- ── Primary SEO ── -->
-    <title>MAIGIA — Artificial Intelligence for Events, Brands and Culture</title>
+    <title>MAIGIA | Inteligencia artificial para eventos, marcas y cultura</title>
     <meta name="description" content="MAIGIA es una agencia de Inteligencia Artificial especializada en avatares IA conversacionales, instalaciones interactivas, producción audiovisual con IA y soluciones digitales para eventos, marcas y cultura. Madrid · Valencia · Barcelona." />
     <meta name="keywords" content="agencia inteligencia artificial, avatar IA, avatares conversacionales, instalaciones interactivas IA, producción audiovisual IA, videomapping IA, experiencias inmersivas, eventos IA, MAIGIA, Girasomnis, Immerso, agencia IA España, AI agency Spain" />
     <meta name="author" content="MAIGIA — Girasomnis × Immerso" />
@@ -35,28 +35,54 @@
     <!-- ── Schema.org JSON-LD (Google + LLMs) ── -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
+  "@context": "https://schema.org",
+  "@graph": [
+    {
       "@type": "Organization",
       "name": "MAIGIA",
-      "alternateName": ["Maigia AI", "MAIGIA Agency"],
-      "url": "https://maigia.tech",
+      "alternateName": [
+        "Maigia AI",
+        "MAIGIA Agency"
+      ],
+      "url": "https://maigia.tech/",
       "logo": "https://maigia.tech/maigia-logo-girasomnis.png",
       "description": "MAIGIA es una AI Agency especializada en experiencias extraordinarias: avatares IA conversacionales, instalaciones interactivas con inteligencia artificial, producción audiovisual generativa y soluciones digitales para eventos, marcas y cultura. Nace de la unión entre Girasomnis, estudio creativo con más de 20 años de experiencia, e Immerso, especialista en desarrollo de software y avatares 3D en tiempo real.",
       "foundingDate": "2024",
       "founders": [
-        { "@type": "Person", "name": "Paco Gramaje" },
-        { "@type": "Person", "name": "Leonardo Bautista" },
-        { "@type": "Person", "name": "Anto Loriso" },
-        { "@type": "Person", "name": "Martin Julià" }
+        {
+          "@type": "Person",
+          "name": "Paco Gramaje"
+        },
+        {
+          "@type": "Person",
+          "name": "Leonardo Bautista"
+        },
+        {
+          "@type": "Person",
+          "name": "Anto Loriso"
+        },
+        {
+          "@type": "Person",
+          "name": "Martin Julià"
+        }
       ],
       "areaServed": {
         "@type": "Country",
         "name": "España"
       },
       "location": [
-        { "@type": "Place", "name": "Madrid, España" },
-        { "@type": "Place", "name": "Valencia, España" },
-        { "@type": "Place", "name": "Barcelona, España" }
+        {
+          "@type": "Place",
+          "name": "Madrid, España"
+        },
+        {
+          "@type": "Place",
+          "name": "Valencia, España"
+        },
+        {
+          "@type": "Place",
+          "name": "Barcelona, España"
+        }
       ],
       "sameAs": [
         "https://www.linkedin.com/company/girasomnis/",
@@ -64,45 +90,79 @@
         "https://www.youtube.com/@PacoGramajegirasomnis",
         "https://immerso.live"
       ],
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Servicios MAIGIA",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Avatares IA Conversacionales",
-              "description": "Avatares de inteligencia artificial para eventos, ferias y espacios físicos. Atienden al público, presentan contenidos, responden preguntas en varios idiomas y captan leads en tiempo real."
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Instalaciones Interactivas con IA",
-              "description": "Experiencias donde el público interactúa con cámaras, pantallas, sensores y sistemas generativos, creando contenido visual en tiempo real."
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Producción Audiovisual con IA",
-              "description": "Imágenes, animaciones y mundos visuales con IA: dirección artística, 3D, motion graphics, videomapping y producción audiovisual profesional."
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Service",
-              "name": "Soluciones Digitales con IA",
-              "description": "Webs con IA, asistentes virtuales, automatización de procesos, CRM integration y experiencias 3D web para empresas."
-            }
-          }
-        ]
+      "@id": "https://maigia.tech/#org"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://maigia.tech/#website",
+      "url": "https://maigia.tech/",
+      "name": "MAIGIA",
+      "inLanguage": [
+        "es",
+        "en"
+      ],
+      "publisher": {
+        "@id": "https://maigia.tech/#org"
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://maigia.tech/avatares#service",
+      "name": "Avatares IA",
+      "url": "https://maigia.tech/avatares",
+      "description": "Avatares conversacionales para eventos, ferias y espacios físicos: atienden al público, presentan contenidos, responden preguntas en varios idiomas y captan leads en tiempo real.",
+      "provider": {
+        "@id": "https://maigia.tech/#org"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "España"
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://maigia.tech/maigiaapps/#service",
+      "name": "Instalaciones interactivas con IA",
+      "url": "https://maigia.tech/maigiaapps/",
+      "description": "Experiencias con IA, cámaras y pantallas en tiempo real en las que el público participa: plano 3D interactivo, AI ART PORTAL y FIREWORKS QR.",
+      "provider": {
+        "@id": "https://maigia.tech/#org"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "España"
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://maigia.tech/maigiaav/#service",
+      "name": "Producción audiovisual con IA",
+      "url": "https://maigia.tech/maigiaav/",
+      "description": "Spots, videoclips y visuales con IA generativa, videomapping, diseño de stands y escenarios LED con dirección creativa.",
+      "provider": {
+        "@id": "https://maigia.tech/#org"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "España"
+      }
+    },
+    {
+      "@type": "Service",
+      "@id": "https://maigia.tech/maigiaos/#service",
+      "name": "MAIGIA OS",
+      "url": "https://maigia.tech/maigiaos/",
+      "description": "Un único presentador dirige contenidos, iluminación, sonido y vídeo con su voz; MAIGIA OS interpreta sus peticiones con información y acciones preparadas para cada proyecto.",
+      "provider": {
+        "@id": "https://maigia.tech/#org"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "España"
       }
     }
+  ]
+}
     </script>
 
     <!-- Sin JavaScript: el HTML ya trae el contenido (pre-render). Se oculta

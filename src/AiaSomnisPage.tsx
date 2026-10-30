@@ -1158,6 +1158,12 @@ export default function AiaSomnisPage() {
   const [scrolledPastHero, setScrolledPastHero] = useState(false)
   const [contactOpen, setContactOpen] = useState(false)
   const closeContact = useCallback(() => setContactOpen(false), [])
+  // Título de la pestaña en el idioma visible (T07 del plan AEO)
+  useEffect(() => {
+    document.title = lang === 'es'
+      ? 'MAIGIA | Inteligencia artificial para eventos, marcas y cultura'
+      : 'MAIGIA | Artificial Intelligence for Events, Brands and Culture'
+  }, [lang])
   const [splineInView, setSplineInView] = useState(false)
   const [splineReady, setSplineReady] = useState(false)
   const [heroQuadrant, setHeroQuadrant] = useState<0|1|2|3|null>(null)
@@ -2123,8 +2129,27 @@ export default function AiaSomnisPage() {
             </a>
           </span>
         </div>
+        <nav aria-label={lang === 'es' ? 'Secciones' : 'Sections'}
+          className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
+          style={{ marginTop: 28 }}>
+          {[
+            { href: '/avatares', label: { es: 'Avatares IA', en: 'AI Avatars' } },
+            { href: '/maigiaapps/', label: { es: 'Instalaciones interactivas', en: 'Interactive installations' } },
+            { href: '/maigiaav/', label: { es: 'Producción audiovisual', en: 'Audiovisual production' } },
+            { href: '/maigiaos/', label: { es: 'MAIGIA OS', en: 'MAIGIA OS' } },
+            { href: '/proyectos', label: { es: 'Proyectos', en: 'Projects' } },
+          ].map(link => (
+            <a key={link.href} href={link.href}
+              className="text-sm transition-colors duration-300"
+              style={{ color: C.gray, textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.color = C.blue)}
+              onMouseLeave={e => (e.currentTarget.style.color = C.gray)}>
+              {link.label[lang]}
+            </a>
+          ))}
+        </nav>
         <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
-          style={{ marginTop: 28, paddingTop: 24, borderTop: `1px solid ${C.border}` }}>
+          style={{ marginTop: 20, paddingTop: 24, borderTop: `1px solid ${C.border}` }}>
           {[
             { href: '/aviso-legal', label: { es: 'Aviso legal', en: 'Legal notice' } },
             { href: '/politica-privacidad', label: { es: 'Política de privacidad', en: 'Privacy policy' } },
